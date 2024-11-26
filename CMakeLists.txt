@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(rtype-server)
+project(server)
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -8,10 +8,11 @@ find_package(Boost REQUIRED)
 
 # Include Boost headers
 include_directories(${Boost_INCLUDE_DIRS})
+include_directories(includes)
 
 # Add source files
-add_executable(rtype-server main.cpp
-        includes/server.hpp)
+add_executable(server main.cpp
+        src/server.cpp)
 
 # Link Boost system and thread libraries
-target_link_libraries(rtype-server ${Boost_LIBRARIES})
+target_link_libraries(server ${Boost_LIBRARIES})
