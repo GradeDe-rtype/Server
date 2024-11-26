@@ -6,7 +6,7 @@
 
 namespace Server {
 
-    TCP::TCP(boost::asio::io_context& io_context, short port)
+    TCP::TCP(boost::asio::io_context& io_context, const short port)
     : acceptor_(io_context, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port))
     {
         start_accept();
@@ -19,11 +19,9 @@ namespace Server {
                 const int client_id = next_client_id_++;
                 clients_[client_id] = socket;
                 std::cout << "Client " << client_id << " connected.\n";
-
                 std::string welcome_message = "Welcome, Client " + std::to_string(client_id) + "!\n";
                 boost::asio::async_write(*socket, boost::asio::buffer(welcome_message),
                     [](const boost::system::error_code&, std::size_t) {});
-
                 start_read(client_id);
             } else {
                 std::cerr << "Accept error: " << error.message() << std::endl;
@@ -37,17 +35,19 @@ namespace Server {
         auto buffer = std::make_shared<std::string>(1024, '\0');
 
         boost::asio::async_read_until(*socket, boost::asio::dynamic_buffer(*buffer), '\n',
-            [this, client_id, buffer](const boost::system::error_code& error, const std::size_t length) {
-                if (!error) {
-                    const std::string message = buffer->substr(0, length);
-                    std::cout << "Client " << client_id << " says: " << message;
-                    send_message(client_id, message);
-                    start_read(client_id); // Continue reading
-                } else {
-                    std::cerr << "Client " << client_id << " disconnected.\n";
-                    clients_.erase(client_id);
-                }
-            });
+    [this, client_id, buffer](const boost::system::error_code& error, const std::size_t length) {
+        if (!error) {
+            std::string raw_message = buffer->substr(0, length);
+            buffer->erase(0, length);
+            std::string sanitized_message = trim(raw_message);
+            std::cout << "Client " << client_id << " says: " << sanitized_message << "\n";
+            command_processor.process_command(client_id, sanitized_message);
+            start_read(client_id); // Continue reading
+        } else {
+            std::cerr << "Client " << client_id << " disconnected.\n";
+            clients_.erase(client_id);
+        }
+    });
     }
 
     void TCP::send_message(int sender_id, const std::string& message) {

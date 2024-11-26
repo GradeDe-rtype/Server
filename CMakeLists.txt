@@ -12,7 +12,9 @@ include_directories(includes)
 
 # Add source files
 add_executable(server main.cpp
-        src/server.cpp)
+        src/server.cpp
+        src/command.cpp
+        src/utils.cpp)
 
 # Link Boost system and thread libraries
 target_link_libraries(server ${Boost_LIBRARIES})

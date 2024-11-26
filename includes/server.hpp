@@ -10,6 +10,8 @@
     #include <memory>
     #include <string>
     #include <unordered_map>
+    #include "command.hpp"
+    #include "utils.hpp"
 
 namespace Server
 {
@@ -24,6 +26,7 @@ namespace Server
             boost::asio::ip::tcp::acceptor acceptor_;
             std::unordered_map<int, std::shared_ptr<boost::asio::ip::tcp::socket>> clients_;
             int next_client_id_ = 0;
+            Command command_processor;
     };
 }
 
