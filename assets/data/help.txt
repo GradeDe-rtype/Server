@@ -1,0 +1,13 @@
+USAGE
+    ./r-type_server [-p port]
+
+DESCRIPTION
+    p    server port
+
+NOTE
+    You can start the r-type_server in 2 differents way:
+        - Just call "./r-type_server", this will strat the client using a default port.
+        - Call it with argument, if you start the server with arguments, it will try to launch the server to the specified port.
+
+WARNING
+    If you start the server using argument, without providing port, the server will not start !

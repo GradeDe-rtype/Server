@@ -1,20 +1,63 @@
-cmake_minimum_required(VERSION 3.10)
-project(server)
+cmake_minimum_required(VERSION 3.16)
+project(RType VERSION 1.0)
 
-set(CMAKE_CXX_STANDARD 11)
+# Set the C++ standard
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+# Define the list of libraries
+set(RTYPE_LIBRARIES
+    papaya
+    rfcArgParser
+)
 
 # Boost ASIO is part of Boost Libraries
 find_package(Boost REQUIRED)
 
+# Include subdirectories for libraries
+foreach(LIB ${RTYPE_LIBRARIES})
+    add_subdirectory(lib/${LIB})
+endforeach()
+
+# Collect all source files
+file(GLOB_RECURSE SOURCES
+    "src/**/**/*.cpp"
+    "src/**/*.cpp"
+    "src/*.cpp"
+)
+
+# Define the main executable
+add_executable(r-type_server ${SOURCES})
+
+# Include directories for the project and libraries
+target_include_directories(r-type_server PRIVATE
+    "include/"
+    "src/Parsing/"
+    "src/Utils/Utils/"
+    "src/Utils/Path/"
+    "src/Server/"
+)
+
 # Include Boost headers
 include_directories(${Boost_INCLUDE_DIRS})
-include_directories(includes)
 
-# Add source files
-add_executable(server main.cpp
-        src/server.cpp
-        src/command.cpp
-        src/utils.cpp)
+foreach(LIB ${RTYPE_LIBRARIES})
+    target_include_directories(r-type_server PRIVATE "lib/${LIB}/include/")
+endforeach()
 
-# Link Boost system and thread libraries
-target_link_libraries(server ${Boost_LIBRARIES})
+# Link the libraries
+target_link_libraries(r-type_server PRIVATE
+    ${RTYPE_LIBRARIES}
+    ${Boost_LIBRARIES}
+)
+
+# Copy the resulting executable to the project root
+add_custom_command(TARGET r-type_server POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:r-type_server> ${CMAKE_SOURCE_DIR}
+)
+
+# Custom clean target
+add_custom_target(fclean
+    COMMAND ${CMAKE_COMMAND} -E remove r-type_server
+    COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_SOURCE_DIR}/r-type_server
+)

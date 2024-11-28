@@ -1,11 +1,17 @@
-//
-// Created by dan13615 on 11/26/24.
-//
+/*
+    Authors:
+    >> Nathan TIROLF - { nathan.tirolf@epitech.eu }
+    >> Daniil STEPANOV - { daniil.stepanov@epitech.eu }
 
-#include "../includes/server.hpp"
+    („• ֊ •„)❤  <  Have a good day !
+    --U-----U------------------------
+*/
+
+/*  ---- INCLUDES ---- */
+#include "Server.hpp"
+
 
 namespace Server {
-
     TCP::TCP(boost::asio::io_context& io_context, const short port)
     : acceptor_(io_context, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port))
     {
@@ -39,7 +45,7 @@ namespace Server {
         if (!error) {
             std::string raw_message = buffer->substr(0, length);
             buffer->erase(0, length);
-            std::string sanitized_message = trim(raw_message);
+            std::string sanitized_message = RType::Utils::trim(raw_message);
             std::cout << "Client " << client_id << " says: " << sanitized_message << "\n";
             command_processor.process_command(client_id, sanitized_message);
             start_read(client_id); // Continue reading

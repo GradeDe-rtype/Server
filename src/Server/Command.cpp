@@ -1,8 +1,13 @@
-//
-// Created by dan13615 on 11/26/24.
-//
+/*
+    Authors:
+    >> Nathan TIROLF - { nathan.tirolf@epitech.eu }
+    >> Daniil STEPANOV - { daniil.stepanov@epitech.eu }
 
-#include "../includes/command.hpp"
+    („• ֊ •„)❤  <  Have a good day !
+    --U-----U------------------------
+*/
+
+#include "Command.hpp"
 
 namespace Server {
 
@@ -13,8 +18,8 @@ namespace Server {
 
     void Command::process_command(int client_id, const std::string& message) {
         const auto space_pos = message.find(' ');
-        std::string command = normalize(message.substr(0, space_pos));
-        std::string args = trim((space_pos != std::string::npos) ? message.substr(space_pos + 1) : "");
+        std::string command = RType::Utils::normalize(message.substr(0, space_pos));
+        std::string args = RType::Utils::trim((space_pos != std::string::npos) ? message.substr(space_pos + 1) : "");
 
         auto it = commands_.find(command);
         if (it != commands_.end()) {
