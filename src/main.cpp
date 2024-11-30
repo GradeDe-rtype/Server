@@ -21,6 +21,7 @@ int main(int argc, char **argv)
 
         boost::asio::io_context io_context;
         Server::TCP server(io_context, parsing.getPort());
+        Server::Command command(server);
         io_context.run();
 
     } catch (const RType::Parsing::ParsingError &e) {
