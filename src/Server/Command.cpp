@@ -40,6 +40,7 @@ namespace Server {
 
     void Command::stop(const int client_id, const std::string& args) {
         std::cout << "Client " << client_id << " stopped.\n";
+        tcp_.setRunning(false);
     }
 
     void Command::send(const int client_id, const std::string& args) {

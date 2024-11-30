@@ -33,6 +33,14 @@ namespace Server
 
             ~TCP();
 
+            bool getRunning() {
+                return is_running;
+            }
+
+            void setRunning(bool running) {
+                is_running = running;
+            }
+
         private:
             void start_accept();
             void start_read(int client_id);
@@ -40,6 +48,7 @@ namespace Server
             std::unordered_map<int, std::shared_ptr<boost::asio::ip::tcp::socket>> clients_;
             int next_client_id_ = 0;
             Command* command_processor;
+            bool is_running = true;
     };
 }
 
