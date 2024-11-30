@@ -9,6 +9,7 @@
 vgcore*
 
 cmake-build-default
+cmake-build-debug
 build
 
 a.out

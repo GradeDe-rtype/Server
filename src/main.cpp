@@ -7,9 +7,9 @@
 */
 
 /*  ---- INCLUDES ---- */
-#include "RType.hpp"
-#include "Parsing.hpp"
-#include "Server.hpp"
+#include <RType.hpp>
+#include <Parsing.hpp>
+#include <Server.hpp>
 
 /*  ---- FUNCTION ---- */
 int main(int argc, char **argv)
@@ -21,7 +21,19 @@ int main(int argc, char **argv)
 
         boost::asio::io_context io_context;
         Server::TCP server(io_context, parsing.getPort());
-        io_context.run();
+        Server::Command command(server);
+        std::cout << "Server starting..." << std::endl;
+        std::thread io_thread([&io_context]()
+        {
+            io_context.run();
+        });
+        std::cout << "Server started." << std::endl;
+        while (server.getRunning()) {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+        io_context.stop();
+        io_thread.join();
+        std::cout << "Server stopped." << std::endl;
 
     } catch (const RType::Parsing::ParsingError &e) {
         std::cerr << "Error: " << e.what() << std::endl;

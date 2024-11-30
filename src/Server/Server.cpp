@@ -8,14 +8,18 @@
 */
 
 /*  ---- INCLUDES ---- */
-#include "Server.hpp"
-
+#include <Server.hpp>
 
 namespace Server {
     TCP::TCP(boost::asio::io_context& io_context, const short port)
-    : acceptor_(io_context, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port))
+    : acceptor_(io_context, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port)),
+    command_processor(new Command(*this))
     {
         start_accept();
+    }
+
+    TCP::~TCP() {
+        delete command_processor;
     }
 
     void TCP::start_accept() {
@@ -47,7 +51,7 @@ namespace Server {
             buffer->erase(0, length);
             std::string sanitized_message = RType::Utils::trim(raw_message);
             std::cout << "Client " << client_id << " says: " << sanitized_message << "\n";
-            command_processor.process_command(client_id, sanitized_message);
+            command_processor->process_command(client_id, sanitized_message);
             start_read(client_id); // Continue reading
         } else {
             std::cerr << "Client " << client_id << " disconnected.\n";
@@ -56,12 +60,13 @@ namespace Server {
     });
     }
 
-    void TCP::send_message(int sender_id, const std::string& message) {
-        for (const auto& [client_id, socket] : clients_) {
-            if (client_id != sender_id) {
-                std::string forward_message = "Client " + std::to_string(sender_id) + ": " + message;
-                boost::asio::async_write(*socket, boost::asio::buffer(forward_message),
+    void TCP::send_message(int client_id, int receiver_id, const std::string& message) {
+        for (const auto& [id, socket] : clients_) {
+            if (id == receiver_id) {
+                std::string featured_message = "Client " + std::to_string(client_id) + " says: " + message + "\n";
+                boost::asio::async_write(*socket, boost::asio::buffer(featured_message),
                     [](const boost::system::error_code&, std::size_t) {});
+                return;
             }
         }
     }
