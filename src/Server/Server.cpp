@@ -70,4 +70,13 @@ namespace Server {
             }
         }
     }
+
+    void TCP::send_broadcast(const std::string& message)
+    {
+        for (const auto& [id, socket] : clients_) {
+            std::string featured_message = message + "\n";
+            boost::asio::async_write(*socket, boost::asio::buffer(featured_message),
+                [](const boost::system::error_code&, std::size_t) {});
+        }
+    }
 }
