@@ -27,7 +27,7 @@ namespace Server
         public:
             TCP(boost::asio::io_context& io_context, short port);
             void send_message(int client_id, int receiver_id, const std::string& message);
-            void TCP::send_broadcast(const std::string& message);
+            void send_broadcast(const std::string& message);
             std::unordered_map<int, std::shared_ptr<boost::asio::ip::tcp::socket>> get_clients(void) {
                 return clients_;
             }
