@@ -23,30 +23,6 @@ namespace Server {
         delete command_processor;
     }
 
-    Player& TCP::get_player(const int client_id) {
-        for (auto& player : players_) {
-            if (player.getId() == client_id) {
-                return player;
-            }
-        }
-        throw std::runtime_error("Player not found");
-    }
-
-    bool TCP::player_exists(const int client_id) {
-        for (const auto& player : players_) {
-            if (player.getId() == client_id) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    void TCP::remove_player(const int client_id) {
-        players_.erase(std::ranges::remove_if(players_,
-            [client_id](const Player& player) { return player.getId() == client_id; }).begin(),
-            players_.end());
-    }
-
     void TCP::start_accept() {
         auto socket = std::make_shared<boost::asio::ip::tcp::socket>(acceptor_.get_executor());
         acceptor_.async_accept(*socket, [this, socket](const boost::system::error_code& error) {
@@ -58,7 +34,10 @@ namespace Server {
                 boost::asio::async_write(*socket, boost::asio::buffer(welcome_message),
                     [](const boost::system::error_code&, std::size_t) {});
                 start_read(player);
-                send_broadcast("connect {player_id:" + std::to_string(player.getId()) + "}", {player.getId()});
+                std::unordered_map<std::string, std::string> data;
+                data["player_id"] = std::to_string(player.getId());
+                data["color"] = "#FF0000";
+                send_broadcast("connect " + rfcArgParser::CreateObject(data), {player.getId()});
             } else {
                 std::cerr << "Accept error: " << error.message() << std::endl;
             }

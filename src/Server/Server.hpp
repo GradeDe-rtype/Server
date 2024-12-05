@@ -14,6 +14,7 @@
     #include <RType.hpp>
     #include <Utils.hpp>
     #include <Command.hpp>
+    #include "rfcArgParser.hpp"
 
     /*  ---- CLASS ---- */
 
