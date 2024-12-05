@@ -40,6 +40,7 @@ namespace Server {
         int pos_x_;
         int pos_y_;
         int color_;
+        bool have_joined_ = false;
         std::shared_ptr<boost::asio::ip::tcp::socket> socket_;
     };
 }

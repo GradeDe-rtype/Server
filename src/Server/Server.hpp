@@ -17,8 +17,6 @@
 
     /*  ---- CLASS ---- */
 
-
-
 namespace Server
 {
     class Command;
