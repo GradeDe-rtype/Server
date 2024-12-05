@@ -1,8 +1,9 @@
 /*
-** EPITECH PROJECT, 2024
-** rfc-arg-parser-library
-** File description:
-** rfcArgParser_private
+    Authors:
+    >> Nathan TIROLF - { nathan.tirolf@epitech.eu }
+
+    („• ֊ •„)❤  <  Have a good day !
+    --U-----U------------------------
 */
 
 #include "rfcArgParser.hpp"
@@ -12,7 +13,7 @@ std::vector<std::string> rfcArgParser::ParseArray(std::string str)
     std::vector<std::string> result;
     std::string tmp = _keep(str, '[', ']');
     if (tmp.size() == 0)
-        throw rfcArgParser::Error("Invalid array format, missing brackets", "rfcArgParser::ParseArray");
+        throw rfcArgParser::Error("Invalid array format, missing \"[]\" or empty string", "rfcArgParser::ParseArray");
 
     tmp = tmp.substr(1, tmp.size() - 2);
     result = _split(tmp, ';');
@@ -23,15 +24,28 @@ std::unordered_map<std::string, std::string> rfcArgParser::ParseObject(std::stri
 {
     std::unordered_map<std::string, std::string> result;
     std::string tmp = _keep(str, '{', '}');
-    tmp = tmp.substr(1, tmp.size() - 2);
     if (tmp.size() == 0)
-        throw rfcArgParser::Error("Invalid object format, missing brackets", "rfcArgParser::ParseObject");
+        throw rfcArgParser::Error("Invalid object format, missing \"{}\" or empty string", "rfcArgParser::ParseObject");
     std::vector<std::string> tmpArray = _split(tmp, ',');
 
     for (std::string s : tmpArray) {
+        std::cerr << "s: {" << s << "}" << std::endl;
         std::vector<std::string> tmpPair = _split(s, ':');
         result[tmpPair[0]] = tmpPair[1];
     }
+    return result;
+}
+
+std::string rfcArgParser::CreateObject(std::unordered_map<std::string, std::string> obj)
+{
+    if (obj.size() == 0)
+        throw rfcArgParser::Error("Invalid object format, empty object", "rfcArgParser::CreateObject");
+    std::string result = "{";
+    for (auto it = obj.begin(); it != obj.end(); it++) {
+        result += it->first + ":" + it->second + ",";
+    }
+    result.pop_back();
+    result += "}";
     return result;
 }
 
@@ -60,6 +74,7 @@ std::string rfcArgParser::_keep(std::string str, char start, char end)
     for (char c : str) {
         if (c == start) {
             keep = true;
+            continue;
         } else if (c == end) {
             keep = false;
         }

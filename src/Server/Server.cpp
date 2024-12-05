@@ -33,7 +33,10 @@ namespace Server {
                 boost::asio::async_write(*socket, boost::asio::buffer(welcome_message),
                     [](const boost::system::error_code&, std::size_t) {});
                 start_read(client_id);
-                send_broadcast("connect {player_id:" + std::to_string(client_id) + "}", {client_id});
+                std::unordered_map<std::string, std::string> data;
+                data["player_id"] = std::to_string(client_id);
+                data["color"] = "#FF0000";
+                send_broadcast("connect " + rfcArgParser::CreateObject(data), {client_id});
             } else {
                 std::cerr << "Accept error: " << error.message() << std::endl;
             }
