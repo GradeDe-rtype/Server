@@ -118,5 +118,10 @@ namespace Server {
         Player player = tcp_.get_player(client_id);
         player.setPosX(x);
         player.setPosY(y);
+
+        std::string temporary = rfcArgParser::CreateObject(obj);
+        const std::string message = "p_position " + std::to_string(client_id) + " " + temporary + "\n";
+
+        tcp_.send_broadcast(message, {client_id});
     }
 }
