@@ -29,7 +29,6 @@ std::unordered_map<std::string, std::string> rfcArgParser::ParseObject(std::stri
     std::vector<std::string> tmpArray = _split(tmp, ',');
 
     for (std::string s : tmpArray) {
-        std::cerr << "s: {" << s << "}" << std::endl;
         std::vector<std::string> tmpPair = _split(s, ':');
         result[tmpPair[0]] = tmpPair[1];
     }

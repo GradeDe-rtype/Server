@@ -23,6 +23,30 @@ namespace Server {
         delete command_processor;
     }
 
+    void TCP::remove_player(int client_id) {
+        players_.erase(std::remove_if(players_.begin(), players_.end(),
+            [client_id](const Player& player) {
+                return player.getId() == client_id;
+            }), players_.end());
+    }
+
+    Player& TCP::get_player(int client_id) {
+        for (auto& player : players_) {
+            if (player.getId() == client_id)
+                return player;
+        }
+        throw std::runtime_error("Player not found.");
+    }
+
+    bool TCP::player_exists(int client_id) {
+        for (const auto& player : players_) {
+            if (player.getId() == client_id)
+                return true;
+        }
+        return false;
+
+    }
+
     void TCP::start_accept() {
         auto socket = std::make_shared<boost::asio::ip::tcp::socket>(acceptor_.get_executor());
         acceptor_.async_accept(*socket, [this, socket](const boost::system::error_code& error) {

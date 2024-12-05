@@ -30,7 +30,7 @@ namespace Server
             void send_broadcast(const std::string& message, const std::vector<int>& excluded_clients = {});
             Player& get_player(int client_id);
             void remove_player(int client_id);
-            std::vector<Player>& get_players() { return players_; };
+            std::vector<Player>& get_players() { return players_; }
             bool player_exists(int client_id);
 
             ~TCP();
