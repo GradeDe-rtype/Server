@@ -14,23 +14,24 @@
     #include <RType.hpp>
     #include <Utils.hpp>
     #include <Command.hpp>
+    #include "rfcArgParser.hpp"
 
     /*  ---- CLASS ---- */
-
-
 
 namespace Server
 {
     class Command;
+    class Player;
     class TCP
     {
         public:
             TCP(boost::asio::io_context& io_context, short port);
             void send_message(int client_id, int receiver_id, const std::string& message);
             void send_broadcast(const std::string& message, const std::vector<int>& excluded_clients = {});
-            std::unordered_map<int, std::shared_ptr<boost::asio::ip::tcp::socket>> get_clients(void) {
-                return clients_;
-            }
+            Player& get_player(int client_id);
+            void remove_player(int client_id);
+            std::vector<Player>& get_players() { return players_; }
+            bool player_exists(int client_id);
 
             ~TCP();
 
@@ -44,10 +45,10 @@ namespace Server
 
         private:
             void start_accept();
-            void start_read(int client_id);
+            void start_read(Player player);
             boost::asio::ip::tcp::acceptor acceptor_;
-            std::unordered_map<int, std::shared_ptr<boost::asio::ip::tcp::socket>> clients_;
             int next_client_id_ = 0;
+            std::vector<Player> players_;
             Command* command_processor;
             bool is_running = true;
     };

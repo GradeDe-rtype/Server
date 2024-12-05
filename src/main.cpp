@@ -21,10 +21,8 @@ int main(int argc, char **argv)
 
         boost::asio::io_context io_context;
         Server::TCP server(io_context, parsing.getPort());
-        Server::Command command(server);
         std::cout << "Server starting..." << std::endl;
-        std::thread io_thread([&io_context]()
-        {
+        std::thread io_thread([&io_context]() {
             io_context.run();
         });
         std::cout << "Server started." << std::endl;

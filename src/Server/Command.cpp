@@ -8,6 +8,7 @@
 */
 
 #include <Command.hpp>
+#include <Player.hpp>
 
 namespace Server {
 
@@ -16,6 +17,7 @@ namespace Server {
         commands_["send"] = [this](int client_id, const std::string& args) { send(client_id, args); };
         commands_["stop"] = [this](int client_id, const std::string& args) { stop(client_id, args); };
         commands_["broadcast"] = [this](int client_id, const std::string& args) { broadcast(client_id, args); };
+        commands_["position"] = [this](int client_id, const std::string& args) { position(client_id, args); };
     }
 
     void Command::process_command(int client_id, const std::string& message) {
@@ -64,8 +66,8 @@ namespace Server {
             return;
         }
         const int id = std::stoi(words[0]);
-        if (tcp_.get_clients().find(id) == tcp_.get_clients().end()) {
-            std::cerr << "Client " << id << " not found.\n";
+        if (!tcp_.player_exists(id)) {
+            std::cerr << "Client " << id << " does not exist.\n";
             return;
         }
         std::string msg;
@@ -79,8 +81,7 @@ namespace Server {
         tcp_.send_message(client_id, id, message);
     }
 
-    void Command::broadcast(int client_id, const std::string& args)
-    {
+    void Command::broadcast(int client_id, const std::string& args ){
         UNUSED(client_id);
         std::vector<std::string> words;
         std::istringstream iss(args);
@@ -101,4 +102,26 @@ namespace Server {
         }
         tcp_.send_broadcast(message, excluded_clients);
     }
-};
+
+    void Command::position(int client_id, const std::string& args) {
+        std::unordered_map<std::string, std::string> obj = rfcArgParser::ParseObject(args);
+        if (!obj.contains("x") || !obj.contains("y")) {
+            std::cerr << "Usage: position {\"x\": <x>, \"y\": <y>}\n";
+            return;
+        }
+        if (!RType::Utils::isNumber(obj["x"]) || !RType::Utils::isNumber(obj["y"])) {
+            std::cerr << "Invalid x or y value.\n";
+            return;
+        }
+        const int x = std::stoi(obj["x"]);
+        const int y = std::stoi(obj["y"]);
+        Player player = tcp_.get_player(client_id);
+        player.setPosX(x);
+        player.setPosY(y);
+
+        std::string temporary = rfcArgParser::CreateObject(obj);
+        const std::string message = "p_position " + std::to_string(client_id) + " " + temporary + "\n";
+
+        tcp_.send_broadcast(message, {client_id});
+    }
+}
