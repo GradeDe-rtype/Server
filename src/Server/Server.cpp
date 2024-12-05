@@ -33,6 +33,7 @@ namespace Server {
                 boost::asio::async_write(*socket, boost::asio::buffer(welcome_message),
                     [](const boost::system::error_code&, std::size_t) {});
                 start_read(client_id);
+                send_broadcast("connect {player_id:" + std::to_string(client_id) + "}", {client_id});
             } else {
                 std::cerr << "Accept error: " << error.message() << std::endl;
             }
@@ -56,6 +57,7 @@ namespace Server {
         } else {
             std::cerr << "Client " << client_id << " disconnected.\n";
             clients_.erase(client_id);
+            send_broadcast("disconnect " + std::to_string(client_id), {client_id});
         }
     });
     }
@@ -68,6 +70,16 @@ namespace Server {
                     [](const boost::system::error_code&, std::size_t) {});
                 return;
             }
+        }
+    }
+
+    void TCP::send_broadcast(const std::string& message, const std::vector<int>& excluded_clients) {
+        for (const auto& [id, socket] : clients_) {
+            if (std::find(excluded_clients.begin(), excluded_clients.end(), id) != excluded_clients.end())
+                continue;
+            std::string featured_message = message + "\n";
+            boost::asio::async_write(*socket, boost::asio::buffer(featured_message),
+                [](const boost::system::error_code&, std::size_t) {});
         }
     }
 }

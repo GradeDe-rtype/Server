@@ -15,6 +15,7 @@ namespace Server {
         commands_["start"] = [this](int client_id, const std::string& args) { start(client_id, args); };
         commands_["send"] = [this](int client_id, const std::string& args) { send(client_id, args); };
         commands_["stop"] = [this](int client_id, const std::string& args) { stop(client_id, args); };
+        commands_["broadcast"] = [this](int client_id, const std::string& args) { broadcast(client_id, args); };
     }
 
     void Command::process_command(int client_id, const std::string& message) {
@@ -76,5 +77,28 @@ namespace Server {
 
         const std::string message = msg + "\n";
         tcp_.send_message(client_id, id, message);
+    }
+
+    void Command::broadcast(int client_id, const std::string& args)
+    {
+        UNUSED(client_id);
+        std::vector<std::string> words;
+        std::istringstream iss(args);
+        std::string word;
+        std::string message;
+        while (iss >> word) {
+            words.push_back(word);
+        }
+        std::vector<int> excluded_clients;
+        for (const auto& elem : words) {
+            if (RType::Utils::isNumber(elem)) {
+                excluded_clients.push_back(std::stoi(elem));
+            } else {
+                if (!message.empty())
+                    message += " ";
+                message += elem;
+            }
+        }
+        tcp_.send_broadcast(message, excluded_clients);
     }
 };
