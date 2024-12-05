@@ -82,6 +82,23 @@ namespace Server {
     void Command::broadcast(int client_id, const std::string& args)
     {
         UNUSED(client_id);
-        tcp_.send_broadcast(args);
+        std::vector<std::string> words;
+        std::istringstream iss(args);
+        std::string word;
+        std::string message;
+        while (iss >> word) {
+            words.push_back(word);
+        }
+        std::vector<int> excluded_clients;
+        for (const auto& elem : words) {
+            if (RType::Utils::isNumber(elem)) {
+                excluded_clients.push_back(std::stoi(elem));
+            } else {
+                if (!message.empty())
+                    message += " ";
+                message += elem;
+            }
+        }
+        tcp_.send_broadcast(message, excluded_clients);
     }
 };
