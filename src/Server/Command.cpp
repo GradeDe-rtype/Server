@@ -64,8 +64,8 @@ namespace Server {
             return;
         }
         const int id = std::stoi(words[0]);
-        if (tcp_.get_clients().find(id) == tcp_.get_clients().end()) {
-            std::cerr << "Client " << id << " not found.\n";
+        if (!tcp_.player_exists(id)) {
+            std::cerr << "Client " << id << " does not exist.\n";
             return;
         }
         std::string msg;
