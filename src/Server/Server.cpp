@@ -51,17 +51,25 @@ namespace Server {
         auto socket = std::make_shared<boost::asio::ip::tcp::socket>(acceptor_.get_executor());
         acceptor_.async_accept(*socket, [this, socket](const boost::system::error_code& error) {
             if (!error) {
-                Player player(next_client_id_++, socket);
-                players_.push_back(player);
-                std::cout << "Client " << player.getId() << " connected.\n";
-                std::string welcome_message = "Welcome, Client " + std::to_string(player.getId()) + "!\n";
+                Player new_player(next_client_id_++, socket);
+                players_.push_back(new_player);
+                std::cout << "Client " << new_player.getId() << " connected.\n";
+                std::string welcome_message = "Welcome, Client " + std::to_string(new_player.getId()) + "!\n";
                 boost::asio::async_write(*socket, boost::asio::buffer(welcome_message),
                     [](const boost::system::error_code&, std::size_t) {});
-                start_read(player);
+                start_read(new_player);
                 std::unordered_map<std::string, std::string> data;
-                data["player_id"] = std::to_string(player.getId());
+                data["player_id"] = std::to_string(new_player.getId());
                 data["color"] = "#FF0000";
-                send_broadcast("connect " + rfcArgParser::CreateObject(data), {player.getId()});
+                send_broadcast("connect " + rfcArgParser::CreateObject(data), {new_player.getId()});
+                for (const auto& player : players_) {
+                    if (player.getId() == new_player.getId())
+                        continue;
+                    std::unordered_map<std::string, std::string> data;
+                    data["player_id"] = std::to_string(player.getId());
+                    data["color"] = "#FF0000";
+                    send_message(-1, new_player.getId(), "connect " + rfcArgParser::CreateObject(data));
+                }
             } else {
                 std::cerr << "Accept error: " << error.message() << std::endl;
             }
@@ -97,7 +105,7 @@ namespace Server {
             const int id = player.getId();
             const auto socket = player.getSocket();
             if (id == receiver_id) {
-                std::string featured_message = "Client " + std::to_string(client_id) + " says: " + message + "\n";
+                std::string featured_message = (client_id != -1 ? "Client " + std::to_string(client_id) + " says: " : "") + message + "\n";
                 boost::asio::async_write(*socket, boost::asio::buffer(featured_message),
                     [](const boost::system::error_code&, std::size_t) {});
                 return;
