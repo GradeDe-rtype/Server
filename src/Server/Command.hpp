@@ -17,23 +17,15 @@
 
 #define UNUSED(x) (void)(x)
 
-namespace Server {
-    class TCP;
-}
-
 namespace Server
 {
+    class TCP;
     class Command
     {
 
         public:
             Command(TCP& tcp);
             void process_command(int client_id, const std::string& message);
-
-            struct DataPacket {
-                char command[16];
-                char *args;
-            };
 
         private:
             void start(int client_id, const std::string& args);

@@ -61,14 +61,21 @@ namespace Server {
                 std::unordered_map<std::string, std::string> data;
                 data["player_id"] = std::to_string(new_player.getId());
                 data["color"] = "#FF0000";
-                send_broadcast("connect " + rfcArgParser::CreateObject(data), {new_player.getId()});
+                DataPacket packet{};
+                strncpy(packet.command, "connect", sizeof(packet.command) - 1);
+                packet.command[sizeof(packet.command) - 1] = '\0';
+                packet.args = rfcArgParser::CreateObject(data).data();
+                send_broadcast(packet, {new_player.getId()});
                 for (const auto& player : players_) {
                     if (player.getId() == new_player.getId())
                         continue;
                     std::unordered_map<std::string, std::string> data;
                     data["player_id"] = std::to_string(player.getId());
                     data["color"] = "#FF0000";
-                    send_message(-1, new_player.getId(), "connect " + rfcArgParser::CreateObject(data));
+                    strncpy(packet.command, "connect", sizeof(packet.command) - 1);
+                    packet.command[sizeof(packet.command) - 1] = '\0';
+                    packet.args = rfcArgParser::CreateObject(data).data();
+                    send_message(-1, new_player.getId(), packet);
                 }
             } else {
                 std::cerr << "Accept error: " << error.message() << std::endl;
@@ -94,12 +101,16 @@ namespace Server {
         } else {
             std::cerr << "Client " << client_id << " disconnected.\n";
             remove_player(client_id);
-            send_broadcast("disconnect " + std::to_string(client_id), {client_id});
+            DataPacket packet{};
+            packet.command[sizeof(packet.command) - 1] = '\0';
+            strncpy(packet.command, "disconnect", sizeof(packet.command) - 1);
+            packet.args = std::to_string(client_id).data();
+            send_broadcast(packet, {client_id});
         }
     });
     }
 
-    void TCP::send_message(int client_id, int receiver_id, Command::DataPacket data) {
+    void TCP::send_message(int client_id, int receiver_id, DataPacket data) {
         for (const auto &player : players_) {
             const int id = player.getId();
             const auto socket = player.getSocket();
@@ -121,7 +132,7 @@ namespace Server {
         }
     }
 
-    void TCP::send_broadcast(Command::DataPacket data, const std::vector<int>& excluded_clients) {
+    void TCP::send_broadcast(DataPacket data, const std::vector<int>& excluded_clients) {
         for (const auto& player : players_) {
             const int id = player.getId();
             const auto socket = player.getSocket();
