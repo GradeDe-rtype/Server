@@ -70,18 +70,21 @@ namespace Server {
             std::cerr << "Client " << id << " does not exist.\n";
             return;
         }
+        DataPacket data{};
+        strncpy(data.command, "send", sizeof(data.command) - 1);
+        data.command[sizeof(data.command) - 1] = '\0';
         std::string msg;
         for (size_t i = 1; i < words.size(); ++i) {
             if (i > 1)
                 msg += " ";
             msg += words[i];
         }
+        data.args = (msg + "\n").data();
 
-        const std::string message = msg + "\n";
-        tcp_.send_message(client_id, id, message);
+        tcp_.send_message(client_id, id, data);
     }
 
-    void Command::broadcast(int client_id, const std::string& args ){
+    void Command::broadcast(int client_id, const std::string& args) {
         UNUSED(client_id);
         std::vector<std::string> words;
         std::istringstream iss(args);
@@ -91,16 +94,23 @@ namespace Server {
             words.push_back(word);
         }
         std::vector<int> excluded_clients;
+        DataPacket data{};
         for (const auto& elem : words) {
             if (RType::Utils::isNumber(elem)) {
                 excluded_clients.push_back(std::stoi(elem));
             } else {
+                if (word == "broadcast") {
+                    strncpy(data.command, elem.c_str(), sizeof(data.command) - 1);
+                    data.command[sizeof(data.command) - 1] = '\0';
+                    continue;
+                }
                 if (!message.empty())
                     message += " ";
                 message += elem;
             }
         }
-        tcp_.send_broadcast(message, excluded_clients);
+        data.args = (message + "\n").data();
+        tcp_.send_broadcast(data, excluded_clients);
     }
 
     void Command::position(int client_id, const std::string& args) {
@@ -120,8 +130,12 @@ namespace Server {
         player.setPosY(y);
 
         std::string temporary = rfcArgParser::CreateObject(obj);
-        const std::string message = "p_position " + std::to_string(client_id) + " " + temporary + "\n";
+        temporary = std::to_string(client_id) + " " + temporary + "\n";
+        DataPacket data{};
+        strncpy(data.command, "p_position", sizeof(data.command) - 1);
+        data.command[sizeof(data.command) - 1] = '\0';
+        data.args = temporary.data();
 
-        tcp_.send_broadcast(message, {client_id});
+        tcp_.send_broadcast(data, {client_id});
     }
 }

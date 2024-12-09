@@ -99,29 +99,44 @@ namespace Server {
     });
     }
 
-    void TCP::send_message(int client_id, int receiver_id, const std::string& message) {
-
-        for (const auto & player : players_) {
+    void TCP::send_message(int client_id, int receiver_id, Command::DataPacket data) {
+        for (const auto &player : players_) {
             const int id = player.getId();
             const auto socket = player.getSocket();
             if (id == receiver_id) {
-                std::string featured_message = (client_id != -1 ? "Client " + std::to_string(client_id) + " says: " : "") + message + "\n";
-                boost::asio::async_write(*socket, boost::asio::buffer(featured_message),
-                    [](const boost::system::error_code&, std::size_t) {});
+                // Serialize the data packet into a buffer
+                boost::asio::async_write(*socket,
+                    boost::asio::buffer(&data, sizeof(data)),
+                    [client_id, receiver_id](const boost::system::error_code& ec, std::size_t bytes_transferred) {
+                        if (!ec) {
+                            std::cout << "Message sent from client " << client_id
+                                      << " to receiver " << receiver_id
+                                      << ", bytes: " << bytes_transferred << std::endl;
+                        } else {
+                            std::cerr << "Error sending message: " << ec.message() << std::endl;
+                        }
+                    });
                 return;
             }
         }
     }
 
-    void TCP::send_broadcast(const std::string& message, const std::vector<int>& excluded_clients) {
+    void TCP::send_broadcast(Command::DataPacket data, const std::vector<int>& excluded_clients) {
         for (const auto& player : players_) {
             const int id = player.getId();
             const auto socket = player.getSocket();
             if (std::find(excluded_clients.begin(), excluded_clients.end(), id) != excluded_clients.end())
                 continue;
-            std::string featured_message = message + "\n";
-            boost::asio::async_write(*socket, boost::asio::buffer(featured_message),
-                [](const boost::system::error_code&, std::size_t) {});
+            boost::asio::async_write(*socket,
+                    boost::asio::buffer(&data, sizeof(data)),
+                    [](const boost::system::error_code& ec, std::size_t bytes_transferred) {
+                        if (!ec) {
+                            std::cout << "Broadcast sent, bytes: " << bytes_transferred << std::endl;
+                        } else {
+                            std::cerr << "Error sending broadcast: " << ec.message() << std::endl;
+                        }
+                    });
+            return;
         }
     }
 }
