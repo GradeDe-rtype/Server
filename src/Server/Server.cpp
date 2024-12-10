@@ -29,7 +29,7 @@ namespace Server
                        players_.end());
     }
 
-    Player &TCP::get_player(int client_id)
+    Player &TCP::get_player(const int client_id)
     {
         for (auto &player : players_)
         {
@@ -39,7 +39,7 @@ namespace Server
         throw std::runtime_error("Player not found.");
     }
 
-    bool TCP::player_exists(int client_id)
+    bool TCP::player_exists(const int client_id)
     {
         for (const auto &player : players_)
         {
@@ -59,20 +59,18 @@ namespace Server
                 if (!error)
                 {
                     Player new_player(next_client_id_++, socket);
+                    std::unordered_map<std::string, std::string> data;
+                    DataPacket packet{};
+
                     players_.push_back(new_player);
                     std::cout << "Client " << new_player.getId() << " connected.\n";
                     std::string welcome_message = "Welcome, Client " + std::to_string(new_player.getId()) + "!\n";
                     boost::asio::async_write(*socket, boost::asio::buffer(welcome_message),
                                              [](const boost::system::error_code &, std::size_t) {});
                     start_read(new_player);
-                    std::unordered_map<std::string, std::string> data;
                     data["player_id"] = std::to_string(new_player.getId());
                     data["color"] = "#FF0000";
-                    DataPacket packet{};
-                    strncpy(packet.command, "connect", sizeof(packet.command) - 1);
-                    packet.command[sizeof(packet.command) - 1] = '\0';
-                    strncpy(packet.args, rfcArgParser::CreateObject(data).c_str(), sizeof(packet.args) - 1);
-                    packet.args[sizeof(packet.args) - 1] = '\0';
+                    packet = RType::Utils::createDataPacket("connect", rfcArgParser::CreateObject(data));
                     send_broadcast(packet, {new_player.getId()});
                     for (const auto &player : players_)
                     {
@@ -81,10 +79,7 @@ namespace Server
                         std::unordered_map<std::string, std::string> data;
                         data["player_id"] = std::to_string(player.getId());
                         data["color"] = "#FF0000";
-                        strncpy(packet.command, "connect", sizeof(packet.command) - 1);
-                        packet.command[sizeof(packet.command) - 1] = '\0';
-                        strncpy(packet.args, rfcArgParser::CreateObject(data).c_str(), sizeof(packet.args) - 1);
-                        packet.args[sizeof(packet.args) - 1] = '\0';
+                        packet = RType::Utils::createDataPacket("connect", rfcArgParser::CreateObject(data));
                         send_message(-1, new_player.getId(), packet);
                     }
                 }
@@ -106,9 +101,8 @@ namespace Server
             return;
         }
         auto buffer = std::make_shared<std::array<char, sizeof(DataPacket)>>();
-        boost::asio::async_read(
-            *socket, boost::asio::buffer(*buffer),
-            [this, client_id, buffer, player](const boost::system::error_code &error, std::size_t length)
+        boost::asio::async_read(*socket, boost::asio::buffer(*buffer),
+            [this, client_id, buffer, player](const boost::system::error_code &error, const std::size_t length)
             {
                 if (!error)
                 {

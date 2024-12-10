@@ -11,6 +11,7 @@
 
 /*  ---- INCLUDES ---- */
 #include "RType.hpp"
+#include <DataPacket.hpp>
 
 /*  ---- CLASS ---- */
 namespace RType
@@ -62,6 +63,16 @@ namespace RType
          * @return The normalized string
          */
         std::string normalize(const std::string &str);
+
+        /**
+         * @brief Create a DataPacket
+         *
+         * @param command The command to put in the DataPacket
+         * @param args The arguments to put in the DataPacket
+         *
+         * @return The created DataPacket
+         */
+        Server::DataPacket createDataPacket(const std::string &command, const std::string &args);
     } // namespace Utils
 } // namespace RType
 

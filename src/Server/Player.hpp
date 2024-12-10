@@ -26,6 +26,18 @@ namespace Server
 
     class Player
     {
+        private:
+        int id_;
+        typedef struct Position
+        {
+            int x;
+            int y;
+        } position_t;
+        position_t position_;
+        int color_;
+        bool have_joined_ = false;
+        std::shared_ptr<boost::asio::ip::tcp::socket> socket_;
+
     public:
         Player(int id, std::shared_ptr<boost::asio::ip::tcp::socket> socket);
         ~Player() = default;
@@ -34,17 +46,11 @@ namespace Server
         [[nodiscard]] int getPosY() const;
         [[nodiscard]] int getColor() const;
         [[nodiscard]] std::shared_ptr<boost::asio::ip::tcp::socket> getSocket() const;
+        [[nodiscard]] position_t getPosition() const;
         void setPosX(int pos_x);
         void setPosY(int pos_y);
         void setColor(int color);
 
-    private:
-        int id_;
-        int pos_x_;
-        int pos_y_;
-        int color_;
-        bool have_joined_ = false;
-        std::shared_ptr<boost::asio::ip::tcp::socket> socket_;
     };
 } // namespace Server
 

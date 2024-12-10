@@ -83,19 +83,14 @@ namespace Server
             std::cerr << "Client " << id << " does not exist.\n";
             return;
         }
-        Server::DataPacket data{};
-        strncpy(data.command, "send", sizeof(data.command) - 1);
-        data.command[sizeof(data.command) - 1] = '\0';
-        std::string msg;
+        std::string message;
         for (size_t i = 1; i < words.size(); ++i)
         {
             if (i > 1)
-                msg += " ";
-            msg += words[i];
+                message += " ";
+            message += words[i];
         }
-        strncpy(data.args, (msg + "\n").c_str(), sizeof(data.args) - 1);
-        data.args[sizeof(data.args) - 1] = '\0';
-
+        Server::DataPacket data = RType::Utils::createDataPacket("message", message);
         tcp_.send_message(client_id, id, data);
     }
 
@@ -111,19 +106,11 @@ namespace Server
             words.push_back(word);
         }
         std::vector<int> excluded_clients;
-        Server::DataPacket data{};
-        for (const auto &elem : words)
-        {
-            if (RType::Utils::isNumber(elem))
-            {
+        for (const auto &elem : words) {
+            if (RType::Utils::isNumber(elem)) {
                 excluded_clients.push_back(std::stoi(elem));
-            }
-            else
-            {
-                if (word == "broadcast")
-                {
-                    strncpy(data.command, elem.c_str(), sizeof(data.command) - 1);
-                    data.command[sizeof(data.command) - 1] = '\0';
+            } else {
+                if (word == "broadcast") {
                     continue;
                 }
                 if (!message.empty())
@@ -131,8 +118,7 @@ namespace Server
                 message += elem;
             }
         }
-        strncpy(data.args, (message + "\n").c_str(), sizeof(data.args) - 1);
-        data.args[sizeof(data.args) - 1] = '\0';
+        const Server::DataPacket data = RType::Utils::createDataPacket("broadcast", message);
         tcp_.send_broadcast(data, excluded_clients);
     }
 
@@ -157,12 +143,7 @@ namespace Server
 
         std::string temporary = rfcArgParser::CreateObject(obj);
         temporary = std::to_string(client_id) + " " + temporary + "\n";
-        Server::DataPacket data{};
-        strncpy(data.command, "p_position", sizeof(data.command) - 1);
-        data.command[sizeof(data.command) - 1] = '\0';
-        strncpy(data.args, (temporary + "\n").c_str(), sizeof(data.args) - 1);
-        data.args[sizeof(data.args) - 1] = '\0';
-
+        Server::DataPacket data = RType::Utils::createDataPacket("position", temporary);
         tcp_.send_broadcast(data, {client_id});
     }
 } // namespace Server
