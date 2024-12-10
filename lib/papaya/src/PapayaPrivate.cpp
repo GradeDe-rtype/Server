@@ -28,14 +28,11 @@ void Papaya::_loadPapaya(const std::vector<std::string> &lines)
 void Papaya::_loadPapayaKeys(const std::string &line)
 {
     std::string key;
-    for (const auto &c : line)
-    {
-        if (c == ';' && key.back() != '\\')
-        {
+    for (const auto &c : line) {
+        if (c == ';' && key.back() != '\\') {
             _keys.push_back(key);
             key.clear();
-        }
-        else
+        } else
             key += c;
     }
     if (key.size() > 0)
@@ -48,20 +45,16 @@ void Papaya::_loadPapayaKeys(const std::string &line)
 void Papaya::_loadPapayaDatas(const std::vector<std::string> &lines)
 {
     _datas.clear();
-    for (const auto &line : lines)
-    {
+    for (const auto &line : lines) {
         std::string data;
         std::unordered_map<std::string, std::string> map;
         size_t keyIndex = 0;
-        for (const auto &c : line)
-        {
-            if (c == ';' && data.back() != '\\')
-            {
+        for (const auto &c : line) {
+            if (c == ';' && data.back() != '\\') {
                 map[_keys[keyIndex]] = data;
                 data.clear();
                 keyIndex++;
-            }
-            else
+            } else
                 data += c;
         }
         map[_keys[keyIndex]] = data;

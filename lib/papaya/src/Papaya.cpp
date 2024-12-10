@@ -59,10 +59,8 @@ std::vector<std::unordered_map<std::string, std::string>> Papaya::getDatas() con
 std::vector<std::string> Papaya::getLine(const std::string &key, const std::string &value) const
 {
     _checkKeys({key}, "Papaya::getLine");
-    for (const auto &data : _datas)
-    {
-        if (data.at(key) == value)
-        {
+    for (const auto &data : _datas) {
+        if (data.at(key) == value) {
             std::vector<std::string> line;
             for (const auto &k : _keys)
                 line.push_back(data.at(k));
@@ -75,8 +73,7 @@ std::vector<std::string> Papaya::getLine(const std::string &key, const std::stri
 std::string Papaya::getData(const std::string &refKey, const std::string &refValue, const std::string &key) const
 {
     _checkKeys({refKey, key}, "Papaya::getData");
-    for (const auto &data : _datas)
-    {
+    for (const auto &data : _datas) {
         if (data.at(refKey) == refValue)
             return data.at(key);
     }
@@ -132,8 +129,7 @@ void Papaya::destroy()
     _keys.clear();
     std::string path = _buildPath();
     std::ifstream file(path);
-    if (file.is_open())
-    {
+    if (file.is_open()) {
         file.clear();
         file.close();
         std::remove(path.c_str());
@@ -143,10 +139,8 @@ void Papaya::destroy()
 void Papaya::removeData(const std::string &refKey, const std::string &refValue, const std::string &key)
 {
     _checkKeys({refKey, key}, "Papaya::removeData");
-    for (std::size_t i = 0; i < _datas.size(); i++)
-    {
-        if (_datas[i].at(refKey) == refValue)
-        {
+    for (std::size_t i = 0; i < _datas.size(); i++) {
+        if (_datas[i].at(refKey) == refValue) {
             _datas[i][key] = "";
             return;
         }
@@ -165,8 +159,7 @@ void Papaya::removeLine(const std::string &refKey, const std::string &refValue)
 {
     _checkKeys({refKey}, "Papaya::removeLine");
     _datas.erase(std::remove_if(_datas.begin(), _datas.end(),
-                                [refKey, refValue](const std::unordered_map<std::string, std::string> &data)
-                                { return data.at(refKey) == refValue; }),
+                                [refKey, refValue](const std::unordered_map<std::string, std::string> &data) { return data.at(refKey) == refValue; }),
                  _datas.end());
 }
 
@@ -174,10 +167,8 @@ void Papaya::updateData(const std::string &refKey, const std::string &refValue, 
                         const std::string &value)
 {
     _checkKeys({refKey, key}, "Papaya::updateData");
-    for (auto &data : _datas)
-    {
-        if (data.at(refKey) == refValue)
-        {
+    for (auto &data : _datas) {
+        if (data.at(refKey) == refValue) {
             data[key] = value;
             return;
         }
@@ -187,8 +178,7 @@ void Papaya::updateData(const std::string &refKey, const std::string &refValue, 
 void Papaya::updateKey(const std::string &refKey, const std::string &newKey)
 {
     _checkKeys({refKey}, "Papaya::updateKey");
-    for (auto &data : _datas)
-    {
+    for (auto &data : _datas) {
         data[newKey] = data[refKey];
         data.erase(refKey);
     }
@@ -198,10 +188,8 @@ void Papaya::updateKey(const std::string &refKey, const std::string &newKey)
 void Papaya::updateLine(const std::string &refKey, const std::string &refValue, const std::vector<std::string> &data)
 {
     _checkKeys({refKey}, "Papaya::updateLine");
-    for (auto &d : _datas)
-    {
-        if (d.at(refKey) == refValue)
-        {
+    for (auto &d : _datas) {
+        if (d.at(refKey) == refValue) {
             for (std::size_t i = 0; i < data.size(); i++)
                 d[_keys[i]] = data[i];
             return;
@@ -219,17 +207,14 @@ void Papaya::save() const
     std::ofstream ofs(path);
     if (!ofs.is_open())
         throw PapayaError("Error while saving the papaya", "Papay::save");
-    for (std::size_t i = 0; i < _keys.size(); i++)
-    {
+    for (std::size_t i = 0; i < _keys.size(); i++) {
         ofs << _keys[i];
         if (i + 1 < _keys.size())
             ofs << ";";
     }
     ofs << std::endl;
-    for (const auto &data : _datas)
-    {
-        for (std::size_t i = 0; i < _keys.size(); i++)
-        {
+    for (const auto &data : _datas) {
+        for (std::size_t i = 0; i < _keys.size(); i++) {
             ofs << data.at(_keys[i]);
             if (i + 1 < _keys.size())
                 ofs << ";";
@@ -241,10 +226,8 @@ void Papaya::save() const
 
 void Papaya::view() const
 {
-    for (auto const &data : _datas)
-    {
-        for (std::size_t i = 0; i < _keys.size(); i++)
-        {
+    for (auto const &data : _datas) {
+        for (std::size_t i = 0; i < _keys.size(); i++) {
             std::cout << _keys[i] << ": [" << data.at(_keys[i]) << "]";
             if (i + 1 < _keys.size())
                 std::cout << " | ";

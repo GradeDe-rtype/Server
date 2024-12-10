@@ -10,10 +10,9 @@
 
 namespace Server
 {
-    struct DataPacket
-    {
-        char command[MAX_COMMAND_SIZE];
-        char args[MAX_ARGS_SIZE];
+    struct DataPacket {
+            char command[MAX_COMMAND_SIZE];
+            char args[MAX_ARGS_SIZE];
     };
 } // namespace Server
 

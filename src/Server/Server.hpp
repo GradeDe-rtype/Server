@@ -25,29 +25,29 @@ namespace Server
     class Player;
     class TCP
     {
-    public:
-        TCP(boost::asio::io_context &io_context, short port);
-        void send_message(int client_id, int receiver_id, DataPacket data);
-        void send_broadcast(DataPacket data, const std::vector<int> &excluded_clients = {});
-        Player &get_player(int client_id);
-        void remove_player(int client_id);
-        std::vector<Player> &get_players() { return players_; }
-        bool player_exists(int client_id);
+        public:
+            TCP(boost::asio::io_context &io_context, short port);
+            void send_message(int client_id, int receiver_id, DataPacket data);
+            void send_broadcast(DataPacket data, const std::vector<int> &excluded_clients = {});
+            Player &get_player(int client_id);
+            void remove_player(int client_id);
+            std::vector<Player> &get_players() { return players_; }
+            bool player_exists(int client_id);
 
-        ~TCP();
+            ~TCP();
 
-        bool getRunning() { return is_running; }
+            bool getRunning() { return is_running; }
 
-        void setRunning(bool running) { is_running = running; }
+            void setRunning(bool running) { is_running = running; }
 
-    private:
-        void start_accept();
-        void start_read(Player player);
-        boost::asio::ip::tcp::acceptor acceptor_;
-        int next_client_id_ = 0;
-        std::vector<Player> players_;
-        Command *command_processor;
-        bool is_running = true;
+        private:
+            void start_accept();
+            void start_read(Player player);
+            boost::asio::ip::tcp::acceptor acceptor_;
+            int next_client_id_ = 0;
+            std::vector<Player> players_;
+            Command *command_processor;
+            bool is_running = true;
     };
 } // namespace Server
 

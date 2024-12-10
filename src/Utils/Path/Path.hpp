@@ -21,15 +21,15 @@ namespace RType
     {
         class Path
         {
-        public:
-            static Path *get();
-            std::string path() const;
+            public:
+                static Path *get();
+                std::string path() const;
 
-        private:
-            Path();
-            ~Path() = default;
+            private:
+                Path();
+                ~Path() = default;
 
-            std::string _path;
+                std::string _path;
         };
     } // namespace Utils
 } // namespace RType

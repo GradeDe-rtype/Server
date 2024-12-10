@@ -22,11 +22,9 @@ namespace RType
             std::vector<std::string> tokens;
             std::size_t start = 0;
 
-            while (true)
-            {
+            while (true) {
                 std::size_t end = str.find(delim, start);
-                if (end == std::string::npos)
-                {
+                if (end == std::string::npos) {
                     tokens.push_back(str.substr(start));
                     break;
                 }
@@ -59,8 +57,7 @@ namespace RType
 
         std::string trim(const std::string &str)
         {
-            auto is_trim_char = [](unsigned char c)
-            { return std::isspace(c) || c == '\n' || c == '\r' || c == '\t' || c == '\0'; };
+            auto is_trim_char = [](unsigned char c) { return std::isspace(c) || c == '\n' || c == '\r' || c == '\t' || c == '\0'; };
             auto start = std::find_if_not(str.begin(), str.end(), is_trim_char);
             auto end = std::find_if_not(str.rbegin(), str.rend(), is_trim_char).base();
             return (start < end) ? std::string(start, end) : "";

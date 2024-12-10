@@ -14,17 +14,14 @@ namespace RType
         if (argc == 2 && (std::string(argv[1]) == "--help" || std::string(argv[1]) == "-h"))
             throw Help();
 
-        if (argc == 1)
-        {
+        if (argc == 1) {
             _parseNoArgs();
             return;
         }
         if (argc != 3)
             throw ParsingError("Invalid number of arguments. Got " + std::to_string(argc) + " expected 5.");
-        for (int i = 1; i < argc; i++)
-        {
-            if (std::string(argv[i]) == "-p")
-            {
+        for (int i = 1; i < argc; i++) {
+            if (std::string(argv[i]) == "-p") {
                 _parseArgPort(argc, argv, i);
                 i++;
                 continue;

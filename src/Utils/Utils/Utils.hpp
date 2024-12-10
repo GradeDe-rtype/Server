@@ -10,8 +10,8 @@
 #define RTYPE_UTILS_HPP_
 
 /*  ---- INCLUDES ---- */
-#include "RType.hpp"
 #include <DataPacket.hpp>
+#include "RType.hpp"
 
 /*  ---- CLASS ---- */
 namespace RType

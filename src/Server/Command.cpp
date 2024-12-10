@@ -27,16 +27,12 @@ namespace Server
         const std::string command = packet.command;
         const std::string args = RType::Utils::trim(packet.args);
 
-        if (const auto it = commands_.find(command); it != commands_.end())
-        {
+        if (const auto it = commands_.find(command); it != commands_.end()) {
             it->second(client_id, args);
-        }
-        else
-        {
+        } else {
             std::cerr << "Unknown command: |" << command << "|\n";
             std::cerr << "Available commands are:\n";
-            for (const auto &[key, _] : commands_)
-            {
+            for (const auto &[key, _] : commands_) {
                 std::cerr << "- |" << key << "|\n";
             }
         }
@@ -55,37 +51,31 @@ namespace Server
 
     void Command::send(const int client_id, const std::string &args)
     {
-        if (args.empty())
-        {
+        if (args.empty()) {
             std::cerr << "No message to send.\n";
             return;
         }
         std::vector<std::string> words;
         std::istringstream iss(args);
         std::string word;
-        while (iss >> word)
-        {
+        while (iss >> word) {
             words.push_back(word);
         }
-        if (words.size() < 2)
-        {
+        if (words.size() < 2) {
             std::cerr << "Usage: send <client_id> <message>\n";
             return;
         }
-        if (!RType::Utils::isNumber(words[0]))
-        {
+        if (!RType::Utils::isNumber(words[0])) {
             std::cerr << "Invalid client id: |" << words[0] << "|\n";
             return;
         }
         const int id = std::stoi(words[0]);
-        if (!tcp_.player_exists(id))
-        {
+        if (!tcp_.player_exists(id)) {
             std::cerr << "Client " << id << " does not exist.\n";
             return;
         }
         std::string message;
-        for (size_t i = 1; i < words.size(); ++i)
-        {
+        for (size_t i = 1; i < words.size(); ++i) {
             if (i > 1)
                 message += " ";
             message += words[i];
@@ -101,8 +91,7 @@ namespace Server
         std::istringstream iss(args);
         std::string word;
         std::string message;
-        while (iss >> word)
-        {
+        while (iss >> word) {
             words.push_back(word);
         }
         std::vector<int> excluded_clients;
@@ -125,13 +114,11 @@ namespace Server
     void Command::position(int client_id, const std::string &args)
     {
         std::unordered_map<std::string, std::string> obj = rfcArgParser::ParseObject(args);
-        if (!obj.contains("x") || !obj.contains("y"))
-        {
+        if (!obj.contains("x") || !obj.contains("y")) {
             std::cerr << "Usage: position {\"x\": <x>, \"y\": <y>}\n";
             return;
         }
-        if (!RType::Utils::isNumber(obj["x"]) || !RType::Utils::isNumber(obj["y"]))
-        {
+        if (!RType::Utils::isNumber(obj["x"]) || !RType::Utils::isNumber(obj["y"])) {
             std::cerr << "Invalid x or y value.\n";
             return;
         }
