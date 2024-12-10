@@ -8,22 +8,26 @@
 
 #include "Path.hpp"
 
-namespace RType {
-namespace Utils {
-Path *Path::get() {
-  static Path instance;
-  return &instance;
-}
+namespace RType
+{
+    namespace Utils
+    {
+        Path *Path::get()
+        {
+            static Path instance;
+            return &instance;
+        }
 
-Path::Path() {
-  _path = "assets/";
+        Path::Path()
+        {
+            _path = "assets/";
 
-  if (!DirectoryExists(_path.c_str()))
-    _path = "../assets/";
-  if (!DirectoryExists(_path.c_str()))
-    _path = "Client/assets/";
-}
+            if (!DirectoryExists(_path.c_str()))
+                _path = "../assets/";
+            if (!DirectoryExists(_path.c_str()))
+                _path = "Client/assets/";
+        }
 
-std::string Path::path() const { return _path; }
-} // namespace Utils
+        std::string Path::path() const { return _path; }
+    } // namespace Utils
 } // namespace RType
