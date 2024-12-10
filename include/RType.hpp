@@ -7,21 +7,21 @@
 */
 
 #ifndef R_TYPE_HPP_
-    #define R_TYPE_HPP_
+#define R_TYPE_HPP_
 
-    /*  ---- INCLUDES ---- */
-    #include <boost/asio.hpp>
-    #include <boost/bind/bind.hpp>
-    #include <iostream>
-    #include <string>
-    #include <thread>
-    #include <vector>
-    #include <memory>
-    #include <mutex>
-    #include <algorithm>
-    #include <cctype>
-    #include <sys/stat.h>
-    #include <unordered_map>
-    #include <functional>
+/*  ---- INCLUDES ---- */
+#include <algorithm>
+#include <boost/asio.hpp>
+#include <boost/bind/bind.hpp>
+#include <cctype>
+#include <functional>
+#include <iostream>
+#include <memory>
+#include <mutex>
+#include <string>
+#include <sys/stat.h>
+#include <thread>
+#include <unordered_map>
+#include <vector>
 
 #endif /* !R_TYPE_HPP_ */
