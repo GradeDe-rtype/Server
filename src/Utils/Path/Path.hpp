@@ -7,18 +7,20 @@
 */
 
 #ifndef RTYPE_PATH_HPP_
-    #define RTYPE_PATH_HPP_
+#define RTYPE_PATH_HPP_
 
-    /*  ---- INCLUDES ---- */
-    #include <string>
+/*  ---- INCLUDES ---- */
+#include <string>
 
-    #include "Utils.hpp"
+#include "Utils.hpp"
 
-
-    /*  ---- CLASS ---- */
-namespace RType {
-    namespace Utils {
-        class Path {
+/*  ---- CLASS ---- */
+namespace RType
+{
+    namespace Utils
+    {
+        class Path
+        {
             public:
                 static Path *get();
                 std::string path() const;
@@ -29,7 +31,7 @@ namespace RType {
 
                 std::string _path;
         };
-    }
-}
+    } // namespace Utils
+} // namespace RType
 
 #endif /* !RTYPE_PATH_HPP_ */

@@ -13,15 +13,9 @@ Papaya::PapayaError::PapayaError(std::string const &what, std::string const &whe
     _where = where;
 }
 
-const char *Papaya::PapayaError::what() const noexcept
-{
-    return _what.c_str();
-}
+const char *Papaya::PapayaError::what() const noexcept { return _what.c_str(); }
 
-const char *Papaya::PapayaError::where() const noexcept
-{
-    return _where.c_str();
-}
+const char *Papaya::PapayaError::where() const noexcept { return _where.c_str(); }
 
 void Papaya::PapayaError::read() const noexcept
 {

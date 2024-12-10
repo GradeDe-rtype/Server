@@ -7,7 +7,8 @@
 
 #include "Parsing.hpp"
 
-namespace RType {
+namespace RType
+{
     Parsing::Parsing(int argc, char **argv)
     {
         if (argc == 2 && (std::string(argv[1]) == "--help" || std::string(argv[1]) == "-h"))
@@ -31,11 +32,7 @@ namespace RType {
             throw ParsingError("Invalid argument: \"-p\". Port not set.");
     }
 
-    int Parsing::getPort()
-    {
-        return _port;
-    }
-
+    int Parsing::getPort() { return _port; }
 
     void Parsing::_parseArgPort(int argc, char **argv, int i)
     {
@@ -46,7 +43,8 @@ namespace RType {
         if (!Utils::isNumber(argv[i + 1]))
             throw ParsingError("Invalid argument for \"-p\": \"" + std::string(argv[i + 1]) + "\". Expect a number.");
         if (std::stoi(argv[i + 1]) < 0 || std::stoi(argv[i + 1]) > 65535)
-                throw ParsingError("Invalid argument for \"-p\": \"" + std::string(argv[i + 1]) + "\". Expect a number between 0 and 65535.");
+            throw ParsingError("Invalid argument for \"-p\": \"" + std::string(argv[i + 1]) +
+                               "\". Expect a number between 0 and 65535.");
         _port = std::stoi(argv[i + 1]);
     }
 
@@ -60,4 +58,4 @@ namespace RType {
             throw ParsingError("Invalid port in the data file. Expect a number.");
         _port = std::stoi(tmpPort);
     }
-}
+} // namespace RType

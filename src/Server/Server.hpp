@@ -8,15 +8,16 @@
 */
 
 #ifndef SERVER_HPP
-    #define SERVER_HPP
+#define SERVER_HPP
 
-    /*  ---- INCLUDES ---- */
-    #include <RType.hpp>
-    #include <Utils.hpp>
-    #include <Command.hpp>
-    #include "rfcArgParser.hpp"
+/*  ---- INCLUDES ---- */
+#include <Command.hpp>
+#include <DataPacket.hpp>
+#include <RType.hpp>
+#include <Utils.hpp>
+#include "rfcArgParser.hpp"
 
-    /*  ---- CLASS ---- */
+/*  ---- CLASS ---- */
 
 namespace Server
 {
@@ -25,23 +26,19 @@ namespace Server
     class TCP
     {
         public:
-            TCP(boost::asio::io_context& io_context, short port);
-            void send_message(int client_id, int receiver_id, const std::string& message);
-            void send_broadcast(const std::string& message, const std::vector<int>& excluded_clients = {});
-            Player& get_player(int client_id);
+            TCP(boost::asio::io_context &io_context, short port);
+            void send_message(int client_id, int receiver_id, DataPacket data);
+            void send_broadcast(DataPacket data, const std::vector<int> &excluded_clients = {});
+            Player &get_player(int client_id);
             void remove_player(int client_id);
-            std::vector<Player>& get_players() { return players_; }
+            std::vector<Player> &get_players() { return players_; }
             bool player_exists(int client_id);
 
             ~TCP();
 
-            bool getRunning() {
-                return is_running;
-            }
+            bool getRunning() { return is_running; }
 
-            void setRunning(bool running) {
-                is_running = running;
-            }
+            void setRunning(bool running) { is_running = running; }
 
         private:
             void start_accept();
@@ -49,9 +46,9 @@ namespace Server
             boost::asio::ip::tcp::acceptor acceptor_;
             int next_client_id_ = 0;
             std::vector<Player> players_;
-            Command* command_processor;
+            Command *command_processor;
             bool is_running = true;
     };
-}
+} // namespace Server
 
-#endif //SERVER_HPP
+#endif // SERVER_HPP

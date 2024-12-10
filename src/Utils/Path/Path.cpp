@@ -8,8 +8,10 @@
 
 #include "Path.hpp"
 
-namespace RType {
-    namespace Utils {
+namespace RType
+{
+    namespace Utils
+    {
         Path *Path::get()
         {
             static Path instance;
@@ -26,9 +28,6 @@ namespace RType {
                 _path = "Client/assets/";
         }
 
-        std::string Path::path() const
-        {
-            return _path;
-        }
-    }
-}
+        std::string Path::path() const { return _path; }
+    } // namespace Utils
+} // namespace RType

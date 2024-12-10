@@ -32,7 +32,6 @@ Papaya::Papaya(std::string path, std::string name)
     _loadPapaya(lines);
 }
 
-
 bool Papaya::hasData(const std::string &refKey, const std::string &refValue, const std::string &key) const
 {
     _checkKeys({refKey, key}, "Papaya::hasData");
@@ -51,21 +50,11 @@ bool Papaya::hasLine(const std::string &refKey, const std::string &refValue) con
     return false;
 }
 
-bool Papaya::hasKey(const std::string &key) const
-{
-    return std::find(_keys.begin(), _keys.end(), key) != _keys.end();
-}
+bool Papaya::hasKey(const std::string &key) const { return std::find(_keys.begin(), _keys.end(), key) != _keys.end(); }
 
+std::vector<std::string> Papaya::getKeys() const { return _keys; }
 
-std::vector<std::string> Papaya::getKeys() const
-{
-    return _keys;
-}
-
-std::vector<std::unordered_map<std::string, std::string>> Papaya::getDatas() const
-{
-    return _datas;
-}
+std::vector<std::unordered_map<std::string, std::string>> Papaya::getDatas() const { return _datas; }
 
 std::vector<std::string> Papaya::getLine(const std::string &key, const std::string &value) const
 {
@@ -100,7 +89,6 @@ std::vector<std::string> Papaya::getKey(const std::string &key) const
     return keys;
 }
 
-
 void Papaya::addData(const std::string &key, const std::string &value)
 {
     _checkKeys({key}, "Papaya::addData");
@@ -133,10 +121,7 @@ void Papaya::addLine(const std::vector<std::string> &data)
     _datas.push_back(map);
 }
 
-void Papaya::clear()
-{
-    _datas.clear();
-}
+void Papaya::clear() { _datas.clear(); }
 
 void Papaya::destroy()
 {
@@ -173,12 +158,13 @@ void Papaya::removeKey(const std::string &key)
 void Papaya::removeLine(const std::string &refKey, const std::string &refValue)
 {
     _checkKeys({refKey}, "Papaya::removeLine");
-    _datas.erase(std::remove_if(_datas.begin(), _datas.end(), [refKey, refValue](const std::unordered_map<std::string, std::string> &data) {
-        return data.at(refKey) == refValue;
-    }), _datas.end());
+    _datas.erase(std::remove_if(_datas.begin(), _datas.end(),
+                                [refKey, refValue](const std::unordered_map<std::string, std::string> &data) { return data.at(refKey) == refValue; }),
+                 _datas.end());
 }
 
-void Papaya::updateData(const std::string &refKey, const std::string &refValue, const std::string &key, const std::string &value)
+void Papaya::updateData(const std::string &refKey, const std::string &refValue, const std::string &key,
+                        const std::string &value)
 {
     _checkKeys({refKey, key}, "Papaya::updateData");
     for (auto &data : _datas) {
@@ -215,7 +201,8 @@ void Papaya::save() const
 {
     std::string path = _buildPath();
     std::ifstream file(path);
-    if (file.is_open()) file.clear();
+    if (file.is_open())
+        file.clear();
     file.close();
     std::ofstream ofs(path);
     if (!ofs.is_open())

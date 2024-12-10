@@ -14,15 +14,9 @@ rfcArgParser::Error::Error(std::string const &what, std::string const &where)
     _where = where;
 }
 
-const char *rfcArgParser::Error::what() const noexcept
-{
-    return _what.c_str();
-}
+const char *rfcArgParser::Error::what() const noexcept { return _what.c_str(); }
 
-const char *rfcArgParser::Error::where() const noexcept
-{
-    return _where.c_str();
-}
+const char *rfcArgParser::Error::where() const noexcept { return _where.c_str(); }
 
 void rfcArgParser::Error::read() const noexcept
 {

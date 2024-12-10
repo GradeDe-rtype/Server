@@ -3,7 +3,7 @@
 //
 
 #ifndef PLAYER_HPP
-    #define PLAYER_HPP
+#define PLAYER_HPP
 
 #include <boost/asio.hpp>
 #include <memory>
@@ -20,29 +20,35 @@ enum class Color {
     WHITE = 8
 };
 
-namespace Server {
+namespace Server
+{
 
-    class Player {
-    public:
-        Player(int id, std::shared_ptr<boost::asio::ip::tcp::socket> socket);
-        ~Player() = default;
-        [[nodiscard]] int getId() const;
-        [[nodiscard]] int getPosX() const;
-        [[nodiscard]] int getPosY() const;
-        [[nodiscard]] int getColor() const;
-        [[nodiscard]] std::shared_ptr<boost::asio::ip::tcp::socket> getSocket() const;
-        void setPosX(int pos_x);
-        void setPosY(int pos_y);
-        void setColor(int color);
+    class Player
+    {
+        private:
+            int id_;
+            typedef struct Position {
+                    int x;
+                    int y;
+            } position_t;
+            position_t position_;
+            int color_;
+            bool have_joined_ = false;
+            std::shared_ptr<boost::asio::ip::tcp::socket> socket_;
 
-    private:
-        int id_;
-        int pos_x_;
-        int pos_y_;
-        int color_;
-        bool have_joined_ = false;
-        std::shared_ptr<boost::asio::ip::tcp::socket> socket_;
+        public:
+            Player(int id, std::shared_ptr<boost::asio::ip::tcp::socket> socket);
+            ~Player() = default;
+            [[nodiscard]] int getId() const;
+            [[nodiscard]] int getPosX() const;
+            [[nodiscard]] int getPosY() const;
+            [[nodiscard]] int getColor() const;
+            [[nodiscard]] std::shared_ptr<boost::asio::ip::tcp::socket> getSocket() const;
+            [[nodiscard]] position_t getPosition() const;
+            void setPosX(int pos_x);
+            void setPosY(int pos_y);
+            void setColor(int color);
     };
-}
+} // namespace Server
 
-#endif //PLAYER_HPP
+#endif // PLAYER_HPP
