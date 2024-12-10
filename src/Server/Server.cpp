@@ -64,7 +64,8 @@ namespace Server {
                 DataPacket packet{};
                 strncpy(packet.command, "connect", sizeof(packet.command) - 1);
                 packet.command[sizeof(packet.command) - 1] = '\0';
-                packet.args = rfcArgParser::CreateObject(data).data();
+                strncpy(packet.args, rfcArgParser::CreateObject(data).c_str(), sizeof(packet.args) - 1);
+                packet.args[sizeof(packet.args) - 1] = '\0';
                 send_broadcast(packet, {new_player.getId()});
                 for (const auto& player : players_) {
                     if (player.getId() == new_player.getId())
@@ -74,7 +75,8 @@ namespace Server {
                     data["color"] = "#FF0000";
                     strncpy(packet.command, "connect", sizeof(packet.command) - 1);
                     packet.command[sizeof(packet.command) - 1] = '\0';
-                    packet.args = rfcArgParser::CreateObject(data).data();
+                    strncpy(packet.args, rfcArgParser::CreateObject(data).c_str(), sizeof(packet.args) - 1);
+                    packet.args[sizeof(packet.args) - 1] = '\0';
                     send_message(-1, new_player.getId(), packet);
                 }
             } else {
@@ -87,27 +89,30 @@ namespace Server {
     void TCP::start_read(Player player) {
         const auto socket = player.getSocket();
         const int client_id = player.getId();
-        auto buffer = std::make_shared<std::string>(1024, '\0');
-
-        boost::asio::async_read_until(*socket, boost::asio::dynamic_buffer(*buffer), '\n',
-    [this, client_id, buffer, player](const boost::system::error_code& error, const std::size_t length) {
-        if (!error) {
-            std::string raw_message = buffer->substr(0, length);
-            buffer->erase(0, length);
-            std::string sanitized_message = RType::Utils::trim(raw_message);
-            std::cout << "Client " << client_id << " says: " << sanitized_message << "\n";
-            command_processor->process_command(client_id, sanitized_message);
-            start_read(player); // Continue reading
-        } else {
-            std::cerr << "Client " << client_id << " disconnected.\n";
-            remove_player(client_id);
-            DataPacket packet{};
-            packet.command[sizeof(packet.command) - 1] = '\0';
-            strncpy(packet.command, "disconnect", sizeof(packet.command) - 1);
-            packet.args = std::to_string(client_id).data();
-            send_broadcast(packet, {client_id});
+        if (!socket) {
+            std::cerr << "Socket for client " << client_id << " is null.\n";
+            return;
         }
-    });
+        auto buffer = std::make_shared<std::array<char, sizeof(DataPacket)>>();
+        boost::asio::async_read(*socket, boost::asio::buffer(*buffer),
+            [this, client_id, buffer, player] (const boost::system::error_code& error, std::size_t length) {
+                if (!error) {
+                    DataPacket packet{};
+                    std::memcpy(&packet, buffer->data(), length);
+                    std::cout << "Client " << client_id << " sent a packet with command: "
+                              << packet.command << "\n";
+                    std::cout << "Arguments: " << packet.args << "\n";
+                    if (command_processor) {
+                        command_processor->process_command(client_id, packet);
+                    } else {
+                        std::cerr << "Command processor is not initialized.\n";
+                    }
+                    start_read(player);
+                } else {
+                    std::cerr << "Client " << client_id << " disconnected: " << error.message() << "\n";
+                    remove_player(client_id);
+                }
+            });
     }
 
     void TCP::send_message(int client_id, int receiver_id, DataPacket data) {

@@ -14,6 +14,7 @@
     #include <RType.hpp>
     #include <Utils.hpp>
     #include <Server.hpp>
+    #include <DataPacket.hpp>
 
 #define UNUSED(x) (void)(x)
 
@@ -22,10 +23,9 @@ namespace Server
     class TCP;
     class Command
     {
-
         public:
             Command(TCP& tcp);
-            void process_command(int client_id, const std::string& message);
+            void process_command(int client_id, Server::DataPacket packet);
 
         private:
             void start(int client_id, const std::string& args);

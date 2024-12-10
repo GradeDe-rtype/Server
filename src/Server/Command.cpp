@@ -11,7 +11,6 @@
 #include <Player.hpp>
 
 namespace Server {
-
     Command::Command(TCP& tcp) : tcp_(tcp) {
         commands_["start"] = [this](int client_id, const std::string& args) { start(client_id, args); };
         commands_["send"] = [this](int client_id, const std::string& args) { send(client_id, args); };
@@ -20,10 +19,10 @@ namespace Server {
         commands_["position"] = [this](int client_id, const std::string& args) { position(client_id, args); };
     }
 
-    void Command::process_command(int client_id, const std::string& message) {
-        const auto space_pos = message.find(' ');
-        std::string command = RType::Utils::normalize(message.substr(0, space_pos));
-        std::string args = RType::Utils::trim((space_pos != std::string::npos) ? message.substr(space_pos + 1) : "");
+    void Command::process_command(int client_id, Server::DataPacket packet) {
+        std::string args_str(packet.args);
+        std::string command = packet.command;
+        std::string args = RType::Utils::trim(packet.args);
 
         auto it = commands_.find(command);
         if (it != commands_.end()) {
@@ -70,7 +69,7 @@ namespace Server {
             std::cerr << "Client " << id << " does not exist.\n";
             return;
         }
-        DataPacket data{};
+        Server::DataPacket data{};
         strncpy(data.command, "send", sizeof(data.command) - 1);
         data.command[sizeof(data.command) - 1] = '\0';
         std::string msg;
@@ -79,7 +78,8 @@ namespace Server {
                 msg += " ";
             msg += words[i];
         }
-        data.args = (msg + "\n").data();
+        strncpy(data.args, (msg + "\n").c_str(), sizeof(data.args) - 1);
+        data.args[sizeof(data.args) - 1] = '\0';
 
         tcp_.send_message(client_id, id, data);
     }
@@ -94,7 +94,7 @@ namespace Server {
             words.push_back(word);
         }
         std::vector<int> excluded_clients;
-        DataPacket data{};
+        Server::DataPacket data{};
         for (const auto& elem : words) {
             if (RType::Utils::isNumber(elem)) {
                 excluded_clients.push_back(std::stoi(elem));
@@ -109,7 +109,8 @@ namespace Server {
                 message += elem;
             }
         }
-        data.args = (message + "\n").data();
+        strncpy(data.args, (message + "\n").c_str(), sizeof(data.args) - 1);
+        data.args[sizeof(data.args) - 1] = '\0';
         tcp_.send_broadcast(data, excluded_clients);
     }
 
@@ -131,10 +132,11 @@ namespace Server {
 
         std::string temporary = rfcArgParser::CreateObject(obj);
         temporary = std::to_string(client_id) + " " + temporary + "\n";
-        DataPacket data{};
+        Server::DataPacket data{};
         strncpy(data.command, "p_position", sizeof(data.command) - 1);
         data.command[sizeof(data.command) - 1] = '\0';
-        data.args = temporary.data();
+        strncpy(data.args, (temporary + "\n").c_str(), sizeof(data.args) - 1);
+        data.args[sizeof(data.args) - 1] = '\0';
 
         tcp_.send_broadcast(data, {client_id});
     }

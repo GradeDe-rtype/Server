@@ -15,15 +15,13 @@
     #include <Utils.hpp>
     #include <Command.hpp>
     #include "rfcArgParser.hpp"
+    #include <DataPacket.hpp>
+
 
     /*  ---- CLASS ---- */
 
 namespace Server
 {
-    struct DataPacket {
-        char command[16];
-        char *args;
-    };
     class Command;
     class Player;
     class TCP
