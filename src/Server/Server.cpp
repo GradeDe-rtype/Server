@@ -14,7 +14,7 @@
 namespace Server
 {
     TCP::TCP(boost::asio::io_context &io_context, const short port) : acceptor_(io_context, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port)),
-                                                                      command_processor(new Command(*this))
+                                                                    command_processor(new Command(*this))
     {
         start_accept();
     }
@@ -24,8 +24,8 @@ namespace Server
     void TCP::remove_player(int client_id)
     {
         players_.erase(std::remove_if(players_.begin(), players_.end(),
-                                      [client_id](const Player &player) { return player.getId() == client_id; }),
-                       players_.end());
+                                    [client_id](const Player &player) { return player.getId() == client_id; }),
+                    players_.end());
     }
 
     Player &TCP::get_player(const int client_id)
@@ -61,7 +61,7 @@ namespace Server
                     std::cout << "Client " << new_player.getId() << " connected.\n";
                     std::string welcome_message = "Welcome, Client " + std::to_string(new_player.getId()) + "!\n";
                     boost::asio::async_write(*socket, boost::asio::buffer(welcome_message),
-                                             [](const boost::system::error_code &, std::size_t) {});
+                                            [](const boost::system::error_code &, std::size_t) {});
                     start_read(new_player);
                     data["player_id"] = std::to_string(new_player.getId());
                     data["color"] = "#FF0000";
