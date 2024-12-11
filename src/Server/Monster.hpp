@@ -1,14 +1,16 @@
 /*
-** EPITECH PROJECT, 2024 | Caroline Boilly
+** EPITECH PROJECT, 2024
 ** R-Type
 ** File description:
 ** Monster class
+** Caroline Boilly @Aeliondw
 */
 
-#ifndef SERVER_HPP
-    #define SERVER_HPP
+#ifndef MONSTER_HPP
+    #define MONSTER_HPP
 
 #include "RType.hpp"
+
 
 namespace Server
 {
@@ -16,8 +18,8 @@ namespace Server
     {
         private:
             typedef struct Position {
-                int x;
-                int y;
+                double x;
+                double y;
             } position_t;
 
             typedef enum {

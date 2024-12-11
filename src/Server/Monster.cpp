@@ -1,6 +1,10 @@
-//
-// Created by dan13615 on 12/5/24.
-//
+/*
+** EPITECH PROJECT, 2024
+** R-Type
+** File description:
+** Monster class
+** Caroline Boilly @Aeliondw
+*/
 
 #include "Monster.hpp"
 
