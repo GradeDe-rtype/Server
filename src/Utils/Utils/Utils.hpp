@@ -10,7 +10,6 @@
 #define RTYPE_UTILS_HPP_
 
 /*  ---- INCLUDES ---- */
-#include <DataPacket.hpp>
 #include "RType.hpp"
 
 /*  ---- CLASS ---- */
@@ -64,15 +63,6 @@ namespace RType
          */
         std::string normalize(const std::string &str);
 
-        /**
-         * @brief Create a DataPacket
-         *
-         * @param command The command to put in the DataPacket
-         * @param args The arguments to put in the DataPacket
-         *
-         * @return The created DataPacket
-         */
-        Server::DataPacket createDataPacket(const std::string &command, const std::string &args);
     } // namespace Utils
 } // namespace RType
 

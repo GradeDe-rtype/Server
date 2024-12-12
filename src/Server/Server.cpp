@@ -24,8 +24,8 @@ namespace Server
     void TCP::remove_player(int client_id)
     {
         players_.erase(std::remove_if(players_.begin(), players_.end(),
-                                    [client_id](const Player &player) { return player.getId() == client_id; }),
-                        players_.end());
+                                      [client_id](const Player &player) { return player.getId() == client_id; }),
+                       players_.end());
     }
 
     Player &TCP::get_player(const int client_id)
@@ -55,7 +55,7 @@ namespace Server
                 if (!error) {
                     Player new_player(next_client_id_++, socket);
                     std::unordered_map<std::string, std::string> data;
-                    DataPacket packet{};
+                    rfcArgParser::DataPacket packet{};
 
                     players_.push_back(new_player);
                     std::cout << "Client " << new_player.getId() << " connected.\n";
@@ -65,7 +65,7 @@ namespace Server
                     start_read(new_player);
                     data["player_id"] = std::to_string(new_player.getId());
                     data["color"] = "#FF0000";
-                    packet = RType::Utils::createDataPacket("connect", rfcArgParser::CreateObject(data));
+                    packet = rfcArgParser::SerializePacket("connect", rfcArgParser::CreateObject(data));
                     send_broadcast(packet, {new_player.getId()});
                     for (const auto &player : players_) {
                         if (player.getId() == new_player.getId())
@@ -73,7 +73,7 @@ namespace Server
                         std::unordered_map<std::string, std::string> data;
                         data["player_id"] = std::to_string(player.getId());
                         data["color"] = "#FF0000";
-                        packet = RType::Utils::createDataPacket("connect", rfcArgParser::CreateObject(data));
+                        packet = rfcArgParser::SerializePacket("connect", rfcArgParser::CreateObject(data));
                         send_message(-1, new_player.getId(), packet);
                     }
                 } else {
@@ -91,12 +91,12 @@ namespace Server
             std::cerr << "Socket for client " << client_id << " is null.\n";
             return;
         }
-        auto buffer = std::make_shared<std::array<char, sizeof(DataPacket)>>();
+        auto buffer = std::make_shared<std::array<char, sizeof(rfcArgParser::DataPacket)>>();
         boost::asio::async_read(*socket, boost::asio::buffer(*buffer),
                                 [this, client_id, buffer, player](const boost::system::error_code &error, const std::size_t length) {
                                     if (!error) {
                                         std::string data(buffer->begin(), buffer->begin() + length);
-                                        DataPacket packet = rfcArgParser::DeserializePacket(data);
+                                        rfcArgParser::DataPacket packet = rfcArgParser::DeserializePacket(data, length);
 
                                         std::cout << "Client " << client_id << " sent a packet with command: " << packet.command << "\n";
                                         std::cout << "Arguments: " << packet.args << "\n";
@@ -113,16 +113,14 @@ namespace Server
                                 });
     }
 
-    void TCP::send_message(int client_id, int receiver_id, DataPacket data)
+    void TCP::send_message(int client_id, int receiver_id, rfcArgParser::DataPacket data)
     {
         for (const auto &player : players_) {
             const int id = player.getId();
             const auto socket = player.getSocket();
             if (id == receiver_id) {
-                std::string serialized_data = rfcArgParser::SerializePacket(data);
-
                 boost::asio::async_write(
-                    *socket, boost::asio::buffer(serialized_data),
+                    *socket, boost::asio::buffer(&data, sizeof(data)),
                     [client_id, receiver_id](const boost::system::error_code &ec, std::size_t bytes_transferred) {
                         if (!ec) {
                             std::cout << "Message sent from client " << client_id << " to receiver " << receiver_id
@@ -136,7 +134,7 @@ namespace Server
         }
     }
 
-    void TCP::send_broadcast(DataPacket data, const std::vector<int> &excluded_clients)
+    void TCP::send_broadcast(rfcArgParser::DataPacket data, const std::vector<int> &excluded_clients)
     {
         for (const auto &player : players_) {
             const int id = player.getId();

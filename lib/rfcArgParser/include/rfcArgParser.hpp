@@ -10,18 +10,24 @@
 #define RFC_ARG_PARSER_HPP_
 
 /*  ---- INCLUDES ---- */
+#include <cstring>
 #include <iostream>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <cstring>
-#include <stdexcept>
-#include <DataPacket.hpp>
+#define MAX_ARGS_SIZE 256
+#define MAX_COMMAND_SIZE 16
 
 /*  ---- CLASS ---- */
 class rfcArgParser
 {
+
     public:
+        struct DataPacket {
+                char command[MAX_COMMAND_SIZE];
+                char args[MAX_ARGS_SIZE];
+        };
         /**
          * @brief PapayaError class
          *
@@ -101,18 +107,27 @@ class rfcArgParser
          *
          * @param packet The DataPacket to serialize
          *
-         * @return std::string Representing the packet serialized
+         * @return std::string Representing the packet deserialized
          */
-        static std::string SerializePacket(const Server::DataPacket &packet);
+        static std::string DeserializePacket(const DataPacket &packet);
 
         /**
          * @brief Deserialize a packet
          *
          * @param data The data to deserialize
          *
-         * @return Server::DataPacket Representing the data deserialized
+         * @return DataPacket Representing the data serialized
          */
-        static Server::DataPacket DeserializePacket(const std::string &data);
+        static DataPacket DeserializePacket(const std::string &data, const std::size_t length);
+
+        /**
+         * @brief Deserialize a packet
+         *
+         * @param data The data to deserialize
+         *
+         * @return DataPacket Representing the data serialized
+         */
+        static DataPacket SerializePacket(const std::string &command, const std::string &args);
 
     private:
         /**
