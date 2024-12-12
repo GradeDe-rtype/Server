@@ -24,8 +24,8 @@ namespace Server
     void TCP::remove_player(int client_id)
     {
         players_.erase(std::remove_if(players_.begin(), players_.end(),
-                                      [client_id](const Player &player) { return player.getId() == client_id; }),
-                       players_.end());
+                                    [client_id](const Player &player) { return player.getId() == client_id; }),
+                        players_.end());
     }
 
     Player &TCP::get_player(const int client_id)
@@ -95,8 +95,9 @@ namespace Server
         boost::asio::async_read(*socket, boost::asio::buffer(*buffer),
                                 [this, client_id, buffer, player](const boost::system::error_code &error, const std::size_t length) {
                                     if (!error) {
-                                        DataPacket packet{};
-                                        std::memcpy(&packet, buffer->data(), length);
+                                        std::string data(buffer->begin(), buffer->begin() + length);
+                                        DataPacket packet = rfcArgParser::DeserializePacket(data);
+
                                         std::cout << "Client " << client_id << " sent a packet with command: " << packet.command << "\n";
                                         std::cout << "Arguments: " << packet.args << "\n";
                                         if (command_processor) {
@@ -118,9 +119,10 @@ namespace Server
             const int id = player.getId();
             const auto socket = player.getSocket();
             if (id == receiver_id) {
-                // Serialize the data packet into a buffer
+                std::string serialized_data = rfcArgParser::SerializePacket(data);
+
                 boost::asio::async_write(
-                    *socket, boost::asio::buffer(&data, sizeof(data)),
+                    *socket, boost::asio::buffer(serialized_data),
                     [client_id, receiver_id](const boost::system::error_code &ec, std::size_t bytes_transferred) {
                         if (!ec) {
                             std::cout << "Message sent from client " << client_id << " to receiver " << receiver_id

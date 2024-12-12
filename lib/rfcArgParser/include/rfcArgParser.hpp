@@ -14,6 +14,9 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <cstring>
+#include <stdexcept>
+#include <DataPacket.hpp>
 
 /*  ---- CLASS ---- */
 class rfcArgParser
@@ -92,6 +95,24 @@ class rfcArgParser
          * @return std::string Representing the created object
          */
         static std::string CreateObject(std::unordered_map<std::string, std::string> obj);
+
+        /**
+         * @brief Serialize a packet
+         *
+         * @param packet The DataPacket to serialize
+         *
+         * @return std::string Representing the packet serialized
+         */
+        static std::string SerializePacket(const Server::DataPacket &packet);
+
+        /**
+         * @brief Deserialize a packet
+         *
+         * @param data The data to deserialize
+         *
+         * @return Server::DataPacket Representing the data deserialized
+         */
+        static Server::DataPacket DeserializePacket(const std::string &data);
 
     private:
         /**

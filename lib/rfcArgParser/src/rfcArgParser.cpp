@@ -48,6 +48,29 @@ std::string rfcArgParser::CreateObject(std::unordered_map<std::string, std::stri
     return result;
 }
 
+std::string rfcArgParser::SerializePacket(const Server::DataPacket &packet)
+{
+    std::unordered_map<std::string, std::string> data;
+    data["command"] = std::string(packet.command);
+    data["args"] = std::string(packet.args);
+
+    return CreateObject(data);
+}
+
+Server::DataPacket rfcArgParser::DeserializePacket(const std::string &data)
+{
+    auto parsed = ParseObject(data);
+    Server::DataPacket packet{};
+
+    if (parsed.find("command") != parsed.end())
+        strncpy(packet.command, parsed["command"].c_str(), sizeof(packet.command) - 1);
+
+    if (parsed.find("args") != parsed.end())
+        strncpy(packet.args, parsed["args"].c_str(), sizeof(packet.args) - 1);
+
+    return packet;
+}
+
 std::vector<std::string> rfcArgParser::_split(std::string str, char delimiter)
 {
     std::vector<std::string> result;
