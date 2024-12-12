@@ -35,7 +35,7 @@ namespace Server
 
             /*  ---- GAME LOGIC ---- */
             void shoot();
-            void updatePosition();
+            void update();
 
             /*  ---- SETTER ---- */
             void setType(int type);

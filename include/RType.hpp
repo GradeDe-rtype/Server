@@ -23,5 +23,6 @@
 #include <thread>
 #include <unordered_map>
 #include <vector>
+#include <chrono>
 
 #endif /* !R_TYPE_HPP_ */

@@ -35,6 +35,8 @@ namespace Server
         public:
             ~AEntity() override = default;
 
+            void removeInactiveShoots() override;
+
             void setLevel(int level) override;
             void setHealth(int health) override;
             void setPosX(int pos_x) override;
@@ -52,6 +54,7 @@ namespace Server
             Direction getDirection() const override;
             int getSpeed() const override;
             bool getIsAlive() const override;    
+            std::vector<Shoot> getShoots() const override;
     };
 } // namespace Server
 

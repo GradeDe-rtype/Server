@@ -35,7 +35,7 @@ namespace Server {
         else if (_direction == Direction::LEFT)
             _position.x -= _speed;
 
-        //TODO : Check if out of bounds (get screen width and height)
+//TODO : Check if out of bounds (get screen width and height)
         if (_position.x < 0 || _position.x > 1920)
             _isActive = false;
     }

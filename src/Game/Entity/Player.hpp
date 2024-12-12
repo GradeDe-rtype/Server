@@ -41,9 +41,11 @@ namespace Server
 
             /*  ---- GAME LOGIC ---- */
             void shoot();
+            void update();
 
             /*  ---- SETTER ---- */
             void setColor(int color);
+            void setHaveJoined(bool haveJoined);
 
             /*  ---- GETTER ---- */
             std::unordered_map<std::string, int> getPlayerInfo() const;

@@ -39,11 +39,28 @@ namespace Server
         _shoots.emplace_back(_position.x, _position.y, shootSpeed, _damage, _direction);
     }
 
+//TODO: Check
+    void Player::update()
+    {
+        for (auto &shoot : _shoots) {
+            shoot.updatePosition();
+        }
+
+        _shoots.erase(std::remove_if(_shoots.begin(), _shoots.end(),
+                                    [](const Shoot &shoot) { return !shoot.getIsActive(); }),
+                    _shoots.end());
+    }
+
     /*  ---- SETTER ---- */
 
     void Player::setColor(int color)
     { 
         _color = color;
+    }
+
+    void Player::setHaveJoined(bool haveJoined)
+    { 
+        _haveJoined = haveJoined;
     }
 
     /*  ---- GETTER ---- */

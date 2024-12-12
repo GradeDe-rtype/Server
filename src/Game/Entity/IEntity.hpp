@@ -28,6 +28,8 @@ namespace Server
         public:
             virtual ~IEntity() = default;
 
+            virtual void removeInactiveShoots() = 0;
+
             virtual void setLevel(int level) = 0;
             virtual void setHealth(int health) = 0;
             virtual void setPosX(int pos_x) = 0;
@@ -45,6 +47,7 @@ namespace Server
             virtual Direction getDirection() const = 0;
             virtual int getSpeed() const = 0;
             virtual bool getIsAlive() const = 0;
+            virtual std::vector<Shoot> getShoots() const = 0;
     };
 } // namespace Server
 

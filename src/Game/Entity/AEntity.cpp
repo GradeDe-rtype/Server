@@ -10,6 +10,14 @@
 
 namespace Server
 {
+    /*  ---- GAME LOGIC ---- */
+    void AEntity::removeInactiveShoots()
+    {
+        _shoots.erase(std::remove_if(_shoots.begin(), _shoots.end(),
+                                    [](const Shoot &shoot) { return !shoot.getIsActive(); }),
+                                    _shoots.end());
+    }
+
     /*  ---- SETTER ---- */
 
     void AEntity::setLevel(int level)
@@ -96,5 +104,10 @@ namespace Server
     bool AEntity::getIsAlive() const
     {
         return _isAlive;
+    }
+
+    std::vector<Shoot> AEntity::getShoots() const
+    {
+        return _shoots;
     }
 }

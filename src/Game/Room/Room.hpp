@@ -10,6 +10,8 @@
     #define ROOM_HPP
 
 #include <RType.hpp>
+#include <Player.hpp>
+#include <Monster.hpp>
 
 
 namespace Server
@@ -22,25 +24,39 @@ namespace Server
             END = 2
         };
 
+        int MAX_PLAYER = 4;
+
         private:
             int _id;
             std::string _name;
-            int count = 0;
-            int mode = 0;
+            int _count = 0;
+            Mode _mode = 0;
+
+            std::vector<Server::Player> _players;
+            std::vector<Server::Monster> _monsters;
+
+            //TODO: Make a Class for Timer
+            std::chrono::steady_clock::time_point _lastMonsterSpawn;
 
         public:
-            Room(int id, std::shared_ptr<boost::asio::ip::tcp::socket> socket);
+            Room(int id, std::string _name);
             ~Room() = default;
 
+            /*  ---- GAME LOGIC ---- */
+            void addPlayer(const Player &player);
+            void removePlayer(int playerId);
+            void spawnMonster();
+            void update();
+
             /*  ---- SETTER ---- */
-            void setColor(int color);
+            void setName(std::string name);
+            void setMode(Mode mode);
 
             /*  ---- GETTER ---- */
-            std::unordered_map<std::string, int> getPlayerInfo() const;
-            std::unordered_map<std::string, int> getPlayerSmallInfo() const;
-            int getColor() const;
-            bool getHaveJoined() const;
-            std::shared_ptr<boost::asio::ip::tcp::socket> getSocket() const;
+            std::unordered_map<std::string, std::string> getRoomInfo() const;
+            std::string getName() const;
+            int getCount() const;
+            Mode getMode() const;
 
     };
 } // namespace Server
