@@ -48,6 +48,12 @@ namespace Server
 
     /*  ---- GAME LOGIC ---- */
 
+    void Monster::shoot()
+    {
+        int shootSpeed = 5 * _speed;
+        _shoots.emplace_back(_position.x, _position.y, shootSpeed, _damage, _direction);
+    }
+
     /*  ---- SETTER ---- */
 
     void Monster::setType(int type)
@@ -58,11 +64,6 @@ namespace Server
     void Monster::setSize(int size)
     {
         _size = size;
-    }
-
-    void Monster::setDirection(Direction direction)
-    {
-        _direction = direction;
     }
 
     /*  ---- GETTER ---- */
@@ -86,11 +87,6 @@ namespace Server
     int Monster::getSize() const
     {
         return _size;
-    }
-
-    Direction Monster::getDirection() const
-    {
-        return _direction;
     }
 
 } // namespace Server

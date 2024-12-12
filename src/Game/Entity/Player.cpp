@@ -33,6 +33,14 @@ namespace Server
 
     /*  ---- SETTER ---- */
 
+    void Player::shoot()
+    {
+        int shootSpeed = 5 * _speed;
+        _shoots.emplace_back(_position.x, _position.y, shootSpeed, _damage, _direction);
+    }
+
+    /*  ---- SETTER ---- */
+
     void Player::setColor(int color)
     { 
         _color = color;

@@ -28,14 +28,17 @@ namespace Server {
 
     /*  ---- GAME LOGIC ---- */
 
-//     def move(self):
-//         if self.direction == "right":
-//             self.x += self.speed
-//         elif self.direction == "left":
-//             self.x -= self.speed
+    void Shoot::updatePosition()
+    {
+        if (_direction == Direction::RIGHT)
+            _position.x += _speed;
+        else if (_direction == Direction::LEFT)
+            _position.x -= _speed;
 
-//     def is_out_of_bounds(self, screen_width, screen_height):
-//         return self.x < 0 or self.x > screen_width or self.y < 0 or self.y > screen_height
+        //TODO : Check if out of bounds (get screen width and height)
+        if (_position.x < 0 || _position.x > 1920)
+            _isActive = false;
+    }
 
     /*  ---- SETTER ---- */
 
@@ -88,7 +91,7 @@ namespace Server {
         return _position.y;
     }
 
-    Shoot::Direction Shoot::getDirection() const
+    Direction Shoot::getDirection() const
     {
         return _direction;
     }

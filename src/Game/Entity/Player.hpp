@@ -31,12 +31,16 @@ namespace Server
     {
         private:
             int _color;
+            Direction _direction = Direction::RIGHT;
             bool _haveJoined = false;
             std::shared_ptr<boost::asio::ip::tcp::socket> _socket;
 
         public:
             Player(int id, std::shared_ptr<boost::asio::ip::tcp::socket> socket);
             ~Player() = default;
+
+            /*  ---- GAME LOGIC ---- */
+            void shoot();
 
             /*  ---- SETTER ---- */
             void setColor(int color);

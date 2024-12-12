@@ -29,8 +29,10 @@ namespace Server
             virtual ~IEntity() = default;
 
             virtual void setLevel(int level) = 0;
+            virtual void setHealth(int health) = 0;
             virtual void setPosX(int pos_x) = 0;
             virtual void setPosY(int pos_y) = 0;
+            virtual void setDirection(Direction direction) = 0;
             virtual void setSpeed(int speed) = 0;
             virtual void setIsAlive(bool isAlive) = 0;
 
@@ -40,6 +42,7 @@ namespace Server
             virtual int getDamage() const = 0;
             virtual int getPosX() const = 0;
             virtual int getPosY() const = 0;
+            virtual Direction getDirection() const = 0;
             virtual int getSpeed() const = 0;
             virtual bool getIsAlive() const = 0;
     };

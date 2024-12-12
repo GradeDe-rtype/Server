@@ -28,9 +28,11 @@ namespace Server
             Shoot(int pos_x, int pos_y, int speed, int damage, Direction direction);
             ~Shoot() = default;
 
-            // void move();
+            /*  ---- GAME LOGIC ---- */
+            void updatePosition();
             // bool is_out_of_bounds(int screen_width, int screen_height);
 
+            /*  ---- SETTER ---- */
             void setDamage(int damage);
             void setPosX(double pos_x);
             void setPosY(double pos_y);
@@ -38,6 +40,7 @@ namespace Server
             void setSpeed(double speed);
             void setIsActive(bool isActive);
 
+            /*  ---- GETTER ---- */
             int getDamage() const;
             int getPosX() const;
             int getPosY() const;

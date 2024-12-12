@@ -19,6 +19,13 @@ namespace Server
         _level = level;
     }
 
+    void AEntity::setHealth(int health)
+    {
+        if (health < 0)
+            return;
+        _health = health;
+    }
+
     void AEntity::setPosX(int pos_x)
     {
         _position.x = pos_x;
@@ -27,6 +34,11 @@ namespace Server
     void AEntity::setPosY(int pos_y)
     {
         _position.y = pos_y;
+    }
+
+    void AEntity::setDirection(Direction direction)
+    {
+        _direction = direction;
     }
 
     void AEntity::setSpeed(int speed)
@@ -69,6 +81,11 @@ namespace Server
     int AEntity::getPosY() const
     {
         return _position.y;
+    }
+
+    Direction AEntity::getDirection() const
+    {
+        return _direction;
     }
 
     int AEntity::getSpeed() const

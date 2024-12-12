@@ -33,16 +33,18 @@ namespace Server
             Monster(int id, int level);
             ~Monster() = default;
 
+            /*  ---- GAME LOGIC ---- */
+            void shoot();
+            void updatePosition();
+
             /*  ---- SETTER ---- */
             void setType(int type);
             void setSize(int size);
-            void setDirection(Direction direction);
 
             /*  ---- GETTER ---- */
             std::unordered_map<std::string, int> getEnemyInfo() const;
             int getType() const;
             int getSize() const;
-            Direction getDirection() const;
     };
 } // namespace Server
 
