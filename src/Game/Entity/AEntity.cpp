@@ -21,12 +21,12 @@ namespace Server
 
     void AEntity::setPosX(int pos_x)
     {
-        _positions.x = pos_x;
+        _position.x = pos_x;
     }
 
     void AEntity::setPosY(int pos_y)
     {
-        _positions.y = pos_y;
+        _position.y = pos_y;
     }
 
     void AEntity::setSpeed(int speed)
@@ -63,12 +63,12 @@ namespace Server
 
     int AEntity::getPosX() const
     {
-        return _positions.x;
+        return _position.x;
     }
 
     int AEntity::getPosY() const
     {
-        return _positions.y;
+        return _position.y;
     }
 
     int AEntity::getSpeed() const
