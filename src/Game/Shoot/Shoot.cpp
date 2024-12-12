@@ -10,16 +10,15 @@
 
 
 namespace Server {
-    Shoot::Shoot(double x, double y, double speed, int damage, std::string direction)
+    Shoot::Shoot(int pos_x, int pos_y, int speed, int damage, Direction direction)
     {
-        _position = {x, y};
-        _speed = speed;
+        _position = {pos_x, pos_y};
+        _direction = direction;
         _damage = damage;
+        _speed = speed;
         _isActive = true;
-        if (direction == "right")
-            _direction = Direction::RIGHT;
-        else if (direction == "left")
-            _direction = Direction::LEFT;
+
+        std::cout << "Shoot initiated" << std::endl;
     }
 
     Shoot::~Shoot()

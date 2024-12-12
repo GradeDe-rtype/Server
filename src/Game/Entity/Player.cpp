@@ -22,6 +22,13 @@ namespace Server
         _isAlive = true;
         _color = 0;
         _socket = socket;
+
+        std::cout << "Player " << _id << " initiated" << std::endl;
+    }
+
+    Player::~Player()
+    {
+        std::cout << "Player " << _id << " destroyed" << std::endl;
     }
 
     /*  ---- SETTER ---- */

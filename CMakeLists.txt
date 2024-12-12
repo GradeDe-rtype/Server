@@ -35,6 +35,7 @@ target_include_directories(r-type_server PRIVATE
     "src/Parsing/"
     "src/Utils/Utils/"
     "src/Utils/Path/"
+    "src/Game/"
     "src/Server/"
 )
 

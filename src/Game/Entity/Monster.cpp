@@ -88,7 +88,7 @@ namespace Server
         return _size;
     }
 
-    AEntity::Direction Monster::getDirection() const
+    Direction Monster::getDirection() const
     {
         return _direction;
     }

@@ -124,7 +124,7 @@ namespace Server
                     [client_id, receiver_id](const boost::system::error_code &ec, std::size_t bytes_transferred) {
                         if (!ec) {
                             std::cout << "Message sent from client " << client_id << " to receiver " << receiver_id
-                                      << ", bytes: " << bytes_transferred << std::endl;
+                                    << ", bytes: " << bytes_transferred << std::endl;
                         } else {
                             std::cerr << "Error sending message: " << ec.message() << std::endl;
                         }
@@ -142,13 +142,13 @@ namespace Server
             if (std::find(excluded_clients.begin(), excluded_clients.end(), id) != excluded_clients.end())
                 continue;
             boost::asio::async_write(*socket, boost::asio::buffer(&data, sizeof(data)),
-                                     [](const boost::system::error_code &ec, std::size_t bytes_transferred) {
-                                         if (!ec) {
-                                             std::cout << "Broadcast sent, bytes: " << bytes_transferred << std::endl;
-                                         } else {
-                                             std::cerr << "Error sending broadcast: " << ec.message() << std::endl;
-                                         }
-                                     });
+                                    [](const boost::system::error_code &ec, std::size_t bytes_transferred) {
+                                        if (!ec) {
+                                            std::cout << "Broadcast sent, bytes: " << bytes_transferred << std::endl;
+                                        } else {
+                                            std::cerr << "Error sending broadcast: " << ec.message() << std::endl;
+                                        }
+                                    });
             return;
         }
     }

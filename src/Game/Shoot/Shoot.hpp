@@ -10,6 +10,7 @@
     #define SHOOT_HPP
 
 #include <RType.hpp>
+#include <AEntity.hpp>
 
 
 namespace Server
@@ -17,25 +18,15 @@ namespace Server
     class Shoot
     {
         private:
-            typedef struct Position {
-                double x;
-                double y;
-            } position_t;
-
-            typedef enum {
-                LEFT,
-                RIGHT,
-            } Direction;
-
-            int _damage;
             position_t _position;
-            Direction _direction;
-            double _speed;
+            Direction _direction = Direction::LEFT;
+            int _damage;
+            int _speed;
             bool _isActive = true;
 
         public:
-            Shoot(double x, double y, double speed, int damage, std::string direction);
-            ~Shoot();
+            Shoot(int pos_x, int pos_y, int speed, int damage, Direction direction);
+            ~Shoot() = default;
 
             // void move();
             // bool is_out_of_bounds(int screen_width, int screen_height);

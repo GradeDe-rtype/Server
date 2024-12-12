@@ -18,15 +18,6 @@ namespace Server
     class AEntity : virtual public Server::IEntity
     {
         protected:
-            typedef struct Position {
-                int x;
-                int y;
-            } position_t;
-
-            typedef enum {
-                    LEFT,
-                    RIGHT,
-            } Direction;
 
             int LEVEL_MAX = 2;
 

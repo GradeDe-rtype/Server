@@ -15,9 +15,15 @@
 
 namespace Server
 {
+    //TODO: Defined Type attribute with devteam
+    enum class Type {
+        MONSTER = 0,
+        BOSS = 1,
+    };
     class Monster : public Server::AEntity
     {
         private:
+            //TODO: Defined Type attribute with devteam
             int _type = 0;
             int _size = 0;
             Direction _direction = Direction::LEFT;

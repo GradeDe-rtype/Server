@@ -14,6 +14,15 @@
 
 namespace Server
 {
+    typedef struct Position {
+        int x;
+        int y;
+    } position_t;
+
+    typedef enum {
+            LEFT,
+            RIGHT,
+    } Direction;
     class IEntity
     {
         public:
