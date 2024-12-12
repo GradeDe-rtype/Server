@@ -9,7 +9,7 @@
 #ifndef SHOOT_HPP
     #define SHOOT_HPP
 
-#include "RType.hpp"
+#include <RType.hpp>
 
 
 namespace Server
@@ -23,8 +23,8 @@ namespace Server
             } position_t;
 
             typedef enum {
-                    LEFT,
-                    RIGHT,
+                LEFT,
+                RIGHT,
             } Direction;
 
             int _damage;
