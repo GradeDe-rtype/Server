@@ -10,13 +10,13 @@
 
 namespace Server
 {
-
+//TODO: Health is set at ten by default but it will change
     Player::Player(int id, std::shared_ptr<boost::asio::ip::tcp::socket> socket)
     {
         _id = id;
         _level = 1;
         _position = {0, 0};
-        _health = 100;
+        _health = 10;
         _damage = 10;
         _speed = 1;
         _isAlive = true;

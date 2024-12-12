@@ -11,12 +11,13 @@
 
 namespace Server
 {
+//TODO: Health is set at ten by default but it will change
     Monster::Monster(int id)
     {
         _id = id;
         _level = 1;
         _position = {0, 0};
-        _health = 100;
+        _health = 10;
         _damage = 10;
         _speed = 1;
         _isAlive = true;
@@ -32,7 +33,7 @@ namespace Server
         else
             _level = level;
         _position = {0, 0};
-        _health = 100 * level;
+        _health = 10 * level;
         _damage = 10 * level;
         _speed = 1;
         _isAlive = true;
