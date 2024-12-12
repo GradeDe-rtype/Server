@@ -30,7 +30,7 @@ namespace Server
             int _id;
             std::string _name;
             int _count = 0;
-            Mode _mode = 0;
+            Mode _mode = Mode::WAITING;
 
             std::vector<Server::Player> _players;
             std::vector<Server::Monster> _monsters;

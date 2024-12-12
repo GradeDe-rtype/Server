@@ -63,66 +63,66 @@ namespace Server
 //TODO: Update Game Mode with Mode::PLAYING 
 //TODO: Lose condition (when all players.isAlive == false)
 void Room::update()
-{
-    auto now = std::chrono::steady_clock::now();
-    if (_mode != Mode::PLAYING)
-        return;
+    {
+        auto now = std::chrono::steady_clock::now();
+        if (_mode != Mode::PLAYING)
+            return;
 
-    if (std::chrono::duration_cast<std::chrono::seconds>(now - _lastMonsterSpawn).count() >= 5) {
-        spawnMonster();
-        _lastMonsterSpawn = now;
-    }
+        if (std::chrono::duration_cast<std::chrono::seconds>(now - _lastMonsterSpawn).count() >= 5) {
+            spawnMonster();
+            _lastMonsterSpawn = now;
+        }
 
-    for (auto &player : _players) {
-        if (player.getIsAlive()) {
-            player.update();
+        for (auto &player : _players) {
+            if (player.getIsAlive()) {
+                player.update();
 
-            for (auto &shoot : player.getShoots()) {
+                for (auto &shoot : player.getShoots()) {
+                    shoot.updatePosition();
+
+                    for (auto &monster : _monsters) {
+                        if (shoot.getPosX() == monster.getPosX() && shoot.getPosY() == monster.getPosY()) {
+                            monster.setHealth(monster.getHealth() - shoot.getDamage());
+                            shoot.setIsActive(false);
+                            if (monster.getHealth() <= 0) {
+                                monster.setIsAlive(false);
+                                std::cout << "Monster " << monster.getId() << " was killed by player " << player.getId() << std::endl;
+                            }
+                        }
+                    }
+                }
+                player.removeInactiveShoots();
+            }
+        }
+
+        for (auto &monster : _monsters) {
+            monster.update();
+
+            for (auto &shoot : monster.getShoots()) {
                 shoot.updatePosition();
 
-                for (auto &monster : _monsters) {
-                    if (shoot.getPosX() == monster.getPosX() && shoot.getPosY() == monster.getPosY()) {
-                        monster.setHealth(monster.getHealth() - shoot.getDamage());
+                for (auto &player : _players) {
+                    if (shoot.getPosX() == player.getPosX() && shoot.getPosY() == player.getPosY()) {
+                        player.setHealth(player.getHealth() - shoot.getDamage());
                         shoot.setIsActive(false);
-                        if (monster.getHealth() <= 0) {
-                            monster.setIsAlive(false);
-                            std::cout << "Monster " << monster.getId() << " was killed by player " << player.getId() << std::endl;
+                        if (player.getHealth() <= 0) {
+                            player.setIsAlive(false);
+                            std::cout << "Player " << player.getId() << " was killed by monster " << monster.getId() << ".\n";
                         }
                     }
                 }
             }
-            player.removeInactiveShoots();
+            monster.removeInactiveShoots();
         }
+
+        _monsters.erase(std::remove_if(_monsters.begin(), _monsters.end(),
+                                        [](const Monster &monster) { return !monster.getIsAlive(); }),
+                                        _monsters.end());
+
+        _players.erase(std::remove_if(_players.begin(), _players.end(),
+                                        [](const Player &player) { return !player.getHaveJoined(); }),
+                                        _players.end());
     }
-
-    for (auto &monster : _monsters) {
-        monster.update();
-
-        for (auto &shoot : monster.getShoots()) {
-            shoot.updatePosition();
-
-            for (auto &player : _players) {
-                if (shoot.getPosX() == player.getPosX() && shoot.getPosY() == player.getPosY()) {
-                    player.setHealth(player.getHealth() - shoot.getDamage());
-                    shoot.setIsActive(false);
-                    if (player.getHealth() <= 0) {
-                        player.setIsAlive(false);
-                        std::cout << "Player " << player.getId() << " was killed by monster " << monster.getId() << ".\n";
-                    }
-                }
-            }
-        }
-        monster.removeInactiveShoots();
-    }
-
-    _monsters.erase(std::remove_if(_monsters.begin(), _monsters.end(),
-                                    [](const Monster &monster) { return !monster.getIsAlive(); }),
-                                    _monsters.end());
-
-    _players.erase(std::remove_if(_players.begin(), _players.end(),
-                                    [](const Player &player) { return !player.getHaveJoined(); }),
-                                    _players.end());
-}
 
     /*  ---- SETTER ---- */
 
@@ -145,7 +145,7 @@ void Room::update()
             {"id", std::to_string(_id)},
             {"name", _name},
             {"count", std::to_string(_count)},
-            {"mode", std::to_string(static_cast<int>(_mode))}};
+            {"mode", std::to_string(static_cast<int>(_mode))}
         };
     }
 
@@ -159,7 +159,7 @@ void Room::update()
         return _count;
     }
 
-    int Room::getMode() const
+    Room::Mode Room::getMode() const
     { 
         return _mode;
     }
