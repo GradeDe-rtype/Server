@@ -10,11 +10,10 @@
 
 namespace Server
 {
-    Room::Room(int id, std::string name)
+    Room::Room(int id, std::string name) : _monsterSpawnTimer(5000)
     {
         _id = id;
         _name = name;
-        _lastMonsterSpawn = std::chrono::steady_clock::now();
 
         std::cout << "Room " << _id << " initiated" << std::endl;
     }
@@ -68,9 +67,9 @@ void Room::update()
         if (_mode != Mode::PLAYING)
             return;
 
-        if (std::chrono::duration_cast<std::chrono::seconds>(now - _lastMonsterSpawn).count() >= 5) {
+        if (_monsterSpawnTimer.hasElapsed()) {
             spawnMonster();
-            _lastMonsterSpawn = now;
+            _monsterSpawnTimer.reset();
         }
 
         for (auto &player : _players) {

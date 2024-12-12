@@ -12,6 +12,7 @@
 #include <RType.hpp>
 #include <Player.hpp>
 #include <Monster.hpp>
+#include <Timer.hpp>
 
 
 namespace Server
@@ -34,9 +35,7 @@ namespace Server
 
             std::vector<Server::Player> _players;
             std::vector<Server::Monster> _monsters;
-
-            //TODO: Make a Class for Timer
-            std::chrono::steady_clock::time_point _lastMonsterSpawn;
+            Timer _monsterSpawnTimer;
 
         public:
             Room(int id, std::string _name);
