@@ -70,15 +70,5 @@ namespace RType
                            [](unsigned char c) { return std::tolower(c); });
             return result;
         }
-
-        Server::DataPacket createDataPacket(const std::string &command, const std::string &args)
-        {
-            Server::DataPacket packet{};
-            strncpy(packet.command, command.c_str(), sizeof(packet.command) - 1);
-            packet.command[sizeof(packet.command) - 1] = '\0';
-            strncpy(packet.args, args.c_str(), sizeof(packet.args) - 1);
-            packet.args[sizeof(packet.args) - 1] = '\0';
-            return packet;
-        }
     } // namespace Utils
 } // namespace RType

@@ -11,10 +11,10 @@
 #define COMMAND_HPP
 
 /*  ---- INCLUDES ---- */
-#include <DataPacket.hpp>
 #include <RType.hpp>
 #include <Server.hpp>
 #include <Utils.hpp>
+#include <rfcArgParser.hpp>
 
 #define UNUSED(x) (void)(x)
 
@@ -25,7 +25,7 @@ namespace Server
     {
         public:
             Command(TCP &tcp);
-            void process_command(int client_id, Server::DataPacket packet);
+            void process_command(int client_id, rfcArgParser::DataPacket packet);
 
         private:
             void start(int client_id, const std::string &args);
