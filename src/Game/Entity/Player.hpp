@@ -30,7 +30,7 @@ namespace Server
     class Player : public Server::AEntity
     {
         private:
-            int _color;
+            Color _color;
             Direction _direction = Direction::RIGHT;
             bool _haveJoined = false;
             std::shared_ptr<boost::asio::ip::tcp::socket> _socket;
@@ -44,13 +44,13 @@ namespace Server
             void update();
 
             /*  ---- SETTER ---- */
-            void setColor(int color);
+            void setColor(Color color);
             void setHaveJoined(bool haveJoined);
 
             /*  ---- GETTER ---- */
-            std::unordered_map<std::string, int> getPlayerInfo() const;
-            std::unordered_map<std::string, int> getPlayerSmallInfo() const;
-            int getColor() const;
+            std::unordered_map<std::string, std::string> getPlayerInfo() const;
+            std::unordered_map<std::string, std::string> getPlayerSmallInfo() const;
+            Color getColor() const;
             bool getHaveJoined() const;
             std::shared_ptr<boost::asio::ip::tcp::socket> getSocket() const;
 

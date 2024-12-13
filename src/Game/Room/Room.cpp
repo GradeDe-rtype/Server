@@ -80,6 +80,7 @@ void Room::update()
                     shoot.updatePosition();
 
                     for (auto &monster : _monsters) {
+                        //TODO: Get range
                         if (shoot.getPosX() == monster.getPosX() && shoot.getPosY() == monster.getPosY()) {
                             monster.setHealth(monster.getHealth() - shoot.getDamage());
                             shoot.setIsActive(false);

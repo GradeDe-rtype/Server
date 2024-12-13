@@ -35,6 +35,7 @@ namespace Server
 
             std::vector<Server::Player> _players;
             std::vector<Server::Monster> _monsters;
+            
             Timer _monsterSpawnTimer;
 
         public:

@@ -20,7 +20,7 @@ namespace Server
         _damage = 10;
         _speed = 1;
         _isAlive = true;
-        _color = 0;
+        _color = Color::RED;
         _socket = socket;
 
         std::cout << "Player " << _id << " initiated" << std::endl;
@@ -53,7 +53,7 @@ namespace Server
 
     /*  ---- SETTER ---- */
 
-    void Player::setColor(int color)
+    void Player::setColor(Color color)
     { 
         _color = color;
     }
@@ -65,26 +65,26 @@ namespace Server
 
     /*  ---- GETTER ---- */
 
-    std::unordered_map<std::string, int> Player::getPlayerInfo() const
+    std::unordered_map<std::string, std::string> Player::getPlayerInfo() const
     {
         return {
-            {"id", _id},
-            {"color", _color},
-            {"health", _health},
-            {"pos_x", _position.x},
-            {"pos_y", _position.y}
+            {"id", std::to_string(_id)},
+            {"color", std::to_string(static_cast<int>(_color))},
+            {"health", std::to_string(_health)},
+            {"pos_x", std::to_string(_position.x)},
+            {"pos_y", std::to_string(_position.y)}
         };
     }
 
-    std::unordered_map<std::string, int> Player::getPlayerSmallInfo() const
+    std::unordered_map<std::string, std::string> Player::getPlayerSmallInfo() const
     {
         return {
-            {"id", _id},
-            {"color", _color},
+            {"id", std::to_string(_id)},
+            {"color", std::to_string(static_cast<int>(_color))},
         };
     }
 
-    int Player::getColor() const
+    Color Player::getColor() const
     { 
         return _color;
     }

@@ -19,7 +19,7 @@ namespace Server
     {
         private:
             position_t _position;
-            Direction _direction = Direction::LEFT;
+            Direction _direction;
             int _damage;
             int _speed;
             bool _isActive = true;
