@@ -51,6 +51,8 @@ namespace Server
 
     void AEntity::setSpeed(int speed)
     {
+        if (speed < 0)
+            return;
         _speed = speed;
     }
 
