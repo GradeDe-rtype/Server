@@ -21,10 +21,9 @@ namespace Server
         commands_["position"] = [this](const int client_id, const std::string &args) { position(client_id, args); };
     }
 
-    void Command::process_command(const int client_id, Server::DataPacket packet)
+    void Command::process_command(const int client_id, rfcArgParser::DataPacket packet)
     {
-        std::string args_str(packet.args);
-        const std::string command = packet.command;
+        const std::string command = RType::Utils::trim(packet.command);
         const std::string args = RType::Utils::trim(packet.args);
 
         if (const auto it = commands_.find(command); it != commands_.end()) {
@@ -80,7 +79,7 @@ namespace Server
                 message += " ";
             message += words[i];
         }
-        Server::DataPacket data = RType::Utils::createDataPacket("message", message);
+        rfcArgParser::DataPacket data = rfcArgParser::SerializePacket("message", message);
         tcp_.send_message(client_id, id, data);
     }
 
@@ -107,7 +106,7 @@ namespace Server
                 message += elem;
             }
         }
-        const Server::DataPacket data = RType::Utils::createDataPacket("broadcast", message);
+        const rfcArgParser::DataPacket data = rfcArgParser::SerializePacket("broadcast", message);
         tcp_.send_broadcast(data, excluded_clients);
     }
 
@@ -130,7 +129,7 @@ namespace Server
 
         std::string temporary = rfcArgParser::CreateObject(obj);
         temporary = std::to_string(client_id) + " " + temporary + "\n";
-        Server::DataPacket data = RType::Utils::createDataPacket("position", temporary);
+        rfcArgParser::DataPacket data = rfcArgParser::SerializePacket("position", temporary);
         tcp_.send_broadcast(data, {client_id});
     }
 } // namespace Server
