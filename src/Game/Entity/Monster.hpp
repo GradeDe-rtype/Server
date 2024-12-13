@@ -24,7 +24,7 @@ namespace Server
     {
         private:
             //TODO: Defined Type attribute with devteam
-            int _type = 0;
+            Type _type = Type::MONSTER;
             int _size = 0;
             Direction _direction = Direction::LEFT;
 
@@ -38,12 +38,12 @@ namespace Server
             void update();
 
             /*  ---- SETTER ---- */
-            void setType(int type);
+            void setType(Type type);
             void setSize(int size);
 
             /*  ---- GETTER ---- */
-            std::unordered_map<std::string, int> getEnemyInfo() const;
-            int getType() const;
+            std::unordered_map<std::string, std::string> getEnemyInfo() const;
+            Type getType() const;
             int getSize() const;
     };
 } // namespace Server

@@ -65,6 +65,7 @@ namespace Server
 
     /*  ---- GETTER ---- */
 
+//TODO: Check if it's necessary using EnemyInfoMap = std::unordered_map<std::string, std::variant<int, float, std::string, Server::Type>>;
     std::unordered_map<std::string, std::string> Player::getPlayerInfo() const
     {
         return {

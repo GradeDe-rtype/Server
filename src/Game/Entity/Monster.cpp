@@ -54,9 +54,20 @@ namespace Server
         _shoots.emplace_back(_position.x, _position.y, shootSpeed, _damage, _direction);
     }
 
+    void Monster::update()
+    {
+        for (auto &shoot : _shoots) {
+            shoot.updatePosition();
+        }
+
+        _shoots.erase(std::remove_if(_shoots.begin(), _shoots.end(),
+                                    [](const Shoot &shoot) { return !shoot.getIsActive(); }),
+                    _shoots.end());
+    }
+
     /*  ---- SETTER ---- */
 
-    void Monster::setType(int type)
+    void Monster::setType(Type type)
     {
         _type = type;
     }
@@ -67,19 +78,19 @@ namespace Server
     }
 
     /*  ---- GETTER ---- */
-    std::unordered_map<std::string, int> Monster::getEnemyInfo() const
+    std::unordered_map<std::string, std::string> Monster::getEnemyInfo() const
     {
         return {
-            {"id", _id},
-            {"type", _type},
-            {"size", _size},
-            {"health", _health},
-            {"pos_x", _position.x},
-            {"pos_y", _position.y}
+            {"id", std::to_string(_id)},
+            {"type", std::to_string(static_cast<int>(_type))},
+            {"size", std::to_string(_size)},
+            {"health", std::to_string(_health)},
+            {"pos_x", std::to_string(_position.x)},
+            {"pos_y", std::to_string(_position.y)}
         };
     }
 
-    int Monster::getType() const
+    Type Monster::getType() const
     {
         return _type;
     }
