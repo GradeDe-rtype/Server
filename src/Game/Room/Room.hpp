@@ -32,6 +32,10 @@ namespace Server
             std::string _name;
             int _count = 0;
             Mode _mode = Mode::WAITING;
+            //TODO: doc
+            bool _isReady = false;
+            //TODO: doc
+            int _score = 0;
 
             std::vector<Server::Player> _players;
             std::vector<Server::Monster> _monsters;
@@ -43,6 +47,8 @@ namespace Server
             ~Room() = default;
 
             /*  ---- GAME LOGIC ---- */
+            //TODO: doc
+            void start();
             void addPlayer(const Player &player);
             void removePlayer(int playerId);
             void spawnMonster();
@@ -51,12 +57,20 @@ namespace Server
             /*  ---- SETTER ---- */
             void setName(std::string name);
             void setMode(Mode mode);
+            //TODO: doc
+            void setIsReady(bool isReady);
+            //TODO: doc
+            void setScore(int score);
 
             /*  ---- GETTER ---- */
             std::unordered_map<std::string, std::string> getRoomInfo() const;
             std::string getName() const;
             int getCount() const;
             Mode getMode() const;
+            //TODO: doc
+            bool getIsReady() const;
+            //TODO: doc
+            int getScore() const;
 
     };
 } // namespace Server
