@@ -1,9 +1,10 @@
 /*
-** EPITECH PROJECT, 2024
-** R-Type
-** File description:
-** Entity abstract
-** Caroline Boilly @Aeliondw
+    Authors:
+    >> Caroline Boilly @Aeliondw
+    >> Nathan Tirolf @dragusheen
+
+    („• ֊ •„)❤  <  Have a good day !
+    --U-----U------------------------
 */
 
 #include "AEntity.hpp"
@@ -29,12 +30,12 @@ namespace RType
 
             void AEntity::setPosX(int pos_x)
             {
-                setPosition((Entity::Position){pos_x, _position.y})
+                setPosition((Entity::Position){pos_x, _position.y});
             }
 
             void AEntity::setPosY(int pos_y)
             {
-                setPosition((Entity::Position){_position.x, pos_y})
+                setPosition((Entity::Position){_position.x, pos_y});
             }
 
             void AEntity::setPosition(Entity::Position position)
@@ -47,7 +48,7 @@ namespace RType
                 _direction = direction;
             }
 
-            void AEntity::setSpeed(int peed)
+            void AEntity::setSpeed(int speed)
             {
                 if (speed < 0) return;
                 _speed = speed;
