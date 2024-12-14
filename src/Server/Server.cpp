@@ -8,13 +8,13 @@
 */
 
 /*  ---- INCLUDES ---- */
-#include "Player.hpp"
 #include "Server.hpp"
+#include "Player.hpp"
 
 namespace Server
 {
     TCP::TCP(boost::asio::io_context &io_context, const short port) : acceptor_(io_context, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port)),
-                                                                    command_processor(new Command(*this))
+                                                                      command_processor(new Command(*this))
     {
         start_accept();
     }
@@ -25,8 +25,8 @@ namespace Server
     void TCP::remove_player(int client_id)
     {
         players_.erase(std::remove_if(players_.begin(), players_.end(),
-                                    [client_id](const Player &player) { return player.getId() == client_id; }),
-                    players_.end());
+                                      [client_id](const Player &player) { return player.getId() == client_id; }),
+                       players_.end());
     }
 
     Player &TCP::get_player(const int client_id)
