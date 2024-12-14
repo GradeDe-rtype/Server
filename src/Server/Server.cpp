@@ -8,8 +8,8 @@
 */
 
 /*  ---- INCLUDES ---- */
-#include <Player.hpp>
-#include <Server.hpp>
+#include "Player.hpp"
+#include "Server.hpp"
 
 namespace Server
 {
@@ -21,6 +21,7 @@ namespace Server
 
     TCP::~TCP() { delete command_processor; }
 
+    // TODO: change all "player " to "client"
     void TCP::remove_player(int client_id)
     {
         players_.erase(std::remove_if(players_.begin(), players_.end(),

@@ -11,7 +11,6 @@
 
 /*  ---- INCLUDES ---- */
 #include <string>
-
 #include "Utils.hpp"
 
 /*  ---- CLASS ---- */

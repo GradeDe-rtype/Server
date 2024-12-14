@@ -33,10 +33,10 @@ namespace Server
 
     /*  ---- SETTER ---- */
 
-    void Player::shoot()
+    void Player::shoot(int x, int y)
     {
         int shootSpeed = 5 * _speed;
-        _shoots.emplace_back(_position.x, _position.y, shootSpeed, _damage, _direction);
+        _shoots.emplace_back(x, y, shootSpeed, _damage, _direction);
     }
 
 //TODO: Check
@@ -61,6 +61,16 @@ namespace Server
     void Player::setHaveJoined(bool haveJoined)
     { 
         _haveJoined = haveJoined;
+    }
+
+    void Player::setPosX(int pos_x)
+    { 
+        _position.x = pos_x;
+    }
+
+    void Player::setPosY(int pos_y)
+    { 
+        _position.y = pos_y;
     }
 
     /*  ---- GETTER ---- */

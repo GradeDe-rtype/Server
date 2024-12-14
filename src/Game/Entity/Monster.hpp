@@ -9,8 +9,8 @@
 #ifndef MONSTER_HPP
     #define MONSTER_HPP
 
-#include <RType.hpp>
-#include <AEntity.hpp>
+#include "RType.hpp"
+#include "AEntity.hpp"
 
 
 namespace Server

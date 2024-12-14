@@ -9,7 +9,7 @@
 #ifndef TIMER_HPP
     #define TIMER_HPP
 
-#include <RType.hpp>
+#include "RType.hpp"
 
 class Timer
 {

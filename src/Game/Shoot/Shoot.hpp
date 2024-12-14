@@ -9,8 +9,8 @@
 #ifndef SHOOT_HPP
     #define SHOOT_HPP
 
-#include <RType.hpp>
-#include <AEntity.hpp>
+#include "RType.hpp"
+#include "IEntity.hpp"
 
 
 namespace Server
@@ -18,14 +18,14 @@ namespace Server
     class Shoot
     {
         private:
-            position_t _position;
-            Direction _direction;
+            Server::position_t _position;
+            Server::Direction _direction;
             int _damage;
             int _speed;
             bool _isActive = true;
 
         public:
-            Shoot(int pos_x, int pos_y, int speed, int damage, Direction direction);
+            Shoot(int pos_x, int pos_y, int speed, int damage, Server::Direction direction);
             ~Shoot() = default;
 
             /*  ---- GAME LOGIC ---- */
@@ -36,7 +36,7 @@ namespace Server
             void setDamage(int damage);
             void setPosX(double pos_x);
             void setPosY(double pos_y);
-            void setDirection(Direction direction);
+            void setDirection(Server::Direction direction);
             void setSpeed(double speed);
             void setIsActive(bool isActive);
 
@@ -44,7 +44,7 @@ namespace Server
             int getDamage() const;
             int getPosX() const;
             int getPosY() const;
-            Direction getDirection() const;
+            Server::Direction getDirection() const;
             double getSpeed() const;
             bool getIsActive() const;
     };

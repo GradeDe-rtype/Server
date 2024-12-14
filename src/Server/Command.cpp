@@ -7,18 +7,21 @@
     --U-----U------------------------
 */
 
-#include <Command.hpp>
-#include <Player.hpp>
+#include "Command.hpp"
+#include "Player.hpp"
 
 namespace Server
 {
     Command::Command(TCP &tcp) : tcp_(tcp)
     {
-        commands_["start"] = [this](const int client_id, const std::string &args) { start(client_id, args); };
-        commands_["send"] = [this](const int client_id, const std::string &args) { send(client_id, args); };
-        commands_["stop"] = [this](const int client_id, const std::string &args) { stop(client_id, args); };
-        commands_["broadcast"] = [this](const int client_id, const std::string &args) { broadcast(client_id, args); };
+        /* COMMANDS READED*/
         commands_["position"] = [this](const int client_id, const std::string &args) { position(client_id, args); };
+        commands_["p_info"] = [this](const int client_id, const std::string &args) { p_info(client_id, args); };
+        commands_["shoot"] = [this](const int client_id, const std::string &args) { shoot(client_id, args); };
+        commands_["e_info"] = [this](const int client_id, const std::string &args) { e_info(client_id, args); };
+
+        /* COMMANDS TO SEND */
+        send_["connect"] = [this](const int receiver_id, const std::string &args, std::string &command) { to_send(receiver_id, args, "connect"); };
     }
 
     void Command::process_command(const int client_id, rfcArgParser::DataPacket packet)
@@ -37,79 +40,6 @@ namespace Server
         }
     }
 
-    void Command::start(const int client_id, const std::string &args)
-    {
-        std::cout << "Client " << client_id << " started.\n";
-    }
-
-    void Command::stop(const int client_id, const std::string &args)
-    {
-        std::cout << "Client " << client_id << " stopped.\n";
-        tcp_.setRunning(false);
-    }
-
-    void Command::send(const int client_id, const std::string &args)
-    {
-        if (args.empty()) {
-            std::cerr << "No message to send.\n";
-            return;
-        }
-        std::vector<std::string> words;
-        std::istringstream iss(args);
-        std::string word;
-        while (iss >> word) {
-            words.push_back(word);
-        }
-        if (words.size() < 2) {
-            std::cerr << "Usage: send <client_id> <message>\n";
-            return;
-        }
-        if (!RType::Utils::isNumber(words[0])) {
-            std::cerr << "Invalid client id: |" << words[0] << "|\n";
-            return;
-        }
-        const int id = std::stoi(words[0]);
-        if (!tcp_.player_exists(id)) {
-            std::cerr << "Client " << id << " does not exist.\n";
-            return;
-        }
-        std::string message;
-        for (size_t i = 1; i < words.size(); ++i) {
-            if (i > 1)
-                message += " ";
-            message += words[i];
-        }
-        rfcArgParser::DataPacket data = rfcArgParser::SerializePacket("message", message);
-        tcp_.send_message(client_id, id, data);
-    }
-
-    void Command::broadcast(const int client_id, const std::string &args)
-    {
-        UNUSED(client_id);
-        std::vector<std::string> words;
-        std::istringstream iss(args);
-        std::string word;
-        std::string message;
-        while (iss >> word) {
-            words.push_back(word);
-        }
-        std::vector<int> excluded_clients;
-        for (const auto &elem : words) {
-            if (RType::Utils::isNumber(elem)) {
-                excluded_clients.push_back(std::stoi(elem));
-            } else {
-                if (word == "broadcast") {
-                    continue;
-                }
-                if (!message.empty())
-                    message += " ";
-                message += elem;
-            }
-        }
-        const rfcArgParser::DataPacket data = rfcArgParser::SerializePacket("broadcast", message);
-        tcp_.send_broadcast(data, excluded_clients);
-    }
-
     void Command::position(int client_id, const std::string &args)
     {
         std::unordered_map<std::string, std::string> obj = rfcArgParser::ParseObject(args);
@@ -126,10 +56,68 @@ namespace Server
         Player player = tcp_.get_player(client_id);
         player.setPosX(x);
         player.setPosY(y);
-
-        std::string temporary = rfcArgParser::CreateObject(obj);
-        temporary = std::to_string(client_id) + " " + temporary + "\n";
-        rfcArgParser::DataPacket data = rfcArgParser::SerializePacket("p_position", temporary);
-        tcp_.send_broadcast(data, {client_id});
     }
+
+    void Command::p_info(int client_id, const std::string &args) {
+        if (!args.empty()) {
+            std::cerr << "Usage: p_info\n";
+            return;
+        }
+        if (!RType::Utils::isNumber(args)) {
+            std::cerr << "Invalid argument.\n";
+            return;
+        }
+        int id = std::stoi(args);
+        // Player player = Room.get_player(id); // TODO: make a get_player from the room class not the server
+        // std::unordered_map<std::string, std::string> data = player.getPlayerInfo();
+        // std::string data_str = rfcArgParser::CreateObject(data);
+        // rfcArgParser::DataPacket packet = rfcArgParser::SerializePacket("p_info", data_str);
+        // tcp_.send_message(SERVER_ID, client_id, packet);
+    }
+
+    void Command::shoot(int client_id, const std::string &args)
+    {
+        if (!args.empty()) {
+            std::cerr << "Usage: shoot\n";
+            return;
+        }
+        Player player = tcp_.get_player(client_id);
+        std::unordered_map<std::string, std::string> data = rfcArgParser::ParseObject(args);
+        if (!data.contains("x") || !data.contains("y")) {
+            std::cerr << "Usage: shoot {\"x\": <x>, \"y\": <y>}\n";
+            return;
+        }
+        if (!RType::Utils::isNumber(data["x"]) || !RType::Utils::isNumber(data["y"])) {
+            std::cerr << "Invalid x or y value.\n";
+            return;
+        }
+
+        player.shoot(std::stoi(data["x"]), std::stoi(data["y"]));
+    }
+
+    void e_info(int client_id, const std::string &args)
+    {
+        if (!args.empty()) {
+            std::cerr << "Usage: e_info\n";
+            return;
+        }
+        if (!RType::Utils::isNumber(args)) {
+            std::cerr << "Invalid argument.\n";
+            return;
+        }
+        int id = std::stoi(args);
+        // Monster monster = Room.getEnemyInfo(id); // TODO: depends on room class
+        // std::unordered_map<std::string, std::string> data = monster.getEnemyInfo();
+        // std::string data_str = rfcArgParser::CreateObject(data);
+        // rfcArgParser::DataPacket packet = rfcArgParser::SerializePacket("e_info", data_str);
+        // tcp_.send_message(SERVER_ID, client_id, packet);
+    }
+
+    void Command::to_send(const int receiver_id, const std::string &args, const std::string &command)
+    {
+        std::string data = rfcArgParser::CreateObject(rfcArgParser::ParseObject(args));
+        rfcArgParser::DataPacket packet = rfcArgParser::SerializePacket(command, data);
+        tcp_.send_message(SERVER_ID, receiver_id, packet);
+    }
+
 } // namespace Server

@@ -9,8 +9,8 @@
 #ifndef PLAYER_HPP
     #define PLAYER_HPP
 
-#include <RType.hpp>
-#include <AEntity.hpp>
+#include "RType.hpp"
+#include "AEntity.hpp"
 
 
 namespace Server
@@ -40,12 +40,14 @@ namespace Server
             ~Player() = default;
 
             /*  ---- GAME LOGIC ---- */
-            void shoot();
+            void shoot(int x, int y);
             void update();
 
             /*  ---- SETTER ---- */
             void setColor(Color color);
             void setHaveJoined(bool haveJoined);
+            void setPosX(int pos_x);
+            void setPosY(int pos_y);
 
             /*  ---- GETTER ---- */
             std::unordered_map<std::string, std::string> getPlayerInfo() const;

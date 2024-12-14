@@ -21,6 +21,7 @@ endforeach()
 
 # Collect all source files
 file(GLOB_RECURSE SOURCES
+    "src/**/**/**/*.cpp"
     "src/**/**/*.cpp"
     "src/**/*.cpp"
     "src/*.cpp"
@@ -32,11 +33,16 @@ add_executable(r-type_server ${SOURCES})
 # Include directories for the project and libraries
 target_include_directories(r-type_server PRIVATE
     "include/"
+    "src/Game/"
+    "src/Game/Entity/"
+    "src/Game/Entity/Base/"
+    "src/Game/Room/"
+    "src/Game/Shoot/"
+    "src/Game/Timer/"
     "src/Parsing/"
+    "src/Server/"
     "src/Utils/Utils/"
     "src/Utils/Path/"
-    "src/Game/"
-    "src/Server/"
 )
 
 # Include Boost headers

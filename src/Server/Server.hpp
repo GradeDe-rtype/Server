@@ -11,9 +11,9 @@
 #define SERVER_HPP
 
 /*  ---- INCLUDES ---- */
-#include <Command.hpp>
-#include <RType.hpp>
-#include <Utils.hpp>
+#include "Command.hpp"
+#include "RType.hpp"
+#include "Utils.hpp"
 #include "rfcArgParser.hpp"
 
 /*  ---- CLASS ---- */
