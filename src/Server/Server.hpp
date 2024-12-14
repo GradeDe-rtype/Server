@@ -27,7 +27,8 @@ namespace Server
         public:
             TCP(boost::asio::io_context &io_context, short port);
             void send_message(int client_id, int receiver_id, rfcArgParser::DataPacket data);
-            void send_broadcast(rfcArgParser::DataPacket data, const std::vector<int> &excluded_clients = {});
+            void send_multicast(rfcArgParser::DataPacket data, const std::vector<int> &included_clients = {});
+            void send_broadcast(rfcArgParser::DataPacket data);
             Player &get_player(int client_id);
             void remove_player(int client_id);
             std::vector<Player> &get_players() { return players_; }

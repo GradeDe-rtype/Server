@@ -132,12 +132,12 @@ namespace Server
         }
     }
 
-    void TCP::send_broadcast(rfcArgParser::DataPacket data, const std::vector<int> &excluded_clients)
+    void TCP::send_multicast(rfcArgParser::DataPacket data, const std::vector<int> &included_clients)
     {
         for (const auto &player : players_) {
             const int id = player.getId();
             const auto socket = player.getSocket();
-            if (std::find(excluded_clients.begin(), excluded_clients.end(), id) != excluded_clients.end())
+            if (std::find(included_clients.begin(), included_clients.end(), id) == included_clients.end())
                 continue;
             boost::asio::async_write(*socket, boost::asio::buffer(&data, sizeof(data)),
                                      [](const boost::system::error_code &ec, std::size_t bytes_transferred) {
@@ -148,6 +148,22 @@ namespace Server
                                          }
                                      });
             return;
+        }
+    }
+
+    void TCP::send_broadcast(rfcArgParser::DataPacket data)
+    {
+        for (const auto &player : players_) {
+            const int id = player.getId();
+            const auto socket = player.getSocket();
+            boost::asio::async_write(*socket, boost::asio::buffer(&data, sizeof(data)),
+                                     [](const boost::system::error_code &ec, std::size_t bytes_transferred) {
+                                         if (!ec) {
+                                             std::cout << "Broadcast sent, bytes: " << bytes_transferred << std::endl;
+                                         } else {
+                                             std::cerr << "Error sending broadcast: " << ec.message() << std::endl;
+                                         }
+                                     });
         }
     }
 } // namespace Server
