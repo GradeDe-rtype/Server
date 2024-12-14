@@ -1,9 +1,11 @@
 /*
-** EPITECH PROJECT, 2024
-** R-Type
-** File description:
-** Timer class
-** Caroline Boilly @Aeliondw
+    Authors:
+    >> Caroline Boilly @Aeliondw
+    >> Nathan Tirolf @dragusheen
+    >> Daniil Stepanov @dan13615
+
+    („• ֊ •„)❤  <  Have a good day !
+    --U-----U------------------------
 */
 
 #include "Timer.hpp"

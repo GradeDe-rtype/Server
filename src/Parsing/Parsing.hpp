@@ -1,8 +1,11 @@
 /*
-** EPITECH PROJECT, 2024
-** zappy_gui
-** File description:
-** Parsing
+    Authors:
+    >> Caroline Boilly @Aeliondw
+    >> Nathan Tirolf @dragusheen
+    >> Daniil Stepanov @dan13615
+
+    („• ֊ •„)❤  <  Have a good day !
+    --U-----U------------------------
 */
 
 #ifndef RTYPE_PARSING_HPP_

@@ -1,8 +1,11 @@
 /*
-** EPITECH PROJECT, 2024
-** tmp
-** File description:
-** Parsing
+    Authors:
+    >> Caroline Boilly @Aeliondw
+    >> Nathan Tirolf @dragusheen
+    >> Daniil Stepanov @dan13615
+
+    („• ֊ •„)❤  <  Have a good day !
+    --U-----U------------------------
 */
 
 #include "Parsing.hpp"

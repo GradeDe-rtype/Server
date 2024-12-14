@@ -1,9 +1,11 @@
 /*
-** EPITECH PROJECT, 2024
-** R-Type
-** File description:
-** Player class
-** Daniil Stepanov @dan13615, Caroline Boilly @Aeliondw
+    Authors:
+    >> Caroline Boilly @Aeliondw
+    >> Nathan Tirolf @dragusheen
+    >> Daniil Stepanov @dan13615
+
+    („• ֊ •„)❤  <  Have a good day !
+    --U-----U------------------------
 */
 
 #include "Player.hpp"
