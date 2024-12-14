@@ -8,24 +8,31 @@
     --U-----U------------------------
 */
 
-#ifndef TIMER_HPP
-    #define TIMER_HPP
+#ifndef RTYPE_GAME_TIMER_HPP_
+#define RTYPE_GAME_TIMER_HPP_
 
-#include "RType.hpp"
+#include <chrono>
+#include <algorithm>
 
-class Timer
+namespace RType
 {
-private:
-    std::chrono::steady_clock::time_point _startTime;
-    std::chrono::milliseconds _interval;
+    namespace Game
+    {
+        class Timer
+        {
+            private:
+                std::chrono::steady_clock::time_point _startTime;
+                std::chrono::milliseconds _interval;
 
-public:
-    Timer(int intervalMs);
-    ~Timer() = default;
+            public:
+                Timer(int intervalMs);
+                ~Timer() = default;
 
-    void reset();
-    bool hasElapsed() const;
-    int timeLeft() const;
-};
+                void reset();
+                bool hasElapsed() const;
+                int timeLeft() const;
+        };
+    } // namespace Game
+} // namespace RType
 
-#endif // TIMER_HPP
+#endif // RTYPE_GAME_TIMER_HPP_
