@@ -11,8 +11,8 @@
 #ifndef RTYPE_GAME_TIMER_HPP_
 #define RTYPE_GAME_TIMER_HPP_
 
-#include <chrono>
 #include <algorithm>
+#include <chrono>
 
 namespace RType
 {

@@ -11,8 +11,8 @@
 #ifndef RTYPE_GAME_ENTITY_SHOOT_HPP_
 #define RTYPE_GAME_ENTITY_SHOOT_HPP_
 
-#include "Entity.hpp"
 #include "AEntity.hpp"
+#include "Entity.hpp"
 
 namespace RType
 {
@@ -20,7 +20,7 @@ namespace RType
     {
         namespace Entity
         {
-            class Shoot: public AEntity
+            class Shoot : public AEntity
             {
                 private:
                     bool _isActive = true;
