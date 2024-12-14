@@ -129,7 +129,7 @@ namespace Server
 
         std::string temporary = rfcArgParser::CreateObject(obj);
         temporary = std::to_string(client_id) + " " + temporary + "\n";
-        rfcArgParser::DataPacket data = rfcArgParser::SerializePacket("position", temporary);
+        rfcArgParser::DataPacket data = rfcArgParser::SerializePacket("p_position", temporary);
         tcp_.send_broadcast(data, {client_id});
     }
 } // namespace Server
