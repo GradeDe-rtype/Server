@@ -46,12 +46,12 @@ namespace RType
             /*  ---- GAME LOGIC ---- */
             void Monster::shoot()
             {
-                _shoots.push_back(std::make_shared<Shoot>(x, y, 15, _damage, _direction));
+                _shoots.push_back(std::make_shared<Entity::Shoot>(_position.x, _position.y, 15, _damage, _direction));
             }
 
             void Monster::update()
             {
-                _shoots.erase(std::remove_if(_shoots.begin(), _shoots.end(), [](const Shoot &shoot) { return !shoot.getIsActive(); }), _shoots.end());
+                _shoots.erase(std::remove_if(_shoots.begin(), _shoots.end(), [](std::shared_ptr<Entity::Shoot> shoot) { return !shoot->getIsActive(); }), _shoots.end());
             }
 
             /*  ---- SETTER ---- */

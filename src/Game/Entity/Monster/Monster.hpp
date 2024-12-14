@@ -10,6 +10,7 @@
 #ifndef RTYPE_GAME_ENTITY_MONSTER_HPP_
 #define RTYPE_GAME_ENTITY_MONSTER_HPP_
 
+#include <algorithm>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -46,7 +47,7 @@ namespace RType
                     /*  ---- GETTER ---- */
                     std::unordered_map<std::string, std::string> getEnemyInfo() const;
                     Type getType() const;
-                    std::vector<std::shared_ptr<Shoot>> getShoots() const;
+                    std::vector<std::shared_ptr<Entity::Shoot>> getShoots() const;
 
                 private:
                     Type _type = Type::MONSTER;

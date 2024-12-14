@@ -58,7 +58,7 @@ namespace RType
             monster->setPosX(1920);
             monster->setPosY(std::rand() % 1080);
             _monsters[monsterId] = monster;
-            // notify all players that a new monster has been created
+            // TODO RFC: Send `enemy` with all the info to all the players
         }
 
         void Room::update()
@@ -76,54 +76,45 @@ namespace RType
                 if (player.second->getIsAlive()) {
                     for (auto &shoot : player.second->getShoots()) {
                         shoot->update();
-                        for (auto &monster : _monsters) {
+                        for (auto it = _monsters.begin(); it != _monsters.end();) {
                             Game::Entity::Position shootPos = shoot->getPosition();
-                            Game::Entity::Position monsterPos = monster.second->getPosition();
-                            int monsterSize = monster.second->getSize();
+                            Game::Entity::Position monsterPos = it->second->getPosition();
+                            int monsterSize = it->second->getSize();
                             if (shootPos.x >= monsterPos.x && shootPos.x <= monsterPos.x + monsterSize && shootPos.y >= monsterPos.y && shootPos.y <= monsterPos.y + monsterSize) {
-                                // TODO RFC: Send e_death to all players
-                                _monsters.erase(monster.first);
-                            }
+                                // TODO RFC: Send `e_death` to all players
+                                it = _monsters.erase(it);
+                            } else
+                                ++it;
                         }
                     }
                     player.second->update();
+                    // TODO RFC: Send `p_position` to all players if player move
                 }
             }
 
             for (auto &monster : _monsters) {
-                monster.second->update();
                 for (auto &shoot : monster.second->getShoots()) {
                     shoot->update();
-                    for (auto &player : _players) {
+                    for (auto it = _players.begin(); it != _players.end();) {
                         Game::Entity::Position shootPos = shoot->getPosition();
-                        Game::Entity::Position playerPos = player.second->getPosition();
-                        int playerSize = player.second->getSize();
+                        Game::Entity::Position playerPos = it->second->getPosition();
+                        int playerSize = it->second->getSize();
                         if (shootPos.x >= playerPos.x && shootPos.x <= playerPos.x + playerSize && shootPos.y >= playerPos.y && shootPos.y <= playerPos.y + playerSize) {
-                            // TODO RFC: Send p_death to all players
-                            player.second->setIsAlive(false);
-                        }
+                            // TODO RFC: Send `p_death` to all players
+                            it = _players.erase(it);
+                        } else
+                            ++it;
                     }
                 }
                 monster.second->update();
+                // Maybe move the enemy
+                // TODO RFC: Send `e_position` to all players if enemy move
             }
-
-            // TODO RFC: Send position of all players to all connected players after a delay
-            // for (const auto &player : _players) {
-            //     sendPlayerPositionToAllPlayers(player);
-            // }
-
-            // TODO RFC: Send position of all enemies to all connected players after a delay
-            // for (const auto &monster : _monsters) {
-            //     sendEnemyPositionToAllPlayers(monster);
-            // }
 
             // TODO RFC: Send a request to all players if they are ready for a new wave
             // if (checkIfWaveReady()) {
             //     sendWaveReadyRequestToAllPlayers();
             // }
-
-            _monsters.erase(std::remove_if(_monsters.begin(), _monsters.end(), [](const std::shared_ptr<Game::Entity::Monster> &monster) { return !monster->getIsAlive(); }), _monsters.end());
-            _players.erase(std::remove_if(_players.begin(), _players.end(), [](const std::shared_ptr<Game::Entity::Player> &player) { return !player->getIsAlive(); }), _players.end());
         }
 
         /*  ---- SETTER ---- */

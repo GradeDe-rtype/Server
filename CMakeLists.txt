@@ -36,6 +36,7 @@ target_include_directories(r-type_server PRIVATE
     "src/Game/"
     "src/Game/Entity/"
     "src/Game/Entity/Base/"
+    "src/Game/Entity/Monster/"
     "src/Game/Entity/Player/"
     "src/Game/Entity/Shoot/"
     "src/Game/Room/"
