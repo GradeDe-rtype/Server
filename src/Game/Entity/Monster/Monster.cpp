@@ -2,13 +2,12 @@
     Authors:
     >> Caroline Boilly @Aeliondw
     >> Nathan Tirolf @dragusheen
-    >> Daniil Stepanov @dan13615
 
     („• ֊ •„)❤  <  Have a good day !
     --U-----U------------------------
 */
 
-#include "Player.hpp"
+#include "Monster.hpp"
 
 namespace RType
 {
@@ -16,7 +15,7 @@ namespace RType
     {
         namespace Entity
         {
-            Player::Player(int id, std::shared_ptr<boost::asio::ip::tcp::socket> socket)
+            Monster::Monster(int id)
             {
                 _id = id;
                 _level = 1;
@@ -25,71 +24,69 @@ namespace RType
                 _damage = 10;
                 _speed = 1;
                 _isAlive = true;
-                _color = Color::RED;
-                _socket = socket;
-                _direction = Direction::RIGHT;
+                _direction = Direction::LEFT;
             }
 
-            /*  ---- SETTER ---- */
+            Monster::Monster(int id, int level)
+            {
+                _id = id;
+                if (level < 1)
+                    _level = 1;
+                else
+                    _level = level;
+                _position = {0, 0};
+                _health = 100 * level;
+                _damage = 10 * level;
+                _speed = 1;
+                _isAlive = true;
+            }
 
-            void Player::shoot(int x, int y)
+            /*  ---- GAME LOGIC ---- */
+            void Monster::shoot()
             {
                 _shoots.push_back(std::make_shared<Shoot>(x, y, 15, _damage, _direction));
             }
 
-            void Player::update()
+            void Monster::update()
             {
                 for (auto &shoot : _shoots)
-                    shoot->update();
+                    shoot.updatePosition();
 
                 _shoots.erase(std::remove_if(_shoots.begin(), _shoots.end(), [](const Shoot &shoot) { return !shoot.getIsActive(); }), _shoots.end());
             }
 
             /*  ---- SETTER ---- */
 
-            void Player::setColor(Color color)
+            void Monster::setType(Type type)
             {
-                _color = color;
+                _type = type;
             }
 
-            void Player::setHaveJoined(bool haveJoined)
+            void Monster::setSize(int size)
             {
-                _haveJoined = haveJoined;
+                _size = size;
             }
 
             /*  ---- GETTER ---- */
-
-            std::unordered_map<std::string, std::string> Player::getPlayerInfo() const
+            std::unordered_map<std::string, std::string> Monster::getEnemyInfo() const
             {
                 return {
                     {"id", std::to_string(_id)},
-                    {"color", std::to_string(static_cast<int>(_color))},
+                    {"type", std::to_string(static_cast<int>(_type))},
+                    {"size", std::to_string(_size)},
                     {"health", std::to_string(_health)},
                     {"x", std::to_string(_position.x)},
                     {"y", std::to_string(_position.y)}};
             }
 
-            std::unordered_map<std::string, std::string> Player::getPlayerSmallInfo() const
+            Type Monster::getType() const
             {
-                return {
-                    {"id", std::to_string(_id)},
-                    {"color", std::to_string(static_cast<int>(_color))},
-                };
+                return _type;
             }
 
-            Player::Color Player::getColor() const
+            int Monster::getSize() const
             {
-                return _color;
-            }
-
-            bool Player::getHaveJoined() const
-            {
-                return _haveJoined;
-            }
-
-            std::shared_ptr<boost::asio::ip::tcp::socket> Player::getSocket() const
-            {
-                return _socket;
+                return _size;
             }
         } // namespace Entity
     } // namespace Game
