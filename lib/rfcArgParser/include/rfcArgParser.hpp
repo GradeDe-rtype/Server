@@ -150,6 +150,8 @@ class rfcArgParser
          * @return `std::string` The kept string
          */
         static std::string _keep(std::string str, char start, char end);
+
+        static DataPacket _getEmptyPacket();
 };
 
 #endif /* RFC_ARG_PARSER_H_ */
