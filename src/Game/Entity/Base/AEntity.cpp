@@ -59,6 +59,12 @@ namespace RType
                 setPosition((Entity::Position){_position.x, pos_y});
             }
 
+            void AEntity::setSize(int size)
+            {
+                if (size < 0) return;
+                _size = size;
+            }
+
             void AEntity::setSpeed(int speed)
             {
                 if (speed < 0) return;
@@ -109,6 +115,11 @@ namespace RType
             int AEntity::getPosY() const
             {
                 return _position.y;
+            }
+
+            int AEntity::getSize() const
+            {
+                return _size;
             }
 
             int AEntity::getSpeed() const

@@ -6,8 +6,8 @@
 ** Daniil Stepanov @dan13615, Caroline Boilly @Aeliondw
 */
 
-#ifndef RTYPE_GAME_ENTITY_INTERFACE_HPP_
-#define RTYPE_GAME_ENTITY_INTERFACE_HPP_
+#ifndef RTYPE_GAME_ENTITY_PLAYER_HPP_
+#define RTYPE_GAME_ENTITY_PLAYER_HPP_
 
 #include <boost/asio.hpp>
 #include <memory>
@@ -55,6 +55,7 @@ namespace RType
                     Color getColor() const;
                     bool getHaveJoined() const;
                     std::shared_ptr<boost::asio::ip::tcp::socket> getSocket() const;
+                    std::vector<std::shared_ptr<Shoot>> getShoots() const;
 
                 private:
                     Color _color;
@@ -66,4 +67,4 @@ namespace RType
     } // namespace Game
 } // namespace RType
 
-#endif // RTYPE_GAME_ENTITY_INTERFACE_HPP_
+#endif // RTYPE_GAME_ENTITY_PLAYER_HPP_

@@ -23,6 +23,7 @@ namespace RType
                 _position = {0, 0};
                 _health = 100;
                 _damage = 10;
+                _size = 40;
                 _speed = 1;
                 _isAlive = true;
                 _color = Color::RED;
@@ -39,10 +40,7 @@ namespace RType
 
             void Player::update()
             {
-                for (auto &shoot : _shoots)
-                    shoot->update();
-
-                _shoots.erase(std::remove_if(_shoots.begin(), _shoots.end(), [](const Shoot &shoot) { return !shoot.getIsActive(); }), _shoots.end());
+                _shoots.erase(std::remove_if(_shoots.begin(), _shoots.end(), [](std::shared_ptr<Shoot> shoot) { return !shoot->getIsActive(); }), _shoots.end());
             }
 
             /*  ---- SETTER ---- */
@@ -58,7 +56,6 @@ namespace RType
             }
 
             /*  ---- GETTER ---- */
-
             std::unordered_map<std::string, std::string> Player::getPlayerInfo() const
             {
                 return {
@@ -90,6 +87,11 @@ namespace RType
             std::shared_ptr<boost::asio::ip::tcp::socket> Player::getSocket() const
             {
                 return _socket;
+            }
+
+            std::vector<std::shared_ptr<Shoot>> Player::getShoots() const
+            {
+                return _shoots;
             }
         } // namespace Entity
     } // namespace Game

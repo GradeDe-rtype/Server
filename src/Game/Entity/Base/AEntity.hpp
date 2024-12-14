@@ -29,6 +29,7 @@ namespace RType
                     int _health;
                     int _damage;
                     int _speed;
+                    int _size;
                     bool _isAlive;
 
                 public:
@@ -45,6 +46,7 @@ namespace RType
                     void setPosition(Entity::Position position) override;
                     void setPosX(int pos_x) override;
                     void setPosY(int pos_y) override;
+                    void setSize(int size) override;
                     void setSpeed(int speed) override;
 
                     int getDamage() const override;
@@ -56,6 +58,7 @@ namespace RType
                     Entity::Position getPosition() const override;
                     int getPosX() const override;
                     int getPosY() const override;
+                    int getSize() const override;
                     int getSpeed() const override;
             };
         } // namespace Entity

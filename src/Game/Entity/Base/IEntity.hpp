@@ -34,6 +34,7 @@ namespace RType
                     virtual void setPosition(Entity::Position position) = 0;
                     virtual void setPosX(int pos_x) = 0;
                     virtual void setPosY(int pos_y) = 0;
+                    virtual void setSize(int size) = 0;
                     virtual void setSpeed(int speed) = 0;
 
                     virtual int getDamage() const = 0;
@@ -45,6 +46,7 @@ namespace RType
                     virtual Entity::Position getPosition() const = 0;
                     virtual int getPosX() const = 0;
                     virtual int getPosY() const = 0;
+                    virtual int getSize() const = 0;
                     virtual int getSpeed() const = 0;
             };
         } // namespace Entity

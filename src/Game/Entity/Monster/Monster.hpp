@@ -46,11 +46,10 @@ namespace RType
                     /*  ---- GETTER ---- */
                     std::unordered_map<std::string, std::string> getEnemyInfo() const;
                     Type getType() const;
-                    int getSize() const;
+                    std::vector<std::shared_ptr<Shoot>> getShoots() const;
 
                 private:
                     Type _type = Type::MONSTER;
-                    int _size = 0;
                     std::vector<std::shared_ptr<Shoot>> _shoots;
             };
         } // namespace Entity

@@ -22,6 +22,7 @@ namespace RType
                 _direction = direction;
                 _damage = damage;
                 _speed = speed;
+                _size = 10;
                 _isActive = true;
             }
 

@@ -23,6 +23,7 @@ namespace RType
                 _health = 100;
                 _damage = 10;
                 _speed = 1;
+                _size = 40;
                 _isAlive = true;
                 _direction = Direction::LEFT;
             }
@@ -38,6 +39,7 @@ namespace RType
                 _health = 100 * level;
                 _damage = 10 * level;
                 _speed = 1;
+                _size = 40;
                 _isAlive = true;
             }
 
@@ -49,9 +51,6 @@ namespace RType
 
             void Monster::update()
             {
-                for (auto &shoot : _shoots)
-                    shoot.updatePosition();
-
                 _shoots.erase(std::remove_if(_shoots.begin(), _shoots.end(), [](const Shoot &shoot) { return !shoot.getIsActive(); }), _shoots.end());
             }
 
@@ -60,11 +59,6 @@ namespace RType
             void Monster::setType(Type type)
             {
                 _type = type;
-            }
-
-            void Monster::setSize(int size)
-            {
-                _size = size;
             }
 
             /*  ---- GETTER ---- */
@@ -79,14 +73,14 @@ namespace RType
                     {"y", std::to_string(_position.y)}};
             }
 
-            Type Monster::getType() const
+            Monster::Type Monster::getType() const
             {
                 return _type;
             }
 
-            int Monster::getSize() const
+            std::vector<std::shared_ptr<Shoot>> Monster::getShoots() const
             {
-                return _size;
+                return _shoots;
             }
         } // namespace Entity
     } // namespace Game
