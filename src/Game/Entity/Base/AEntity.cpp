@@ -16,16 +16,37 @@ namespace RType
         namespace Entity
         {
             /*  ---- SETTER ---- */
-            void AEntity::setLevel(int level)
+            void AEntity::setDamage(int damage)
             {
-                if (level < 1) return;
-                _level = level;
+                if (damage < 0) return;
+                _damage = damage;
+            }
+
+            void AEntity::setDirection(Entity::Direction direction)
+            {
+                _direction = direction;
             }
 
             void AEntity::setHealth(int health)
             {
                 if (health < 0) return;
                 _health = health;
+            }
+
+            void AEntity::setIsAlive(bool isAlive)
+            {
+                _isAlive = isAlive;
+            }
+
+            void AEntity::setLevel(int level)
+            {
+                if (level < 1) return;
+                _level = level;
+            }
+
+            void AEntity::setPosition(Entity::Position position)
+            {
+                _position = position;
             }
 
             void AEntity::setPosX(int pos_x)
@@ -38,36 +59,22 @@ namespace RType
                 setPosition((Entity::Position){_position.x, pos_y});
             }
 
-            void AEntity::setPosition(Entity::Position position)
-            {
-                _position = position;
-            }
-
-            void AEntity::setDirection(Entity::Direction direction)
-            {
-                _direction = direction;
-            }
-
             void AEntity::setSpeed(int speed)
             {
                 if (speed < 0) return;
                 _speed = speed;
             }
 
-            void AEntity::setIsAlive(bool isAlive)
-            {
-                _isAlive = isAlive;
-            }
 
             /*  ---- GETTER ---- */
-            int AEntity::getId() const
+            int AEntity::getDamage() const
             {
-                return _id;
+                return _damage;
             }
 
-            int AEntity::getLevel() const
+            Entity::Direction AEntity::getDirection() const
             {
-                return _level;
+                return _direction;
             }
 
             int AEntity::getHealth() const
@@ -75,9 +82,24 @@ namespace RType
                 return _health;
             }
 
-            int AEntity::getDamage() const
+            int AEntity::getId() const
             {
-                return _damage;
+                return _id;
+            }
+
+            bool AEntity::getIsAlive() const
+            {
+                return _isAlive;
+            }
+
+            int AEntity::getLevel() const
+            {
+                return _level;
+            }
+
+            Entity::Position AEntity::getPosition() const
+            {
+                return _position;
             }
 
             int AEntity::getPosX() const
@@ -90,24 +112,9 @@ namespace RType
                 return _position.y;
             }
 
-            Entity::Position AEntity::getPosition() const
-            {
-                return _position;
-            }
-
-            Entity::Direction AEntity::getDirection() const
-            {
-                return _direction;
-            }
-
             int AEntity::getSpeed() const
             {
                 return _speed;
-            }
-
-            bool AEntity::getIsAlive() const
-            {
-                return _isAlive;
             }
 
             /*  ---- FUNCTIONS ---- */
