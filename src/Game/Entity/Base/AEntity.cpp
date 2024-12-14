@@ -65,7 +65,6 @@ namespace RType
                 _speed = speed;
             }
 
-
             /*  ---- GETTER ---- */
             int AEntity::getDamage() const
             {
