@@ -30,6 +30,9 @@ namespace RType
                     _position.x += _speed;
                 else if (_direction == Direction::LEFT)
                     _position.x -= _speed;
+
+                if (_position.x > 1920 || _position.x < 0)
+                    _isActive = false;
             }
 
             /*  ---- SETTER ---- */
