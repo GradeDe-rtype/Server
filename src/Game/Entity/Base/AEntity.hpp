@@ -29,6 +29,7 @@ namespace RType
                     int _health;
                     int _damage;
                     int _speed;
+                    int _size;
                     bool _isAlive;
 
                 public:
@@ -37,25 +38,28 @@ namespace RType
 
                     void update() override;
 
-                    void setLevel(int level) override;
+                    void setDamage(int damage) override;
+                    void setDirection(Entity::Direction direction) override;
                     void setHealth(int health) override;
+                    void setIsAlive(bool isAlive) override;
+                    void setLevel(int level) override;
+                    void setPosition(Entity::Position position) override;
                     void setPosX(int pos_x) override;
                     void setPosY(int pos_y) override;
-                    void setPosition(Entity::Position position) override;
-                    void setDirection(Entity::Direction direction) override;
+                    void setSize(int size) override;
                     void setSpeed(int speed) override;
-                    void setIsAlive(bool isAlive) override;
 
-                    int getId() const override;
-                    int getLevel() const override;
-                    int getHealth() const override;
                     int getDamage() const override;
+                    Entity::Direction getDirection() const override;
+                    int getHealth() const override;
+                    int getId() const override;
+                    bool getIsAlive() const override;
+                    int getLevel() const override;
+                    Entity::Position getPosition() const override;
                     int getPosX() const override;
                     int getPosY() const override;
-                    Entity::Position getPosition() const override;
-                    Entity::Direction getDirection() const override;
+                    int getSize() const override;
                     int getSpeed() const override;
-                    bool getIsAlive() const override;
             };
         } // namespace Entity
     } // namespace Game

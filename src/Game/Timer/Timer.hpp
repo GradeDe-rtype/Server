@@ -1,29 +1,38 @@
 /*
-** EPITECH PROJECT, 2024
-** R-Type
-** File description:
-** Timer class
-** Caroline Boilly @Aeliondw
+    Authors:
+    >> Caroline Boilly @Aeliondw
+    >> Nathan Tirolf @dragusheen
+    >> Daniil Stepanov @dan13615
+
+    („• ֊ •„)❤  <  Have a good day !
+    --U-----U------------------------
 */
 
-#ifndef TIMER_HPP
-    #define TIMER_HPP
+#ifndef RTYPE_GAME_TIMER_HPP_
+#define RTYPE_GAME_TIMER_HPP_
 
-#include "RType.hpp"
+#include <algorithm>
+#include <chrono>
 
-class Timer
+namespace RType
 {
-private:
-    std::chrono::steady_clock::time_point _startTime;
-    std::chrono::milliseconds _interval;
+    namespace Game
+    {
+        class Timer
+        {
+            private:
+                std::chrono::steady_clock::time_point _startTime;
+                std::chrono::milliseconds _interval;
 
-public:
-    Timer(int intervalMs);
-    ~Timer() = default;
+            public:
+                Timer(int intervalMs);
+                ~Timer() = default;
 
-    void reset();
-    bool hasElapsed() const;
-    int timeLeft() const;
-};
+                void reset();
+                bool hasElapsed() const;
+                int timeLeft() const;
+        };
+    } // namespace Game
+} // namespace RType
 
-#endif // TIMER_HPP
+#endif // RTYPE_GAME_TIMER_HPP_

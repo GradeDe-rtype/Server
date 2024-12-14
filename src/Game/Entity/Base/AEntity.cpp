@@ -1,9 +1,10 @@
 /*
-** EPITECH PROJECT, 2024
-** R-Type
-** File description:
-** Entity abstract
-** Caroline Boilly @Aeliondw
+    Authors:
+    >> Caroline Boilly @Aeliondw
+    >> Nathan Tirolf @dragusheen
+
+    („• ֊ •„)❤  <  Have a good day !
+    --U-----U------------------------
 */
 
 #include "AEntity.hpp"
@@ -15,10 +16,15 @@ namespace RType
         namespace Entity
         {
             /*  ---- SETTER ---- */
-            void AEntity::setLevel(int level)
+            void AEntity::setDamage(int damage)
             {
-                if (level < 1) return;
-                _level = level;
+                if (damage < 0) return;
+                _damage = damage;
+            }
+
+            void AEntity::setDirection(Entity::Direction direction)
+            {
+                _direction = direction;
             }
 
             void AEntity::setHealth(int health)
@@ -27,14 +33,15 @@ namespace RType
                 _health = health;
             }
 
-            void AEntity::setPosX(int pos_x)
+            void AEntity::setIsAlive(bool isAlive)
             {
-                setPosition((Entity::Position){pos_x, _position.y})
+                _isAlive = isAlive;
             }
 
-            void AEntity::setPosY(int pos_y)
+            void AEntity::setLevel(int level)
             {
-                setPosition((Entity::Position){_position.x, pos_y})
+                if (level < 1) return;
+                _level = level;
             }
 
             void AEntity::setPosition(Entity::Position position)
@@ -42,31 +49,37 @@ namespace RType
                 _position = position;
             }
 
-            void AEntity::setDirection(Entity::Direction direction)
+            void AEntity::setPosX(int pos_x)
             {
-                _direction = direction;
+                setPosition((Entity::Position){pos_x, _position.y});
             }
 
-            void AEntity::setSpeed(int peed)
+            void AEntity::setPosY(int pos_y)
+            {
+                setPosition((Entity::Position){_position.x, pos_y});
+            }
+
+            void AEntity::setSize(int size)
+            {
+                if (size < 0) return;
+                _size = size;
+            }
+
+            void AEntity::setSpeed(int speed)
             {
                 if (speed < 0) return;
                 _speed = speed;
             }
 
-            void AEntity::setIsAlive(bool isAlive)
-            {
-                _isAlive = isAlive;
-            }
-
             /*  ---- GETTER ---- */
-            int AEntity::getId() const
+            int AEntity::getDamage() const
             {
-                return _id;
+                return _damage;
             }
 
-            int AEntity::getLevel() const
+            Entity::Direction AEntity::getDirection() const
             {
-                return _level;
+                return _direction;
             }
 
             int AEntity::getHealth() const
@@ -74,9 +87,24 @@ namespace RType
                 return _health;
             }
 
-            int AEntity::getDamage() const
+            int AEntity::getId() const
             {
-                return _damage;
+                return _id;
+            }
+
+            bool AEntity::getIsAlive() const
+            {
+                return _isAlive;
+            }
+
+            int AEntity::getLevel() const
+            {
+                return _level;
+            }
+
+            Entity::Position AEntity::getPosition() const
+            {
+                return _position;
             }
 
             int AEntity::getPosX() const
@@ -89,24 +117,14 @@ namespace RType
                 return _position.y;
             }
 
-            Entity::Position AEntity::getPosition() const
+            int AEntity::getSize() const
             {
-                return _position;
-            }
-
-            Entity::Direction AEntity::getDirection() const
-            {
-                return _direction;
+                return _size;
             }
 
             int AEntity::getSpeed() const
             {
                 return _speed;
-            }
-
-            bool AEntity::getIsAlive() const
-            {
-                return _isAlive;
             }
 
             /*  ---- FUNCTIONS ---- */
