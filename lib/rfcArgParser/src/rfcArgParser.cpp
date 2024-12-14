@@ -63,7 +63,7 @@ rfcArgParser::DataPacket rfcArgParser::DeserializePacket(const std::string &data
 
 rfcArgParser::DataPacket rfcArgParser::SerializePacket(const std::string &command, const std::string &args)
 {
-    rfcArgParser::DataPacket packet{};
+    rfcArgParser::DataPacket packet = _getEmptyPacket();
     strncpy(packet.command, command.c_str(), sizeof(packet.command) - 1);
     packet.command[sizeof(packet.command) - 1] = '\0';
     strncpy(packet.args, args.c_str(), sizeof(packet.args) - 1);
@@ -105,4 +105,14 @@ std::string rfcArgParser::_keep(std::string str, char start, char end)
         }
     }
     return result;
+}
+
+rfcArgParser::DataPacket rfcArgParser::_getEmptyPacket()
+{
+    rfcArgParser::DataPacket packet{};
+    for (unsigned long int i = 0; i < sizeof(packet.command); i++)
+        packet.command[i] = '\0';
+    for (unsigned long int i = 0; i < sizeof(packet.args); i++)
+        packet.args[i] = '\0';
+    return packet;
 }
