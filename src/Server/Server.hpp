@@ -12,16 +12,21 @@
 
 /*  ---- INCLUDES ---- */
 #include "Command.hpp"
+#include "Game/Entity/Player/Player.hpp"
+#include "Game/Room/Room.hpp"
 #include "RType.hpp"
 #include "Utils.hpp"
 #include "rfcArgParser.hpp"
 
 /*  ---- CLASS ---- */
 
-namespace Server
+namespace RType::Game
+{
+    class Room;}namespace RType::Game::Entity
+{
+    class Player;}namespace Server
 {
     class Command;
-    class Player;
     class TCP
     {
         public:
@@ -29,10 +34,11 @@ namespace Server
             void send_message(int client_id, int receiver_id, rfcArgParser::DataPacket data);
             void send_multicast(rfcArgParser::DataPacket data, const std::vector<int> &included_clients = {});
             void send_broadcast(rfcArgParser::DataPacket data);
-            Player &get_player(int client_id);
-            void remove_player(int client_id);
-            std::vector<Player> &get_players() { return players_; }
-            bool player_exists(int client_id);
+            std::vector<std::shared_ptr<RType::Game::Entity::Player>> &get_clients() { return clients_; }
+            RType::Game::Entity::Player &get_client(int client_id);
+            void remove_client(int client_id);
+            void add_client(std::shared_ptr<RType::Game::Entity::Player> client);
+            bool client_exist(int client_id);
 
             ~TCP();
 
@@ -42,10 +48,11 @@ namespace Server
 
         private:
             void start_accept();
-            void start_read(Player player);
+            void start_read(RType::Game::Entity::Player player);
             boost::asio::ip::tcp::acceptor acceptor_;
             int next_client_id_ = 0;
-            std::vector<Player> players_;
+            std::vector<std::shared_ptr<RType::Game::Entity::Player>> clients_;
+            std::vector<RType::Game::Room> rooms_;
             Command *command_processor;
             bool is_running = true;
     };
