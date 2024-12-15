@@ -16,6 +16,7 @@
 #include <vector>
 #include "AEntity.hpp"
 #include "Shoot.hpp"
+#include "Colors.hpp"
 
 namespace RType
 {
