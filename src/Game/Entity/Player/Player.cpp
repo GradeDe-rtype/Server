@@ -26,7 +26,7 @@ namespace RType
                 _size = 40;
                 _speed = 1;
                 _isAlive = true;
-                _color = Color::RED;
+                _color = Game::Colors::get().getColor(_id);
                 _socket = socket;
                 _direction = Direction::RIGHT;
             }
@@ -45,7 +45,7 @@ namespace RType
 
             /*  ---- SETTER ---- */
 
-            void Player::setColor(Color color)
+            void Player::setColor(std::string color)
             {
                 _color = color;
             }
@@ -60,7 +60,7 @@ namespace RType
             {
                 return {
                     {"id", std::to_string(_id)},
-                    {"color", std::to_string(static_cast<int>(_color))},
+                    {"color", _color},
                     {"health", std::to_string(_health)},
                     {"x", std::to_string(_position.x)},
                     {"y", std::to_string(_position.y)}};
@@ -70,11 +70,11 @@ namespace RType
             {
                 return {
                     {"id", std::to_string(_id)},
-                    {"color", std::to_string(static_cast<int>(_color))},
+                    {"color", _color},
                 };
             }
 
-            Player::Color Player::getColor() const
+            std::string Player::getColor() const
             {
                 return _color;
             }

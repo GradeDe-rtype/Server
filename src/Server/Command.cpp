@@ -68,6 +68,14 @@ namespace Server
         RType::Game::Entity::Player player = tcp_.get_client(client_id);
         player.setPosX(x);
         player.setPosY(y);
+
+        std::unordered_map<std::string, std::string> data;
+        data["x"] = std::to_string(player.getPosX());
+        data["y"] = std::to_string(player.getPosY());
+        std::string data_str = rfcArgParser::CreateObject(data);
+        data_str = std::to_string(client_id) + " " + data_str;
+        rfcArgParser::DataPacket packet = rfcArgParser::SerializePacket("p_position", data_str);
+        tcp_.send_broadcast(packet);
     }
 
     void Command::p_info(int client_id, const std::string &args)

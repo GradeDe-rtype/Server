@@ -28,6 +28,7 @@ namespace Server
         clients_.erase(std::remove_if(clients_.begin(), clients_.end(),
                                       [client_id](const std::shared_ptr<RType::Game::Entity::Player> &client) { return client->getId() == client_id; }),
                       clients_.end());
+        send_broadcast(rfcArgParser::SerializePacket("disconnect", std::to_string(client_id)));
     }
 
     RType::Game::Entity::Player &TCP::get_client(const int client_id)
@@ -107,16 +108,15 @@ namespace Server
                     add_client(std::make_shared<RType::Game::Entity::Player>(new_client));
                     std::cout << "Client " << new_client.getId() << " connected.\n";
                     start_read(new_client);
-                    data["id"] = std::to_string(new_client.getId());
-                    data["color"] = "#FF0000";
-                    packet = rfcArgParser::SerializePacket("connect", rfcArgParser::CreateObject(data)); // TODO: use command class
+                    packet = rfcArgParser::SerializePacket("connect", rfcArgParser::CreateObject(new_client.getPlayerSmallInfo()));
                     send_multicast(packet, {new_client.getId()});
+                    new_client.setColor("#FFFFFF");
+                    packet = rfcArgParser::SerializePacket("connect_you", rfcArgParser::CreateObject(new_client.getPlayerSmallInfo()));
+                    send_message(-1, new_client.getId(), packet);
                     for (const auto &client : clients_) {
                         if (client->getId() == new_client.getId())
                             continue;
-                        data["id"] = std::to_string(client->getId());
-                        data["color"] = "#FF0000";
-                        packet = rfcArgParser::SerializePacket("connect", rfcArgParser::CreateObject(data)); // TODO: use command class
+                        packet = rfcArgParser::SerializePacket("connect", rfcArgParser::CreateObject(client->getPlayerSmallInfo()));
                         send_message(-1, new_client.getId(), packet);
                     }
                     add_player_to_room(0, new_client.getId()); // TODO: in the future add a room selection
@@ -178,13 +178,13 @@ namespace Server
         }
     }
 
-    void TCP::send_multicast(rfcArgParser::DataPacket data, const std::vector<int> &included_clients)
+    void TCP::send_multicast(rfcArgParser::DataPacket data, const std::vector<int> &excludes)
     {
         for (const auto &client : clients_) {
             const int id = client->getId();
+            if (std::find(excludes.begin(), excludes.end(), id) != excludes.end()) continue;
             const auto socket = client->getSocket();
-            if (std::find(included_clients.begin(), included_clients.end(), id) == included_clients.end())
-                continue;
+            std::cout << "Sending multicast to client " << id << std::endl;
             boost::asio::async_write(*socket, boost::asio::buffer(&data, sizeof(data)),
                                      [](const boost::system::error_code &ec, std::size_t bytes_transferred) {
                                          if (!ec) {
@@ -193,7 +193,6 @@ namespace Server
                                              std::cerr << "Error sending broadcast: " << ec.message() << std::endl;
                                          }
                                      });
-            return;
         }
     }
 

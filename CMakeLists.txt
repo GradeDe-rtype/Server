@@ -34,6 +34,7 @@ add_executable(r-type_server ${SOURCES})
 target_include_directories(r-type_server PRIVATE
     "include/"
     "src/Game/"
+    "src/Game/Colors/"
     "src/Game/Entity/"
     "src/Game/Entity/Base/"
     "src/Game/Entity/Monster/"

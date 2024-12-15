@@ -12,8 +12,8 @@
 
 /*  ---- INCLUDES ---- */
 #include "Command.hpp"
-#include "../Game/Entity/Player/Player.hpp"
-#include "../Game/Room/Room.hpp"
+#include "Player.hpp"
+#include "Room.hpp"
 #include "RType.hpp"
 #include "Utils.hpp"
 #include "rfcArgParser.hpp"
@@ -22,9 +22,13 @@
 
 namespace RType::Game
 {
-    class Room;}namespace RType::Game::Entity
+    class Room;
+}
+namespace RType::Game::Entity
 {
-    class Player;}namespace Server
+    class Player;
+}
+namespace Server
 {
     class Command;
     class TCP
@@ -32,7 +36,7 @@ namespace RType::Game
         public:
             TCP(boost::asio::io_context &io_context, short port);
             void send_message(int client_id, int receiver_id, rfcArgParser::DataPacket data);
-            void send_multicast(rfcArgParser::DataPacket data, const std::vector<int> &included_clients = {});
+            void send_multicast(rfcArgParser::DataPacket data, const std::vector<int> &exclude = {});
             void send_broadcast(rfcArgParser::DataPacket data);
             RType::Game::Entity::Player &get_client(int client_id);
             std::shared_ptr<RType::Game::Entity::Player> &get_client_ptr(int client_id);

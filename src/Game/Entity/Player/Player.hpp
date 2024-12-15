@@ -15,6 +15,7 @@
 #include <unordered_map>
 #include <vector>
 #include "AEntity.hpp"
+#include "Colors.hpp"
 #include "Shoot.hpp"
 
 namespace RType
@@ -26,18 +27,6 @@ namespace RType
             class Player : public AEntity
             {
                 public:
-                    typedef enum {
-                        RED = 0,
-                        GREEN = 1,
-                        BLUE = 2,
-                        YELLOW = 3,
-                        PINK = 4,
-                        CYAN = 5,
-                        ORANGE = 6,
-                        PURPLE = 7,
-                        WHITE = 8
-                    } Color;
-
                     Player(int id, std::shared_ptr<boost::asio::ip::tcp::socket> socket);
                     ~Player() = default;
 
@@ -46,19 +35,19 @@ namespace RType
                     void update();
 
                     /*  ---- SETTER ---- */
-                    void setColor(Color color);
+                    void setColor(std::string color);
                     void setHaveJoined(bool haveJoined);
 
                     /*  ---- GETTER ---- */
                     std::unordered_map<std::string, std::string> getPlayerInfo() const;
                     std::unordered_map<std::string, std::string> getPlayerSmallInfo() const;
-                    Color getColor() const;
+                    std::string getColor() const;
                     bool getHaveJoined() const;
                     std::shared_ptr<boost::asio::ip::tcp::socket> getSocket() const;
                     std::vector<std::shared_ptr<Shoot>> getShoots() const;
 
                 private:
-                    Color _color;
+                    std::string _color;
                     bool _haveJoined = false;
                     std::shared_ptr<boost::asio::ip::tcp::socket> _socket;
                     std::vector<std::shared_ptr<Shoot>> _shoots;
