@@ -178,5 +178,11 @@ namespace RType
         {
             return _id;
         }
+
+        RType::Game::Entity::Player &Room::getPlayer(int playerId)
+        {
+            return *_players[playerId];
+        }
+
     } // namespace Game
 } // namespace RType

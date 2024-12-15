@@ -26,8 +26,8 @@ namespace Server
     void TCP::remove_client(int client_id)
     {
         clients_.erase(std::remove_if(clients_.begin(), clients_.end(),
-                                      [client_id](const RType::Game::Entity::Player &player) { return player.getId() == client_id; }),
-                       clients_.end());
+                                      [client_id](const std::shared_ptr<RType::Game::Entity::Player> &client) { return client->getId() == client_id; }),
+                      clients_.end());
     }
 
     RType::Game::Entity::Player &TCP::get_client(const int client_id)
@@ -114,12 +114,12 @@ namespace Server
                     for (const auto &client : clients_) {
                         if (client->getId() == new_client.getId())
                             continue;
-                        std::unordered_map<std::string, std::string> data;
                         data["id"] = std::to_string(client->getId());
                         data["color"] = "#FF0000";
                         packet = rfcArgParser::SerializePacket("connect", rfcArgParser::CreateObject(data)); // TODO: use command class
                         send_message(-1, new_client.getId(), packet);
                     }
+                    add_player_to_room(0, new_client.getId()); // TODO: in the future add a room selection
                 } else {
                     std::cerr << "Accept error: " << error.message() << std::endl;
                 }

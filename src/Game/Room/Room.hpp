@@ -55,6 +55,8 @@ namespace RType
                 Mode getMode() const;
                 bool getIsReady() const;
                 int getScore() const;
+                int getID() const;
+                RType::Game::Entity::Player &getPlayer(int playerId);
                 int getId() const;
 
             private:

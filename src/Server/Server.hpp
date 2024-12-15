@@ -34,6 +34,8 @@ namespace RType::Game
             void send_message(int client_id, int receiver_id, rfcArgParser::DataPacket data);
             void send_multicast(rfcArgParser::DataPacket data, const std::vector<int> &included_clients = {});
             void send_broadcast(rfcArgParser::DataPacket data);
+            RType::Game::Entity::Player &get_client(int client_id);
+            std::shared_ptr<RType::Game::Entity::Player> &get_client_ptr(int client_id);
 
             ~TCP();
 
@@ -46,8 +48,6 @@ namespace RType::Game
             void start_read(RType::Game::Entity::Player player);
 
             std::vector<std::shared_ptr<RType::Game::Entity::Player>> &get_clients() { return clients_; }
-            RType::Game::Entity::Player &get_client(int client_id);
-            std::shared_ptr<RType::Game::Entity::Player> &get_client_ptr(int client_id);
             void remove_client(int client_id);
             void add_client(std::shared_ptr<RType::Game::Entity::Player> client);
             bool client_exist(int client_id);
