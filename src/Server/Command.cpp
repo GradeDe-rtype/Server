@@ -112,11 +112,7 @@ namespace Server
 
     void Command::shoot(int client_id, const std::string &args)
     {
-        if (!args.empty()) {
-            std::cerr << "Usage: shoot\n";
-            return;
-        }
-        RType::Game::Entity::Player player = tcp_.get_client(client_id);
+        std::shared_ptr<RType::Game::Entity::Player> player = tcp_.get_client_ptr(client_id);
         std::unordered_map<std::string, std::string> data = rfcArgParser::ParseObject(args);
         if (!data.contains("x") || !data.contains("y")) {
             std::cerr << "Usage: shoot {\"x\": <x>, \"y\": <y>}\n";
@@ -127,7 +123,7 @@ namespace Server
             return;
         }
 
-        player.shoot(std::stoi(data["x"]), std::stoi(data["y"]));
+        player->shoot(std::stoi(data["x"]), std::stoi(data["y"]));
     }
 
     // void e_info(int client_id, const std::string &args)

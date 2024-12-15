@@ -133,18 +133,16 @@ namespace RType {
             if (_monsterSpawnTimer.hasElapsed()) {
                 spawnMonster();
                 _monsterSpawnTimer.reset();
-                std::cout << "Monster spawned" << std::endl;
             }
 
 
             for (auto &player : _players) {
                 if (player.second->getIsAlive()) {
-                    std::cerr << "Size shoot: " << player.second->getShoots().size() << std::endl;
                     for (auto &shoot : player.second->getShoots()) {
                         shoot->update();
                         for (auto it = _monsters.begin(); it != _monsters.end();) {
                             if (checkCollision(shoot->getPosition(), 1, it->second->getPosition(), it->second->getSize())) {
-                                // Monster hit logic
+                                command_processor->process_send(-1, "e_death", std::to_string(it->second->getId()));
                                 it = _monsters.erase(it);
                             } else
                                 ++it;
@@ -167,7 +165,10 @@ namespace RType {
                     shoot->update();
                     for (auto it = _players.begin(); it != _players.end();) {
                         if (checkCollision(shoot->getPosition(), 1, it->second->getPosition(), it->second->getSize())) {
-                            // TODO RFC: Send `p_death` to all players
+                            command_processor->process_send(-1, "p_death", std::to_string(it->second->getId()));
+                            it = _players.erase(it);
+                        } else if (checkCollision(monster.second->getPosition(), monster.second->getSize(), it->second->getPosition(), it->second->getSize())) {
+                            command_processor->process_send(-1, "p_death", std::to_string(it->second->getId()));
                             it = _players.erase(it);
                         } else
                             ++it;
@@ -178,6 +179,14 @@ namespace RType {
                 tmp["x"] = std::to_string(monster.second->getPosX());
                 tmp["y"] = std::to_string(monster.second->getPosY());
                 command_processor->process_send(-1, "e_position", std::to_string(monster.second->getId()) + " " + rfcArgParser::CreateObject(tmp));
+            }
+
+            for (auto it = _monsters.begin(); it != _monsters.end();) {
+                if (it->second->getPosX() < -100) {
+                    command_processor->process_send(-1, "e_death", std::to_string(it->second->getId()));
+                    it = _monsters.erase(it);
+                } else
+                    ++it;
             }
 
             // TODO RFC: Send a request to all players if they are ready for a new wave
