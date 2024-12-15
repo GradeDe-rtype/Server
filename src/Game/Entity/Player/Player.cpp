@@ -98,7 +98,6 @@ namespace RType
             std::string Player::getPosInfo() const
             {
                 std::string pos = std::to_string(_id) + " {x:" + std::to_string(_position.x) + ",y:" + std::to_string(_position.y) + "}";
-                std::cout << pos << std::endl;
                 return pos;
             }
         } // namespace Entity

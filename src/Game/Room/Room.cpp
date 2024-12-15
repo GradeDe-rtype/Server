@@ -66,8 +66,7 @@ namespace RType {
                 _shouldStop.store(other._shouldStop.load());
 
                 // Safely transfer players and monsters
-                std::scoped_lock lock(_playerMutex, other._playerMutex,
-                                      _monsterMutex, other._monsterMutex);
+                std::scoped_lock lock(_playerMutex, other._playerMutex, _monsterMutex, other._monsterMutex);
                 _players = std::move(other._players);
                 _monsters = std::move(other._monsters);
             }
@@ -134,16 +133,17 @@ namespace RType {
             if (_monsterSpawnTimer.hasElapsed()) {
                 spawnMonster();
                 _monsterSpawnTimer.reset();
+                std::cout << "Monster spawned" << std::endl;
             }
+
 
             for (auto &player : _players) {
                 if (player.second->getIsAlive()) {
+                    std::cerr << "Size shoot: " << player.second->getShoots().size() << std::endl;
                     for (auto &shoot : player.second->getShoots()) {
                         shoot->update();
                         for (auto it = _monsters.begin(); it != _monsters.end();) {
-                            if (checkCollision(shoot->getPosition(), 1,
-                                               it->second->getPosition(),
-                                               it->second->getSize())) {
+                            if (checkCollision(shoot->getPosition(), 1, it->second->getPosition(), it->second->getSize())) {
                                 // Monster hit logic
                                 it = _monsters.erase(it);
                             } else
@@ -156,8 +156,9 @@ namespace RType {
                     // TODO RFC: Send `p_damage` to all players if player take damage
                     // TODO RFC: Send `p_death` to all players if player die
                     // TODO RFC: Send `p_info` to all players if player info change
-                    std::string args = player.second->getPosInfo();
-                    command_processor->process_send(player.second->getId(), "p_position", args);
+
+                    // std::string args = player.second->getPosInfo();
+                    // command_processor->process_send(player.second->getId(), "p_position", args);
                 }
             }
 
@@ -165,9 +166,7 @@ namespace RType {
                 for (auto &shoot : monster.second->getShoots()) {
                     shoot->update();
                     for (auto it = _players.begin(); it != _players.end();) {
-                        if (checkCollision(shoot->getPosition(), 1,
-                                           it->second->getPosition(),
-                                           it->second->getSize())) {
+                        if (checkCollision(shoot->getPosition(), 1, it->second->getPosition(), it->second->getSize())) {
                             // TODO RFC: Send `p_death` to all players
                             it = _players.erase(it);
                         } else
@@ -175,8 +174,10 @@ namespace RType {
                     }
                 }
                 monster.second->update();
-                // Maybe move the enemy
-                // TODO RFC: Send `e_position` to all players if enemy move
+                std::unordered_map<std::string, std::string> tmp;
+                tmp["x"] = std::to_string(monster.second->getPosX());
+                tmp["y"] = std::to_string(monster.second->getPosY());
+                command_processor->process_send(-1, "e_position", std::to_string(monster.second->getId()) + " " + rfcArgParser::CreateObject(tmp));
             }
 
             // TODO RFC: Send a request to all players if they are ready for a new wave
@@ -184,11 +185,9 @@ namespace RType {
             //     sendWaveReadyRequestToAllPlayers();
         }
 
-        bool Room::checkCollision(const Game::Entity::Position& pos1, int size1,
-                           const Game::Entity::Position& pos2, int size2)
+        bool Room::checkCollision(const Game::Entity::Position& pos1, int size1, const Game::Entity::Position& pos2, int size2)
         {
-            return (pos1.x >= pos2.x && pos1.x <= pos2.x + size2 &&
-                    pos1.y >= pos2.y && pos1.y <= pos2.y + size2);
+            return (pos1.x >= pos2.x && pos1.x <= pos2.x + size2 && pos1.y >= pos2.y && pos1.y <= pos2.y + size2);
         }
 
         void Room::spawnMonster()
@@ -197,13 +196,13 @@ namespace RType {
                 int monsterId = _monsters.size() + 1;
                 int level = 1;
                 auto monster = std::make_shared<Game::Entity::Monster>(monsterId, level);
-                monster->setPosX(1920);
-                monster->setPosY(std::rand() % 1080);
+                monster->setPosX(900);
+                monster->setPosY(std::rand() % 600);
 
                 std::lock_guard<std::mutex> lock(_monsterMutex);
                 _monsters[monsterId] = monster;
 
-                // TODO: Implement network broadcast for new monster
+                command_processor->process_send(-1, "enemy", rfcArgParser::CreateObject(monster->getEnemyInfo()));
             }
             catch (const std::exception& e) {
                 std::cerr << "Error spawning monster: " << e.what() << std::endl;
@@ -251,7 +250,5 @@ namespace RType {
         {
             return _isReady.load() && !_shouldStop.load();
         }
-
-
     } // namespace Game
 } // namespace RType

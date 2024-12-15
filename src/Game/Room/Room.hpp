@@ -110,7 +110,6 @@ namespace RType
             Timer _monsterSpawnTimer;
 
             Server::Command* command_processor;
-
         };
     }
 }

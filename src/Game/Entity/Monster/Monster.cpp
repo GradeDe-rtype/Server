@@ -22,7 +22,7 @@ namespace RType
                 _position = {0, 0};
                 _health = 100;
                 _damage = 10;
-                _speed = 1;
+                _speed = 8;
                 _size = 40;
                 _isAlive = true;
                 _direction = Direction::LEFT;
@@ -38,7 +38,7 @@ namespace RType
                 _position = {0, 0};
                 _health = 100 * level;
                 _damage = 10 * level;
-                _speed = 1;
+                _speed = 8;
                 _size = 40;
                 _isAlive = true;
             }
@@ -52,6 +52,7 @@ namespace RType
             void Monster::update()
             {
                 _shoots.erase(std::remove_if(_shoots.begin(), _shoots.end(), [](std::shared_ptr<Entity::Shoot> shoot) { return !shoot->getIsActive(); }), _shoots.end());
+                setPosX(_position.x - _speed);
             }
 
             /*  ---- SETTER ---- */

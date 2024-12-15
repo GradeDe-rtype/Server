@@ -34,6 +34,7 @@ namespace Server
         send_["color"] = [this](const int receiver_id, const std::string &args, const std::string &command) { to_broadcast(receiver_id, args, command); };
         send_["wave"] = [this](const int receiver_id, const std::string &args, const std::string &command) { to_broadcast(receiver_id, args, command); };
         send_["end"] = [this](const int receiver_id, const std::string &args, const std::string &command) { to_broadcast(receiver_id, args, command); };
+        send_["enemy"] = [this](const int receiver_id, const std::string &args, const std::string &command) { to_broadcast(receiver_id, args, command); };
     }
 
     void Command::process_command(const int client_id, rfcArgParser::DataPacket packet)
@@ -54,7 +55,6 @@ namespace Server
 
     void Command::process_send(const int receiver_id, const std::string &command, const std::string &args)
     {
-        std::cout << "here" << std::endl;
         if (const auto it = send_.find(command); it != send_.end()) {
             it->second(receiver_id, args, command);
         } else {
