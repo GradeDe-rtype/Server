@@ -9,6 +9,7 @@
 */
 
 #include "Player.hpp"
+#include <iostream>
 
 namespace RType
 {
@@ -92,6 +93,13 @@ namespace RType
             std::vector<std::shared_ptr<Shoot>> Player::getShoots() const
             {
                 return _shoots;
+            }
+
+            std::string Player::getPosInfo() const
+            {
+                std::string pos = std::to_string(_id) + " {x:" + std::to_string(_position.x) + ",y:" + std::to_string(_position.y) + "}";
+                std::cout << pos << std::endl;
+                return pos;
             }
         } // namespace Entity
     } // namespace Game

@@ -9,6 +9,7 @@
 */
 
 #include "Room.hpp"
+#include <iostream>
 
 // TODO: Send _position players to all connected player after a delay
 // TODO: Send damage a player received by a monster to all player
@@ -22,45 +23,108 @@
 // TODO: Send that a monster die to all player
 // TODO: Send a request to all player if they are ready to a new wave
 
-namespace RType
-{
+namespace RType {
     namespace Game
     {
-        Room::Room(int id, std::string name)
-            : _monsterSpawnTimer(5000)
+        // Static factory method for safe room creation
+        std::unique_ptr<Room> Room::create(int id, const std::string& name, Server::Command* command_processor)
         {
-            _id = id;
-            _name = name;
+            return std::make_unique<Room>(id, name, command_processor);
         }
 
-        /*  ---- GAME LOGIC ---- */
+        Room::Room(int id, std::string name, Server::Command *command_processor)
+            : _id(id), _name(std::move(name)), _monsterSpawnTimer(5000), command_processor(command_processor)
+        {
+        }
+
+        // Move constructor
+        Room::Room(Room &&other) noexcept
+            : _id(other._id), _name(std::move(other._name)), _mode(other._mode.load()), _isReady(other._isReady.load()), _shouldStop(other._shouldStop.load()),
+            _monsterSpawnTimer(other._monsterSpawnTimer), command_processor(other.command_processor)
+        {
+            // Safely transfer players and monsters
+            std::lock_guard<std::mutex> playerLock(other._playerMutex);
+            std::lock_guard<std::mutex> monsterLock(other._monsterMutex);
+
+            _players = std::move(other._players);
+            _monsters = std::move(other._monsters);
+        }
+
+        // Move assignment
+        Room& Room::operator=(Room&& other) noexcept
+        {
+            if (this != &other)
+            {
+                // Stop current thread if running
+                stop();
+
+                // Transfer basic data
+                _id = other._id;
+                _name = std::move(other._name);
+                _mode.store(other._mode.load());
+                _isReady.store(other._isReady.load());
+                _shouldStop.store(other._shouldStop.load());
+
+                // Safely transfer players and monsters
+                std::scoped_lock lock(_playerMutex, other._playerMutex,
+                                      _monsterMutex, other._monsterMutex);
+                _players = std::move(other._players);
+                _monsters = std::move(other._monsters);
+            }
+            return *this;
+        }
+
         void Room::start()
         {
-            _mode = Mode::PLAYING;
+            bool expected = false;
+            if (!_isReady.compare_exchange_strong(expected, true)) {
+                return;
+            }
+            std::cout << "Room " << _name << " is ready" << std::endl;
+            std::lock_guard<std::mutex> lock(_threadMutex);
+            _gameThread.emplace([this]() { this->runGameLoop(); });
         }
 
-        void Room::addPlayer(std::shared_ptr<Game::Entity::Player> &player)
+        void Room::stop()
         {
-            if ((int)_players.size() >= MAX_PLAYER) return;
-            _players[player->getId()] = player;
+            _shouldStop.store(true);
+            _stateCondVar.notify_all();
+            if (_gameThread) {
+                _gameThread->join();
+                _gameThread.reset();
+            }
+            _isReady.store(false);
+            _mode.store(Mode::WAITING);
         }
 
-        void Room::removePlayer(int playerId)
+        void Room::runGameLoop()
         {
-            _players.erase(playerId);
+            _mode.store(Mode::PLAYING);
+            while (!_shouldStop.load())
+            {
+                std::unique_lock<std::mutex> lock(_stateMutex);
+                _stateCondVar.wait(lock, [this]{
+                    return _mode.load() == Mode::PLAYING || _shouldStop.load();
+                });
+
+                if (_shouldStop.load())
+                    break;
+
+                try
+                {
+                    update();
+                }
+                catch (const std::exception& e)
+                {
+                    _mode.store(Mode::END);
+                    break;
+                }
+
+                std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            }
         }
 
-        void Room::spawnMonster()
-        {
-            int monsterId = _monsters.size() + 1;
-            int level = 1;
-            std::shared_ptr<Game::Entity::Monster> monster = std::make_shared<Game::Entity::Monster>(monsterId, level);
-            monster->setPosX(1920);
-            monster->setPosY(std::rand() % 1080);
-            _monsters[monsterId] = monster;
-            // TODO RFC: Send `enemy` with all the info to all the players
-        }
-
+        // Simplified implementations of other methods...
         void Room::update()
         {
             if (!_isReady && _mode != Mode::PLAYING)
@@ -77,11 +141,10 @@ namespace RType
                     for (auto &shoot : player.second->getShoots()) {
                         shoot->update();
                         for (auto it = _monsters.begin(); it != _monsters.end();) {
-                            Game::Entity::Position shootPos = shoot->getPosition();
-                            Game::Entity::Position monsterPos = it->second->getPosition();
-                            int monsterSize = it->second->getSize();
-                            if (shootPos.x >= monsterPos.x && shootPos.x <= monsterPos.x + monsterSize && shootPos.y >= monsterPos.y && shootPos.y <= monsterPos.y + monsterSize) {
-                                // TODO RFC: Send `e_death` to all players
+                            if (checkCollision(shoot->getPosition(), 1,
+                                               it->second->getPosition(),
+                                               it->second->getSize())) {
+                                // Monster hit logic
                                 it = _monsters.erase(it);
                             } else
                                 ++it;
@@ -89,6 +152,12 @@ namespace RType
                     }
                     player.second->update();
                     // TODO RFC: Send `p_position` to all players if player move
+                    // TODO RFC: Send `p_shoot` to all players if player shoot
+                    // TODO RFC: Send `p_damage` to all players if player take damage
+                    // TODO RFC: Send `p_death` to all players if player die
+                    // TODO RFC: Send `p_info` to all players if player info change
+                    std::string args = player.second->getPosInfo();
+                    command_processor->process_send(player.second->getId(), "p_position", args);
                 }
             }
 
@@ -96,10 +165,9 @@ namespace RType
                 for (auto &shoot : monster.second->getShoots()) {
                     shoot->update();
                     for (auto it = _players.begin(); it != _players.end();) {
-                        Game::Entity::Position shootPos = shoot->getPosition();
-                        Game::Entity::Position playerPos = it->second->getPosition();
-                        int playerSize = it->second->getSize();
-                        if (shootPos.x >= playerPos.x && shootPos.x <= playerPos.x + playerSize && shootPos.y >= playerPos.y && shootPos.y <= playerPos.y + playerSize) {
+                        if (checkCollision(shoot->getPosition(), 1,
+                                           it->second->getPosition(),
+                                           it->second->getSize())) {
                             // TODO RFC: Send `p_death` to all players
                             it = _players.erase(it);
                         } else
@@ -114,64 +182,59 @@ namespace RType
             // TODO RFC: Send a request to all players if they are ready for a new wave
             // if (checkIfWaveReady()) {
             //     sendWaveReadyRequestToAllPlayers();
-            // }
         }
 
-        /*  ---- SETTER ---- */
-
-        void Room::setName(std::string name)
+        bool Room::checkCollision(const Game::Entity::Position& pos1, int size1,
+                           const Game::Entity::Position& pos2, int size2)
         {
-            _name = name;
+            return (pos1.x >= pos2.x && pos1.x <= pos2.x + size2 &&
+                    pos1.y >= pos2.y && pos1.y <= pos2.y + size2);
         }
 
-        void Room::setMode(Mode mode)
+        void Room::spawnMonster()
         {
-            _mode = mode;
+            try {
+                int monsterId = _monsters.size() + 1;
+                int level = 1;
+                auto monster = std::make_shared<Game::Entity::Monster>(monsterId, level);
+                monster->setPosX(1920);
+                monster->setPosY(std::rand() % 1080);
+
+                std::lock_guard<std::mutex> lock(_monsterMutex);
+                _monsters[monsterId] = monster;
+
+                // TODO: Implement network broadcast for new monster
+            }
+            catch (const std::exception& e) {
+                std::cerr << "Error spawning monster: " << e.what() << std::endl;
+                return;
+            }
         }
 
-        void Room::setIsReady(bool isReady)
+        void Room::addPlayer(std::shared_ptr<Game::Entity::Player> player)
         {
-            _isReady = isReady;
+            std::lock_guard<std::mutex> lock(_playerMutex);
+            if ((int)_players.size() >= MAX_PLAYER) return;
+            _players[player->getId()] = player;
         }
 
-        void Room::setScore(int score)
+        void Room::removePlayer(int playerId)
         {
-            _score = score;
+            std::lock_guard<std::mutex> lock(_playerMutex);
+            _players.erase(playerId);
         }
 
-        /*  ---- GETTER ---- */
-        std::unordered_map<std::string, std::string> Room::getRoomInfo() const
+        // Destructor
+        Room::~Room()
         {
-            return {
-                {"id", std::to_string(_id)},
-                {"name", _name},
-                {"count", std::to_string((int)_players.size())},
-                {"mode", std::to_string(static_cast<int>(_mode))}};
+            // Ensure thread is stopped
+            stop();
         }
 
+        // Getter implementations
         std::string Room::getName() const
         {
             return _name;
-        }
-
-        int Room::getCount() const
-        {
-            return (int)_players.size();
-        }
-
-        Room::Mode Room::getMode() const
-        {
-            return _mode;
-        }
-
-        bool Room::getIsReady() const
-        {
-            return _isReady;
-        }
-
-        int Room::getScore() const
-        {
-            return _score;
         }
 
         int Room::getID() const
@@ -179,10 +242,16 @@ namespace RType
             return _id;
         }
 
-        RType::Game::Entity::Player &Room::getPlayer(int playerId)
+        Room::Mode Room::getMode() const
         {
-            return *_players[playerId];
+            return _mode.load();
         }
+
+        bool Room::isRunning() const
+        {
+            return _isReady.load() && !_shouldStop.load();
+        }
+
 
     } // namespace Game
 } // namespace RType

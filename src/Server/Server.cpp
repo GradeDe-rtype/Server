@@ -17,8 +17,8 @@ namespace Server
                                                                       command_processor(new Command(*this))
     {
         start_accept();
-        RType::Game::Room room(0, "Room 0");
-        add_room(room);
+        add_room(0, "First Room");
+        start_room(0);
     }
 
     TCP::~TCP() { delete command_processor; }
@@ -63,9 +63,18 @@ namespace Server
         clients_.push_back(client);
     }
 
-    void TCP::add_room(const RType::Game::Room room)
+    void TCP::add_room(int id, const std::string& name)
     {
-        rooms_.push_back(std::make_unique<RType::Game::Room>(room));
+        auto room = RType::Game::Room::create(id, name, command_processor);
+        rooms_.push_back(std::move(room));
+    }
+
+    void TCP::start_room(size_t index)
+    {
+        if (index < rooms_.size())
+        {
+            rooms_[index]->start();
+        }
     }
 
     void TCP::remove_room(const int room_id)
@@ -193,6 +202,24 @@ namespace Server
                                              std::cerr << "Error sending broadcast: " << ec.message() << std::endl;
                                          }
                                      });
+        }
+    }
+
+    void TCP::send_multicast_excluded(rfcArgParser::DataPacket data, const std::vector<int> &excluded_clients) {
+        for (const auto &client : clients_) {
+            const int id = client->getId();
+            const auto socket = client->getSocket();
+            if (std::find(excluded_clients.begin(), excluded_clients.end(), id) != excluded_clients.end())
+                continue;
+            boost::asio::async_write(*socket, boost::asio::buffer(&data, sizeof(data)),
+                                     [](const boost::system::error_code &ec, std::size_t bytes_transferred) {
+                                         if (!ec) {
+                                             std::cout << "Broadcast sent, bytes: " << bytes_transferred << std::endl;
+                                         } else {
+                                             std::cerr << "Error sending broadcast: " << ec.message() << std::endl;
+                                         }
+                                     });
+            return;
         }
     }
 

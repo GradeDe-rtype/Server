@@ -52,6 +52,20 @@ namespace Server
         }
     }
 
+    void Command::process_send(const int receiver_id, const std::string &command, const std::string &args)
+    {
+        std::cout << "here" << std::endl;
+        if (const auto it = send_.find(command); it != send_.end()) {
+            it->second(receiver_id, args, command);
+        } else {
+            std::cerr << "Unknown command: |" << command << "|\n";
+            std::cerr << "Available commands are:\n";
+            for (const auto &[key, _] : send_) {
+                std::cerr << "- |" << key << "|\n";
+            }
+        }
+    }
+
     void Command::position(int client_id, const std::string &args)
     {
         std::unordered_map<std::string, std::string> obj = rfcArgParser::ParseObject(args);
@@ -66,8 +80,8 @@ namespace Server
         const int x = std::stoi(obj["x"]);
         const int y = std::stoi(obj["y"]);
         RType::Game::Entity::Player player = tcp_.get_client(client_id);
-        player.setPosX(x);
-        player.setPosY(y);
+        std::shared_ptr<RType::Game::Entity::Player> p = tcp_.get_client_ptr(client_id);
+        p->setPosition({x,y});
 
         std::unordered_map<std::string, std::string> data;
         data["x"] = std::to_string(player.getPosX());
@@ -136,16 +150,14 @@ namespace Server
 
     void Command::to_send(const int receiver_id, const std::string &args, const std::string &command)
     {
-        std::string data = rfcArgParser::CreateObject(rfcArgParser::ParseObject(args));
-        rfcArgParser::DataPacket packet = rfcArgParser::SerializePacket(command, data);
+        rfcArgParser::DataPacket packet = rfcArgParser::SerializePacket(command, args);
         tcp_.send_message(SERVER_ID, receiver_id, packet);
     }
 
     void Command::to_broadcast(const int receiver_id, const std::string &args, const std::string &command)
     {
-        std::string data = rfcArgParser::CreateObject(rfcArgParser::ParseObject(args));
-        rfcArgParser::DataPacket packet = rfcArgParser::SerializePacket(command, data);
-        tcp_.send_broadcast(packet);
+        rfcArgParser::DataPacket packet = rfcArgParser::SerializePacket(command, args);
+        tcp_.send_multicast_excluded(packet, {receiver_id});
     }
 
 } // namespace Server

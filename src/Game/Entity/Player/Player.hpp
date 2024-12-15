@@ -15,7 +15,6 @@
 #include <unordered_map>
 #include <vector>
 #include "AEntity.hpp"
-#include "Colors.hpp"
 #include "Shoot.hpp"
 
 namespace RType
@@ -39,12 +38,13 @@ namespace RType
                     void setHaveJoined(bool haveJoined);
 
                     /*  ---- GETTER ---- */
-                    std::unordered_map<std::string, std::string> getPlayerInfo() const;
-                    std::unordered_map<std::string, std::string> getPlayerSmallInfo() const;
+                    [[nodiscard]] std::unordered_map<std::string, std::string> getPlayerInfo() const;
+                    [[nodiscard]] std::unordered_map<std::string, std::string> getPlayerSmallInfo() const;
+                    [[nodiscard]] bool getHaveJoined() const;
+                    [[nodiscard]] std::shared_ptr<boost::asio::ip::tcp::socket> getSocket() const;
+                    [[nodiscard]] std::vector<std::shared_ptr<Shoot>> getShoots() const;
+                    [[nodiscard]] std::string getPosInfo() const;
                     std::string getColor() const;
-                    bool getHaveJoined() const;
-                    std::shared_ptr<boost::asio::ip::tcp::socket> getSocket() const;
-                    std::vector<std::shared_ptr<Shoot>> getShoots() const;
 
                 private:
                     std::string _color;

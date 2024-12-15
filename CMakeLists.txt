@@ -21,6 +21,7 @@ endforeach()
 
 # Collect all source files
 file(GLOB_RECURSE SOURCES
+    "src/**/**/**/**/*.cpp"
     "src/**/**/**/*.cpp"
     "src/**/**/*.cpp"
     "src/**/*.cpp"

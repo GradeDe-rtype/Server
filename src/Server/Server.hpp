@@ -36,7 +36,8 @@ namespace Server
         public:
             TCP(boost::asio::io_context &io_context, short port);
             void send_message(int client_id, int receiver_id, rfcArgParser::DataPacket data);
-            void send_multicast(rfcArgParser::DataPacket data, const std::vector<int> &exclude = {});
+            void send_multicast(rfcArgParser::DataPacket data, const std::vector<int> &included_clients = {});
+            void send_multicast_excluded(rfcArgParser::DataPacket data, const std::vector<int> &excluded_clients);
             void send_broadcast(rfcArgParser::DataPacket data);
             RType::Game::Entity::Player &get_client(int client_id);
             std::shared_ptr<RType::Game::Entity::Player> &get_client_ptr(int client_id);
@@ -56,8 +57,8 @@ namespace Server
             void add_client(std::shared_ptr<RType::Game::Entity::Player> client);
             bool client_exist(int client_id);
 
-            void add_room(const RType::Game::Room room);
-            void remove_room(int room_id);
+            void add_room(int id, const std::string&name);
+            void start_room(size_t index);void remove_room(int room_id);
             RType::Game::Room &get_room(int room_id);
             bool room_exist(int room_id);
             void add_player_to_room(int room_id, int player_id);
