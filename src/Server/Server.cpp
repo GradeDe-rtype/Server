@@ -46,6 +46,11 @@ namespace Server
         return false;
     }
 
+    void TCP::add_client(std::shared_ptr<RType::Game::Entity::Player> client)
+    {
+        clients_.push_back(client);
+    }
+
     void TCP::start_accept()
     {
         auto socket = std::make_shared<boost::asio::ip::tcp::socket>(acceptor_.get_executor());
