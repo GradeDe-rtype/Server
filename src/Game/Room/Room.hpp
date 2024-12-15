@@ -57,7 +57,6 @@ namespace RType
                 int getScore() const;
                 int getID() const;
                 RType::Game::Entity::Player &getPlayer(int playerId);
-                int getId() const;
 
             private:
                 int _id;

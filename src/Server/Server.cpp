@@ -70,14 +70,14 @@ namespace Server
     void TCP::remove_room(const int room_id)
     {
         rooms_.erase(std::remove_if(rooms_.begin(), rooms_.end(),
-                                    [room_id](const std::unique_ptr<RType::Game::Room> &room) { return room->getId() == room_id; }),
+                                    [room_id](const std::unique_ptr<RType::Game::Room> &room) { return room->getID() == room_id; }),
                      rooms_.end());
     }
 
     void TCP::add_player_to_room(const int room_id, const int player_id)
     {
         for (auto &room : rooms_) {
-            if (room->getId() == room_id) {
+            if (room->getID() == room_id) {
                 room->addPlayer(get_client_ptr(player_id));
                 return;
             }
@@ -87,7 +87,7 @@ namespace Server
     void TCP::remove_player_from_room(const int room_id, const int player_id)
     {
         for (auto &room : rooms_) {
-            if (room->getId() == room_id) {
+            if (room->getID() == room_id) {
                 room->removePlayer(player_id);
                 return;
             }

@@ -42,7 +42,7 @@ namespace RType
 
                     /*  ---- SETTER ---- */
                     void setType(Type type);
-                    void setSize(int size);
+                    // void setSize(int size);
 
                     /*  ---- GETTER ---- */
                     std::unordered_map<std::string, std::string> getEnemyInfo() const;
