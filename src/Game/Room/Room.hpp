@@ -55,6 +55,7 @@ namespace RType
                 Mode getMode() const;
                 bool getIsReady() const;
                 int getScore() const;
+                int getId() const;
 
             private:
                 int _id;

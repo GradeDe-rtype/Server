@@ -173,5 +173,10 @@ namespace RType
         {
             return _score;
         }
+
+        int Room::getID() const
+        {
+            return _id;
+        }
     } // namespace Game
 } // namespace RType

@@ -17,6 +17,8 @@ namespace Server
                                                                       command_processor(new Command(*this))
     {
         start_accept();
+        RType::Game::Room room(0, "Room 0");
+        add_room(room);
     }
 
     TCP::~TCP() { delete command_processor; }
@@ -37,6 +39,15 @@ namespace Server
         throw std::runtime_error("Player not found.");
     }
 
+    std::shared_ptr<RType::Game::Entity::Player> &TCP::get_client_ptr(const int client_id)
+    {
+        for (auto &player : clients_) {
+            if (player->getId() == client_id)
+                return player;
+        }
+        throw std::runtime_error("Player not found.");
+    }
+
     bool TCP::client_exist(const int client_id)
     {
         for (const auto &player : clients_) {
@@ -49,6 +60,38 @@ namespace Server
     void TCP::add_client(std::shared_ptr<RType::Game::Entity::Player> client)
     {
         clients_.push_back(client);
+    }
+
+    void TCP::add_room(const RType::Game::Room room)
+    {
+        rooms_.push_back(std::make_unique<RType::Game::Room>(room));
+    }
+
+    void TCP::remove_room(const int room_id)
+    {
+        rooms_.erase(std::remove_if(rooms_.begin(), rooms_.end(),
+                                    [room_id](const std::unique_ptr<RType::Game::Room> &room) { return room->getId() == room_id; }),
+                     rooms_.end());
+    }
+
+    void TCP::add_player_to_room(const int room_id, const int player_id)
+    {
+        for (auto &room : rooms_) {
+            if (room->getId() == room_id) {
+                room->addPlayer(get_client_ptr(player_id));
+                return;
+            }
+        }
+    }
+
+    void TCP::remove_player_from_room(const int room_id, const int player_id)
+    {
+        for (auto &room : rooms_) {
+            if (room->getId() == room_id) {
+                room->removePlayer(player_id);
+                return;
+            }
+        }
     }
 
     void TCP::start_accept()
