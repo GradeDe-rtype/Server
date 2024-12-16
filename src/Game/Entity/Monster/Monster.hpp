@@ -30,6 +30,8 @@ namespace RType
                     typedef enum {
                         MONSTER = 0,
                         BOSS = 1,
+                        KAMIKAZE_MONSTER = 2,
+                        BASIC_MONSTER = 3
                     } Type;
 
                     Monster(int id);
