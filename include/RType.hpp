@@ -14,6 +14,7 @@
 #include <boost/asio.hpp>
 #include <boost/bind/bind.hpp>
 #include <cctype>
+#include <chrono>
 #include <functional>
 #include <iostream>
 #include <memory>
@@ -23,6 +24,5 @@
 #include <thread>
 #include <unordered_map>
 #include <vector>
-#include <chrono>
 
 #endif /* !R_TYPE_HPP_ */

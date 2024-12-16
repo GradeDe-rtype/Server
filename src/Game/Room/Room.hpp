@@ -1,78 +1,116 @@
 /*
-** EPITECH PROJECT, 2024
-** R-Type
-** File description:
-** Room class
-** Caroline Boilly @Aeliondw
+    Authors:
+    >> Caroline Boilly @Aeliondw
+    >> Nathan Tirolf @dragusheen
+    >> Daniil Stepanov @dan13615
+
+    („• ֊ •„)❤  <  Have a good day !
+    --U-----U------------------------
 */
 
-#ifndef ROOM_HPP
-    #define ROOM_HPP
+#ifndef RTYPE_GAME_ROOM_HPP_
+#define RTYPE_GAME_ROOM_HPP_
 
-#include <RType.hpp>
-#include <Player.hpp>
-#include <Monster.hpp>
-#include <Timer.hpp>
+#include "Monster.hpp"
+#include "Player.hpp"
+#include "Timer.hpp"
+#include "Server.hpp"
+#include "Command.hpp"
+#include <string>
+#include <unordered_map>
+#include <atomic>
+#include <mutex>
+#include <condition_variable>
+#include <future>
+#include <optional>
+#include <memory>
+#include <thread>
 
+namespace Server {
+    class Command;
+}
 
-namespace Server
+namespace RType
 {
-    class Room
+    namespace Game
     {
-        enum class Mode {
-            WAITING = 0,
-            PLAYING = 1,
-            END = 2
-        };
+        class Room
+        {
+        public:
+            enum class Mode {
+                WAITING = 0,
+                PLAYING = 1,
+                END = 2
+            };
 
-        int MAX_PLAYER = 4;
+            // Constructor using std::unique_ptr for thread ownership
+            static std::unique_ptr<Room> create(int id, const std::string &name, Server::Command *command_processor);
+            Room(int id, std::string name, Server::Command *command_processor);
+
+            // Destructor
+            ~Room();
+
+            // Prevent copying
+            Room(const Room&) = delete;
+            Room& operator=(const Room&) = delete;
+
+            // Allow moving
+            Room(Room&& other) noexcept;
+            Room& operator=(Room&& other) noexcept;
+
+            // Game Logic Methods
+            void start();
+            void stop();
+            void addPlayer(std::shared_ptr<Game::Entity::Player> player);
+            void removePlayer(int playerId);
+            void update();
+            bool checkCollision(const Game::Entity::Position &pos1, int size1, const Game::Entity::Position &pos2, int size2);
+
+            // Setters
+            void setMode(Mode mode);
+            void setIsReady(bool isReady);
+
+            // Getters
+            std::string getName() const;
+            int getID() const;
+            Mode getMode() const;
+            bool isRunning() const;
 
         private:
+            // Private constructor to enforce using create() method
+            Room(int id, std::string name);
+
+            // Core room data
             int _id;
             std::string _name;
-            int _count = 0;
-            Mode _mode = Mode::WAITING;
-            //TODO: doc
-            bool _isReady = false;
-            //TODO: doc
-            int _score = 0;
+            const int MAX_PLAYER = 4;
+            std::atomic<Mode> _mode{Mode::WAITING};
+            std::atomic<bool> _isReady{false};
+            std::atomic<bool> _shouldStop{false};
 
-            std::vector<Server::Player> _players;
-            std::vector<Server::Monster> _monsters;
-            
+            // Thread-safe collections
+            std::mutex _playerMutex;
+            std::unordered_map<int, std::shared_ptr<Game::Entity::Player>> _players;
+
+            std::mutex _monsterMutex;
+            std::unordered_map<int, std::shared_ptr<Game::Entity::Monster>> _monsters;
+
+            // Thread management
+            std::optional<std::jthread> _gameThread;
+            std::mutex _threadMutex;
+
+            // Synchronization primitives
+            std::condition_variable _stateCondVar;
+            mutable std::mutex _stateMutex;
+
+            // Internal methods
+            void runGameLoop();
+            void spawnMonster();
+
             Timer _monsterSpawnTimer;
 
-        public:
-            Room(int id, std::string _name);
-            ~Room() = default;
-
-            /*  ---- GAME LOGIC ---- */
-            //TODO: doc
-            void start();
-            void addPlayer(const Player &player);
-            void removePlayer(int playerId);
-            void spawnMonster();
-            void update();
-
-            /*  ---- SETTER ---- */
-            void setName(std::string name);
-            void setMode(Mode mode);
-            //TODO: doc
-            void setIsReady(bool isReady);
-            //TODO: doc
-            void setScore(int score);
-
-            /*  ---- GETTER ---- */
-            std::unordered_map<std::string, std::string> getRoomInfo() const;
-            std::string getName() const;
-            int getCount() const;
-            Mode getMode() const;
-            //TODO: doc
-            bool getIsReady() const;
-            //TODO: doc
-            int getScore() const;
-
-    };
-} // namespace Server
-
-#endif // ROOM_HPP
+            Server::Command* command_processor;
+        };
+    }
+}
+#endif

@@ -67,7 +67,7 @@ namespace RType
         {
             std::string result = trim(str);
             std::transform(result.begin(), result.end(), result.begin(),
-                        [](unsigned char c) { return std::tolower(c); });
+                           [](unsigned char c) { return std::tolower(c); });
             return result;
         }
     } // namespace Utils
