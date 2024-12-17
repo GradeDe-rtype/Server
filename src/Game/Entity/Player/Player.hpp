@@ -15,8 +15,8 @@
 #include <unordered_map>
 #include <vector>
 #include "AEntity.hpp"
-#include "Shoot.hpp"
 #include "Colors.hpp"
+#include "Shoot.hpp"
 
 namespace RType
 {

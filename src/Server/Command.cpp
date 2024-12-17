@@ -18,6 +18,7 @@ namespace Server
         commands_["position"] = [this](const int client_id, const std::string &args) { position(client_id, args); };
         commands_["p_info"] = [this](const int client_id, const std::string &args) { p_info(client_id, args); };
         commands_["shoot"] = [this](const int client_id, const std::string &args) { shoot(client_id, args); };
+        commands_["ready"] = [this](const int client_id, const std::string &args) { ready(client_id, args); };
         // commands_["e_info"] = [this](const int client_id, const std::string &args) { e_info(client_id, args); };
 
         /* COMMANDS TO SEND */
@@ -81,7 +82,7 @@ namespace Server
         const int y = std::stoi(obj["y"]);
         RType::Game::Entity::Player player = tcp_.get_client(client_id);
         std::shared_ptr<RType::Game::Entity::Player> p = tcp_.get_client_ptr(client_id);
-        p->setPosition({x,y});
+        p->setPosition({x, y});
 
         std::unordered_map<std::string, std::string> data;
         data["x"] = std::to_string(player.getPosX());
@@ -150,16 +151,23 @@ namespace Server
     //     // tcp_.send_message(SERVER_ID, client_id, packet);
     // }
 
+    void Command::ready(int client_id, const std::string &args)
+    {
+        UNUSED(args);
+        std::shared_ptr<RType::Game::Entity::Player> player = tcp_.get_client_ptr(client_id);
+        player->setHaveJoined(true);
+    }
+
     void Command::to_send(const int receiver_id, const std::string &args, const std::string &command)
     {
         rfcArgParser::DataPacket packet = rfcArgParser::SerializePacket(command, args);
-        tcp_.send_message(SERVER_ID, receiver_id, packet);
+        tcp_.send_message(receiver_id, receiver_id, packet);
     }
 
     void Command::to_broadcast(const int receiver_id, const std::string &args, const std::string &command)
     {
         rfcArgParser::DataPacket packet = rfcArgParser::SerializePacket(command, args);
-        tcp_.send_multicast_excluded(packet, {receiver_id});
+        tcp_.send_broadcast(packet);
     }
 
 } // namespace Server

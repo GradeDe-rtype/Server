@@ -27,7 +27,7 @@ namespace Server
     {
         clients_.erase(std::remove_if(clients_.begin(), clients_.end(),
                                       [client_id](const std::shared_ptr<RType::Game::Entity::Player> &client) { return client->getId() == client_id; }),
-                      clients_.end());
+                       clients_.end());
         send_broadcast(rfcArgParser::SerializePacket("disconnect", std::to_string(client_id)));
     }
 
@@ -63,7 +63,7 @@ namespace Server
         clients_.push_back(client);
     }
 
-    void TCP::add_room(int id, const std::string& name)
+    void TCP::add_room(int id, const std::string &name)
     {
         auto room = RType::Game::Room::create(id, name, command_processor);
         rooms_.push_back(std::move(room));
@@ -71,8 +71,7 @@ namespace Server
 
     void TCP::start_room(size_t index)
     {
-        if (index < rooms_.size())
-        {
+        if (index < rooms_.size()) {
             rooms_[index]->start();
         }
     }
@@ -176,8 +175,8 @@ namespace Server
                     *socket, boost::asio::buffer(&data, sizeof(data)),
                     [client_id, receiver_id](const boost::system::error_code &ec, std::size_t bytes_transferred) {
                         if (!ec) {
-                            std::cout << "Message sent from client " << client_id << " to receiver " << receiver_id
-                                      << ", bytes: " << bytes_transferred << std::endl;
+                            // std::cout << "Message sent from client " << client_id << " to receiver " << receiver_id
+                            //           << ", bytes: " << bytes_transferred << std::endl;
                         } else {
                             std::cerr << "Error sending message: " << ec.message() << std::endl;
                         }
@@ -197,7 +196,7 @@ namespace Server
             boost::asio::async_write(*socket, boost::asio::buffer(&data, sizeof(data)),
                                      [](const boost::system::error_code &ec, std::size_t bytes_transferred) {
                                          if (!ec) {
-                                             std::cout << "Broadcast sent, bytes: " << bytes_transferred << std::endl;
+                                             // std::cout << "Broadcast sent, bytes: " << bytes_transferred << std::endl;
                                          } else {
                                              std::cerr << "Error sending broadcast: " << ec.message() << std::endl;
                                          }
@@ -205,7 +204,8 @@ namespace Server
         }
     }
 
-    void TCP::send_multicast_excluded(rfcArgParser::DataPacket data, const std::vector<int> &excluded_clients) {
+    void TCP::send_multicast_excluded(rfcArgParser::DataPacket data, const std::vector<int> &excluded_clients)
+    {
         for (const auto &client : clients_) {
             const int id = client->getId();
             const auto socket = client->getSocket();
@@ -214,7 +214,7 @@ namespace Server
             boost::asio::async_write(*socket, boost::asio::buffer(&data, sizeof(data)),
                                      [](const boost::system::error_code &ec, std::size_t bytes_transferred) {
                                          if (!ec) {
-                                             std::cout << "Broadcast sent, bytes: " << bytes_transferred << std::endl;
+                                             // std::cout << "Broadcast sent, bytes: " << bytes_transferred << std::endl;
                                          } else {
                                              std::cerr << "Error sending broadcast: " << ec.message() << std::endl;
                                          }
@@ -231,7 +231,7 @@ namespace Server
             boost::asio::async_write(*socket, boost::asio::buffer(&data, sizeof(data)),
                                      [](const boost::system::error_code &ec, std::size_t bytes_transferred) {
                                          if (!ec) {
-                                             std::cout << "Broadcast sent, bytes: " << bytes_transferred << std::endl;
+                                             // std::cout << "Broadcast sent, bytes: " << bytes_transferred << std::endl;
                                          } else {
                                              std::cerr << "Error sending broadcast: " << ec.message() << std::endl;
                                          }

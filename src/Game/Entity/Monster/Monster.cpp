@@ -52,7 +52,8 @@ namespace RType
             void Monster::update()
             {
                 _shoots.erase(std::remove_if(_shoots.begin(), _shoots.end(), [](std::shared_ptr<Entity::Shoot> shoot) { return !shoot->getIsActive(); }), _shoots.end());
-                setPosX(_position.x - _speed);
+                if (_type == Type::KAMIKAZE_MONSTER)
+                    setPosX(_position.x - _speed);
             }
 
             /*  ---- SETTER ---- */
@@ -82,6 +83,11 @@ namespace RType
             std::vector<std::shared_ptr<Shoot>> Monster::getShoots() const
             {
                 return _shoots;
+            }
+
+            Timer &Monster::getShootTimer()
+            {
+                return _shootTimer;
             }
         } // namespace Entity
     } // namespace Game

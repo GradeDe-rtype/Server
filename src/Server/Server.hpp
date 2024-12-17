@@ -13,8 +13,8 @@
 /*  ---- INCLUDES ---- */
 #include "Command.hpp"
 #include "Player.hpp"
-#include "Room.hpp"
 #include "RType.hpp"
+#include "Room.hpp"
 #include "Utils.hpp"
 #include "rfcArgParser.hpp"
 
@@ -57,8 +57,9 @@ namespace Server
             void add_client(std::shared_ptr<RType::Game::Entity::Player> client);
             bool client_exist(int client_id);
 
-            void add_room(int id, const std::string&name);
-            void start_room(size_t index);void remove_room(int room_id);
+            void add_room(int id, const std::string &name);
+            void start_room(size_t index);
+            void remove_room(int room_id);
             RType::Game::Room &get_room(int room_id);
             bool room_exist(int room_id);
             void add_player_to_room(int room_id, int player_id);

@@ -29,14 +29,15 @@ namespace Server
             Command(TCP &tcp);
             void process_command(int client_id, rfcArgParser::DataPacket packet);
             void process_send(int receiver_id, const std::string &command, const std::string &args);
+            void to_send(int receiver_id, const std::string &args, const std::string &command);
+            void to_broadcast(int receiver_id, const std::string &args, const std::string &command);
 
         private:
             void position(int client_id, const std::string &args);
             void p_info(int client_id, const std::string &args);
             void shoot(int client_id, const std::string &args);
+            void ready(int client_id, const std::string &args);
             void e_info(int client_id, const std::string &args);
-            void to_send(int receiver_id, const std::string &args, const std::string &command);
-            void to_broadcast(int receiver_id, const std::string &args, const std::string &command);
             std::unordered_map<std::string, std::function<void(int, const std::string &)>> commands_;
             std::unordered_map<std::string, std::function<void(int, const std::string &, const std::string &)>> send_;
             TCP &tcp_;

@@ -18,6 +18,8 @@
 #include "AEntity.hpp"
 #include "Shoot.hpp"
 
+#include <Timer.hpp>
+
 namespace RType
 {
     namespace Game
@@ -50,10 +52,12 @@ namespace RType
                     std::unordered_map<std::string, std::string> getEnemyInfo() const;
                     Type getType() const;
                     std::vector<std::shared_ptr<Entity::Shoot>> getShoots() const;
+                    Timer &getShootTimer();
 
                 private:
                     Type _type = Type::BASIC_MONSTER;
                     std::vector<std::shared_ptr<Shoot>> _shoots;
+                    Timer _shootTimer{1000};
             };
         } // namespace Entity
     } // namespace Game

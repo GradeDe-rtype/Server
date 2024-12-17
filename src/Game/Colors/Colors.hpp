@@ -17,17 +17,18 @@ namespace RType
 {
     namespace Game
     {
-        class Colors {
-                public:
-                    static Colors &get();
+        class Colors
+        {
+            public:
+                static Colors &get();
 
-                    std::string getColor(int color) const;
+                std::string getColor(int color) const;
 
-                private:
-                    Colors();
+            private:
+                Colors();
 
-                    std::unordered_map<int, std::string> _colors;
-            };
+                std::unordered_map<int, std::string> _colors;
+        };
     } // namespace Game
 } // namespace RType
 
