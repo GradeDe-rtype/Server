@@ -52,7 +52,7 @@ namespace RType
                     std::vector<std::shared_ptr<Entity::Shoot>> getShoots() const;
 
                 private:
-                    Type _type = Type::MONSTER;
+                    Type _type = Type::BASIC_MONSTER;
                     std::vector<std::shared_ptr<Shoot>> _shoots;
             };
         } // namespace Entity

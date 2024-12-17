@@ -29,7 +29,7 @@ namespace RType
 
             void AEntity::setHealth(int health)
             {
-                if (health < 0) return;
+                if (health < 0) _health = 0;
                 _health = health;
             }
 
