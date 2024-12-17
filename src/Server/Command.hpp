@@ -10,11 +10,13 @@
 #ifndef COMMAND_HPP
 #define COMMAND_HPP
 
+#define SERVER_ID -1
+
 /*  ---- INCLUDES ---- */
-#include <RType.hpp>
-#include <Server.hpp>
-#include <Utils.hpp>
-#include <rfcArgParser.hpp>
+#include "RType.hpp"
+#include "Server.hpp"
+#include "Utils.hpp"
+#include "rfcArgParser.hpp"
 
 #define UNUSED(x) (void)(x)
 
@@ -26,14 +28,18 @@ namespace Server
         public:
             Command(TCP &tcp);
             void process_command(int client_id, rfcArgParser::DataPacket packet);
+            void process_send(int receiver_id, const std::string &command, const std::string &args);
+            void to_send(int receiver_id, const std::string &args, const std::string &command);
+            void to_broadcast(int receiver_id, const std::string &args, const std::string &command);
 
         private:
-            void start(int client_id, const std::string &args);
-            void stop(int client_id, const std::string &args);
-            void send(int client_id, const std::string &args);
-            void broadcast(int client_id, const std::string &args);
             void position(int client_id, const std::string &args);
+            void p_info(int client_id, const std::string &args);
+            void shoot(int client_id, const std::string &args);
+            void ready(int client_id, const std::string &args);
+            void e_info(int client_id, const std::string &args);
             std::unordered_map<std::string, std::function<void(int, const std::string &)>> commands_;
+            std::unordered_map<std::string, std::function<void(int, const std::string &, const std::string &)>> send_;
             TCP &tcp_;
     };
 } // namespace Server

@@ -14,6 +14,7 @@
 #include <boost/asio.hpp>
 #include <boost/bind/bind.hpp>
 #include <cctype>
+#include <chrono>
 #include <functional>
 #include <iostream>
 #include <memory>

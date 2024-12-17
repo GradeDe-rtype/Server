@@ -11,27 +11,36 @@
 #define SERVER_HPP
 
 /*  ---- INCLUDES ---- */
-#include <Command.hpp>
-#include <RType.hpp>
-#include <Utils.hpp>
+#include "Command.hpp"
+#include "Player.hpp"
+#include "RType.hpp"
+#include "Room.hpp"
+#include "Utils.hpp"
 #include "rfcArgParser.hpp"
 
 /*  ---- CLASS ---- */
 
+namespace RType::Game
+{
+    class Room;
+}
+namespace RType::Game::Entity
+{
+    class Player;
+}
 namespace Server
 {
     class Command;
-    class Player;
     class TCP
     {
         public:
             TCP(boost::asio::io_context &io_context, short port);
             void send_message(int client_id, int receiver_id, rfcArgParser::DataPacket data);
-            void send_broadcast(rfcArgParser::DataPacket data, const std::vector<int> &excluded_clients = {});
-            Player &get_player(int client_id);
-            void remove_player(int client_id);
-            std::vector<Player> &get_players() { return players_; }
-            bool player_exists(int client_id);
+            void send_multicast(rfcArgParser::DataPacket data, const std::vector<int> &included_clients = {});
+            void send_multicast_excluded(rfcArgParser::DataPacket data, const std::vector<int> &excluded_clients);
+            void send_broadcast(rfcArgParser::DataPacket data);
+            RType::Game::Entity::Player &get_client(int client_id);
+            std::shared_ptr<RType::Game::Entity::Player> &get_client_ptr(int client_id);
 
             ~TCP();
 
@@ -41,10 +50,25 @@ namespace Server
 
         private:
             void start_accept();
-            void start_read(Player player);
+            void start_read(RType::Game::Entity::Player player);
+
+            std::vector<std::shared_ptr<RType::Game::Entity::Player>> &get_clients() { return clients_; }
+            void remove_client(int client_id);
+            void add_client(std::shared_ptr<RType::Game::Entity::Player> client);
+            bool client_exist(int client_id);
+
+            void add_room(int id, const std::string &name);
+            void start_room(size_t index);
+            void remove_room(int room_id);
+            RType::Game::Room &get_room(int room_id);
+            bool room_exist(int room_id);
+            void add_player_to_room(int room_id, int player_id);
+            void remove_player_from_room(int room_id, int player_id);
+
             boost::asio::ip::tcp::acceptor acceptor_;
             int next_client_id_ = 0;
-            std::vector<Player> players_;
+            std::vector<std::shared_ptr<RType::Game::Entity::Player>> clients_;
+            std::vector<std::unique_ptr<RType::Game::Room>> rooms_;
             Command *command_processor;
             bool is_running = true;
     };
