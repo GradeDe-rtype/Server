@@ -46,9 +46,12 @@ namespace RType
                     [[nodiscard]] std::vector<std::shared_ptr<Shoot>> getShoots() const;
                     [[nodiscard]] std::string getPosInfo() const;
                     std::string getColor() const;
+                    bool getIsDeadForRun();
+                    void setIsDeadForRun(bool IsDeadForRestart);
 
                 private:
                     std::string _color;
+                    bool _IsDeadForRestart = false;
                     bool _haveJoined = false;
                     std::shared_ptr<boost::asio::ip::tcp::socket> _socket;
                     std::vector<std::shared_ptr<Shoot>> _shoots;

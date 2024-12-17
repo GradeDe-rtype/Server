@@ -100,6 +100,17 @@ namespace RType
                 std::string pos = std::to_string(_id) + " {x:" + std::to_string(_position.x) + ",y:" + std::to_string(_position.y) + "}";
                 return pos;
             }
+
+
+            bool Player::getIsDeadForRun() 
+            {
+                return _IsDeadForRestart;
+            }
+            void Player::setIsDeadForRun(bool IsDeadForRestart)
+            {
+                _IsDeadForRestart = IsDeadForRestart;
+                return;
+            }
         } // namespace Entity
     } // namespace Game
 } // namespace RType
