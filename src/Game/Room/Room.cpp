@@ -266,10 +266,10 @@ namespace RType
                     monster->setPosX(900);
                 } else {
                     monster->setType(RType::Game::Entity::Monster::BASIC_MONSTER);
-                    monster->setPosX(800);
+                    monster->setPosX(750);
                 }
 
-                monster->setPosY(std::rand() % 600);
+                monster->setPosY(std::rand() % 500 + 50);
                 std::cout << "Monster " << monsterId << " spawned at " << monster->getPosX() << ", " << monster->getPosY()
                           << "Type of " << monster->getType() << std::endl;
                 std::lock_guard<std::mutex> lock(_monsterMutex);

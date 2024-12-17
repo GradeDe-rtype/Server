@@ -36,7 +36,7 @@ namespace RType
 
             void Player::shoot(int x, int y)
             {
-                _shoots.push_back(std::make_shared<Shoot>(x, y, 15, _damage, _direction));
+                _shoots.push_back(std::make_shared<Shoot>(x, y, 20, _damage, _direction));
             }
 
             void Player::update()

@@ -46,7 +46,7 @@ namespace RType
             /*  ---- GAME LOGIC ---- */
             void Monster::shoot()
             {
-                _shoots.push_back(std::make_shared<Entity::Shoot>(_position.x, _position.y, 15, _damage, _direction));
+                _shoots.push_back(std::make_shared<Entity::Shoot>(_position.x, _position.y, 10, _damage, _direction));
             }
 
             void Monster::update()
