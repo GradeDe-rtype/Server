@@ -139,7 +139,14 @@ namespace RType
                 std::cout << "All players are dead" << std::endl;
                 std::string arg = std::to_string(_wave);
                 command_processor->process_send(-1, "end", arg);
-                _mode.store(Mode::END);
+                _isReady = false;
+                _mode = Mode::WAITING;
+                _wave = 1;
+                for (auto &player : _players) {
+                    player.second->setHealth(100);
+                    player.second->setIsAlive(true);
+                }
+                // _mode.store(Mode::END);
                 return;
             }
             if (_monsters.empty()) {
