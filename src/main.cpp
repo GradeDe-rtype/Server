@@ -20,11 +20,11 @@ int main(int argc, char **argv)
         std::cout << "Port: " << parsing.getPort() << std::endl;
 
         boost::asio::io_context io_context;
-        Server::TCP server(io_context, parsing.getPort());
+        Server::GameServer server(io_context, parsing.getPort());
         std::cout << "Server starting..." << std::endl;
         std::thread io_thread([&io_context]() { io_context.run(); });
         std::cout << "Server started." << std::endl;
-        while (server.getRunning()) {
+        while (server.isRunning()) {
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
         io_context.stop();

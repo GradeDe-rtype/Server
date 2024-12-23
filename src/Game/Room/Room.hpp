@@ -86,7 +86,7 @@ namespace RType
                 std::string _name;
                 const int MAX_PLAYER = 4;
                 int _wave = 0;
-                int _maxWave = 5;
+                int _maxWave = 6;
                 bool haveAskedForNextWave = false;
                 std::atomic<Mode> _mode{Mode::WAITING};
                 std::atomic<bool> _isReady{false};
