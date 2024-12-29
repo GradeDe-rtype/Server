@@ -28,9 +28,9 @@ namespace Server
         public:
             Command(Server::GameServer &server);
             void process_command(int client_id, rfcArgParser::DataPacket packet);
-            void process_send(int receiver_id, const std::string &command, const std::string &args);
-            void to_send(int receiver_id, const std::string &args, const std::string &command);
-            void to_broadcast(int receiver_id, const std::string &args, const std::string &command);
+            void send(int receiver_id, const std::string &command, const std::string &args);
+            void to_send(int receiver_id, const std::string &command, const std::string &args);
+            void to_broadcast(int receiver_id, const std::string &command, const std::string &args);
 
         private:
             void position(int client_id, const std::string &args);

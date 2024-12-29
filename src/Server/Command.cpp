@@ -22,20 +22,20 @@ namespace Server
         // commands_["e_info"] = [this](const int client_id, const std::string &args) { e_info(client_id, args); };
 
         /* COMMANDS TO SEND */
-        send_["connect"] = [this](const int receiver_id, const std::string &args, const std::string &command) { to_broadcast(receiver_id, args, command); };
-        send_["disconnect"] = [this](const int receiver_id, const std::string &args, const std::string &command) { to_broadcast(receiver_id, args, command); };
-        send_["p_position"] = [this](const int receiver_id, const std::string &args, const std::string &command) { to_broadcast(receiver_id, args, command); };
-        send_["p_damage"] = [this](const int receiver_id, const std::string &args, const std::string &command) { to_broadcast(receiver_id, args, command); };
-        send_["p_shoot"] = [this](const int receiver_id, const std::string &args, const std::string &command) { to_broadcast(receiver_id, args, command); };
-        send_["p_death"] = [this](const int receiver_id, const std::string &args, const std::string &command) { to_broadcast(receiver_id, args, command); };
-        send_["e_position"] = [this](const int receiver_id, const std::string &args, const std::string &command) { to_broadcast(receiver_id, args, command); };
-        send_["e_damage"] = [this](const int receiver_id, const std::string &args, const std::string &command) { to_broadcast(receiver_id, args, command); };
-        send_["e_shoot"] = [this](const int receiver_id, const std::string &args, const std::string &command) { to_broadcast(receiver_id, args, command); };
-        send_["e_death"] = [this](const int receiver_id, const std::string &args, const std::string &command) { to_broadcast(receiver_id, args, command); };
-        send_["color"] = [this](const int receiver_id, const std::string &args, const std::string &command) { to_broadcast(receiver_id, args, command); };
-        send_["wave"] = [this](const int receiver_id, const std::string &args, const std::string &command) { to_broadcast(receiver_id, args, command); };
-        send_["end"] = [this](const int receiver_id, const std::string &args, const std::string &command) { to_broadcast(receiver_id, args, command); };
-        send_["enemy"] = [this](const int receiver_id, const std::string &args, const std::string &command) { to_broadcast(receiver_id, args, command); };
+        send_["connect"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
+        send_["disconnect"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
+        send_["p_position"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
+        send_["p_damage"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
+        send_["p_shoot"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
+        send_["p_death"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
+        send_["e_position"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
+        send_["e_damage"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
+        send_["e_shoot"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
+        send_["e_death"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
+        send_["color"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
+        send_["wave"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
+        send_["end"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
+        send_["enemy"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
     }
 
     void Command::process_command(const int client_id, rfcArgParser::DataPacket packet)
@@ -54,7 +54,7 @@ namespace Server
         }
     }
 
-    void Command::process_send(const int receiver_id, const std::string &command, const std::string &args)
+    void Command::send(const int receiver_id, const std::string &command, const std::string &args)
     {
         if (const auto it = send_.find(command); it != send_.end()) {
             it->second(receiver_id, args, command);
@@ -158,13 +158,13 @@ namespace Server
         player->setHaveJoined(true);
     }
 
-    void Command::to_send(const int receiver_id, const std::string &args, const std::string &command)
+    void Command::to_send(const int receiver_id, const std::string &command, const std::string &args)
     {
         rfcArgParser::DataPacket packet = rfcArgParser::SerializePacket(command, args);
         server_.send_message(receiver_id, receiver_id, packet);
     }
 
-    void Command::to_broadcast(const int receiver_id, const std::string &args, const std::string &command)
+    void Command::to_broadcast(const int receiver_id, const std::string &command, const std::string &args)
     {
         rfcArgParser::DataPacket packet = rfcArgParser::SerializePacket(command, args);
         server_.send_broadcast(packet);

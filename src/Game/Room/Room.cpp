@@ -118,7 +118,7 @@ namespace RType
             if (DeadPlayer == TotalPlayer && DeadPlayer != 0) {
                 std::cout << "All players are dead" << std::endl;
                 std::string arg = std::to_string(_wave);
-                command_processor->process_send(-1, "end", arg);
+                command_processor->send(-1, "end", arg);
                 _mode.store(Mode::END);
                 return false;
             }
@@ -130,12 +130,12 @@ namespace RType
             if (haveAskedForNextWave == false) {
                 _wave += 1;
                 haveAskedForNextWave = true;
-                command_processor->process_send(-1, "wave", std::to_string(_wave));
+                command_processor->send(-1, "wave", std::to_string(_wave));
             }
 
             for (auto &player : _players) {
                 if (player.second->getHaveJoined() == false) {
-                    command_processor->to_send(player.second->getId(), std::to_string(_wave), "wave");
+                    command_processor->to_send(player.second->getId(),  "wave", std::to_string(_wave));
                     return false;
                 }
             }
@@ -164,7 +164,7 @@ namespace RType
                         std::unordered_map<int, std::shared_ptr<Entity::Monster>> new_monsters = _monsters;
                         for (const auto &it : new_monsters) {
                             if (checkCollision(shoot->getPosition(), 1, it.second->getPosition(), it.second->getSize())) {
-                                command_processor->process_send(-1, "e_death", std::to_string(it.second->getId()));
+                                command_processor->send(-1, "e_death", std::to_string(it.second->getId()));
                                 _monsters.erase(it.first);
                             }
                         }
@@ -182,7 +182,7 @@ namespace RType
                 std::unordered_map<std::string, std::string> tmp;
                 tmp["x"] = std::to_string(monster.second->getPosX());
                 tmp["y"] = std::to_string(monster.second->getPosY());
-                command_processor->process_send(-1, "e_shoot", rfcArgParser::CreateObject(tmp));
+                command_processor->send(-1, "e_shoot", rfcArgParser::CreateObject(tmp));
             }
 
             for (auto &shoot : monster.second->getShoots()) {
@@ -191,7 +191,7 @@ namespace RType
                     if (!player->second->getIsAlive())
                         continue;
                     if (checkCollision(shoot->getPosition(), 1, player->second->getPosition(), player->second->getSize())) {
-                        command_processor->process_send(-1, "p_death", std::to_string(player->second->getId()));
+                        command_processor->send(-1, "p_death", std::to_string(player->second->getId()));
                         player->second->setIsAlive(false);
                     }
                 }
@@ -217,7 +217,7 @@ namespace RType
                         if (!player->second->getIsAlive())
                             continue;
                         if (checkCollision(monster.second->getPosition(), monster.second->getSize(), player->second->getPosition(), player->second->getSize())) {
-                            command_processor->process_send(-1, "p_death", std::to_string(player->second->getId()));
+                            command_processor->send(-1, "p_death", std::to_string(player->second->getId()));
                             player->second->setIsAlive(false);
                         }
                     }
@@ -226,7 +226,7 @@ namespace RType
                     std::unordered_map<std::string, std::string> tmp;
                     tmp["x"] = std::to_string(monster.second->getPosX());
                     tmp["y"] = std::to_string(monster.second->getPosY());
-                    command_processor->process_send(-1, "e_position", std::to_string(monster.second->getId()) + " " + rfcArgParser::CreateObject(tmp));
+                    command_processor->send(-1, "e_position", std::to_string(monster.second->getId()) + " " + rfcArgParser::CreateObject(tmp));
                 }
             }
 
@@ -255,7 +255,7 @@ namespace RType
                     for (int i = 0; i <= _wave; i++)
                         spawnMonster();
                 } else {
-                    command_processor->process_send(-1, "end", std::to_string(_wave));
+                    command_processor->send(-1, "end", std::to_string(_wave));
                     _mode.store(Mode::END);
                     return;
                 }
@@ -289,7 +289,7 @@ namespace RType
                           << "Type of " << monster->getType() << std::endl;
                 std::lock_guard<std::mutex> lock(_monsterMutex);
                 _monsters[monsterId] = monster;
-                command_processor->process_send(-1, "enemy", rfcArgParser::CreateObject(monster->getEnemyInfo()));
+                command_processor->send(-1, "enemy", rfcArgParser::CreateObject(monster->getEnemyInfo()));
             } catch (const std::exception &e) {
                 std::cerr << "Error spawning monster: " << e.what() << std::endl;
                 return;
@@ -309,14 +309,11 @@ namespace RType
             _players.erase(playerId);
         }
 
-        // Destructor
         Room::~Room()
         {
-            // Ensure thread is stopped
             stop();
         }
 
-        // Getter implementations
         std::string Room::getName() const
         {
             return _name;
