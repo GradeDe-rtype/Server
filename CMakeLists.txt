@@ -45,6 +45,7 @@ target_include_directories(r-type_server PRIVATE
     "src/Game/Timer/"
     "src/Parsing/"
     "src/Server/"
+    "src/Network/"
     "src/Utils/Utils/"
     "src/Utils/Path/"
 )

@@ -11,6 +11,9 @@
 #ifndef RTYPE_GAME_ROOM_HPP_
 #define RTYPE_GAME_ROOM_HPP_
 
+#define MAX_WAVE 6
+#define MAX_PLAYER 4
+
 #include <atomic>
 #include <condition_variable>
 #include <future>
@@ -66,6 +69,13 @@ namespace RType
                 void removePlayer(int playerId);
                 void update();
                 bool checkCollision(const Game::Entity::Position &pos1, int size1, const Game::Entity::Position &pos2, int size2);
+                bool arePlayersAlive();
+                bool nextWave();
+                void resetPlayers();
+                void playersUpdate();
+                void basicMonster(std::pair<int, std::shared_ptr<Entity::Monster>> monster);
+                void kamikazeMonster(std::pair<int, std::shared_ptr<Entity::Monster>> monster);
+                void monstersUpdate();
 
                 // Setters
                 void setMode(Mode mode);
@@ -84,9 +94,7 @@ namespace RType
                 // Core room data
                 int _id;
                 std::string _name;
-                const int MAX_PLAYER = 4;
                 int _wave = 0;
-                int _maxWave = 5;
                 bool haveAskedForNextWave = false;
                 std::atomic<Mode> _mode{Mode::WAITING};
                 std::atomic<bool> _isReady{false};
