@@ -57,7 +57,7 @@ namespace Server
     void Command::send(const int receiver_id, const std::string &command, const std::string &args)
     {
         if (const auto it = send_.find(command); it != send_.end()) {
-            it->second(receiver_id, args, command);
+            it->second(receiver_id, command, args);
         } else {
             std::cerr << "Unknown command: |" << command << "|\n";
             std::cerr << "Available commands are:\n";
