@@ -44,7 +44,7 @@ namespace RType
 
                     /*  ---- GETTER ---- */
                     bool getIsActive() const;
-                    std::unordered_map<std::string, std::string> Shoot::getShootInfo() const;
+                    std::unordered_map<std::string, std::string> getShootInfo() const;
             };
         } // namespace Entity
     } // namespace Game
