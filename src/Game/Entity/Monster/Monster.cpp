@@ -70,6 +70,11 @@ namespace RType
                 _phase = phase;
             }
 
+            void Monster::setRuee(bool ruee)
+            {
+                _ruee = ruee;
+            }
+
             /*  ---- GETTER ---- */
             std::unordered_map<std::string, std::string> Monster::getEnemyInfo() const
             {
@@ -96,6 +101,17 @@ namespace RType
             {
                 return _shootTimer;
             }
+
+            Timer &Monster::getSpawnTimer()
+            {
+                return _spawnTimer;
+            }
+
+            Timer &Monster::getRushTimer()
+            {
+                return _rushTimer;
+            }
+
             int Monster::getPhase()
             {
                 return _phase;
