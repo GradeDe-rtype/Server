@@ -23,15 +23,13 @@ namespace RType
                 _level = 1;
                 _position = {0, 0};
                 _health = 100;
-                _damage = 10;
+                _damage = 25;
                 _size = 40;
                 _speed = 1;
                 _isAlive = true;
                 _color = Game::Colors::get().getColor(_id);
                 _socket = socket;
                 _direction = Direction::RIGHT;
-                _hp = 100;
-                _damage = 25;
             }
 
             /*  ---- SETTER ---- */
