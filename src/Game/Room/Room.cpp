@@ -180,6 +180,7 @@ namespace RType
                 monster.second->shoot();
                 monster.second->getShootTimer().reset();
                 command_processor->send(-1, "shoot", rfcArgParser::CreateObject(monster.second->getShoots().back()->getShootInfo()));
+                std::cout << "Monster " << monster.second->getId() << " shoot" << std::endl;
             }
 
             for (auto &shoot : monster.second->getShoots()) {
