@@ -399,10 +399,34 @@ namespace RType
                     monster->setPosX(900);
                 } else {
                     monster->setType(RType::Game::Entity::Monster::BASIC_MONSTER);
-                    monster->setPosX(750);
+                    monster->setPosX(800);
                 }
 
-                monster->setPosY(std::rand() % 500 + 50);
+                monster->setPosY(std::rand() % 600);
+                monster->setHp(100);
+                std::cout << "Monster " << monsterId << " spawned at " << monster->getPosX() << ", " << monster->getPosY()
+                          << "Type of " << monster->getType() << std::endl;
+                std::lock_guard<std::mutex> lock(_monsterMutex);
+                _monsters[monsterId] = monster;
+                command_processor->send(-1, "enemy", rfcArgParser::CreateObject(monster->getEnemyInfo()));
+            } catch (const std::exception &e) {
+                std::cerr << "Error spawning monster: " << e.what() << std::endl;
+                return;
+            }
+        }
+
+        void Room::spawnBoss()
+        {
+            try {
+                int monsterId = _monsters.size() + 10;
+                auto monster = std::make_shared<Game::Entity::Monster>(monsterId, _wave);
+                monster->setType(RType::Game::Entity::Monster::BOSS);
+                monster->setHp(1000);
+                monster->setDamage(50);
+                monster->setPosY(300);
+                monster->setPosX(700);
+                monster->setPhase(1);
+
                 std::cout << "Monster " << monsterId << " spawned at " << monster->getPosX() << ", " << monster->getPosY()
                           << "Type of " << monster->getType() << std::endl;
                 std::lock_guard<std::mutex> lock(_monsterMutex);
