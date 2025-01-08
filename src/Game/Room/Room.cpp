@@ -11,10 +11,23 @@
 #include "Room.hpp"
 #include <iostream>
 
+// TODO: Send _position players to all connected player after a delay
+// TODO: Send damage a player received by a monster to all player
+// TODO: Send that a player die to all player
+
+// TODO: Send the position of a player shoot to all player
+// TODO: Send enemy-info to all player when a new enemy has been created
+
+// TODO: Send _position enemy to all connected player after a delay
+// TODO: Send damage a monster received by a player to all player
+// TODO: Send that a monster die to all player
+// TODO: Send a request to all player if they are ready to a new wave
+
 namespace RType
 {
     namespace Game
     {
+        // Static factory method for safe room creation
         std::unique_ptr<Room> Room::create(int id, const std::string &name, Server::Command *command_processor)
         {
             return std::make_unique<Room>(id, name, command_processor);
@@ -25,10 +38,12 @@ namespace RType
         {
         }
 
+        // Move constructor
         Room::Room(Room &&other) noexcept
             : _id(other._id), _name(std::move(other._name)), _mode(other._mode.load()), _isReady(other._isReady.load()), _shouldStop(other._shouldStop.load()),
               _monsterTimer(other._monsterTimer), command_processor(other.command_processor)
         {
+            // Safely transfer players and monsters
             std::lock_guard<std::mutex> playerLock(other._playerMutex);
             std::lock_guard<std::mutex> monsterLock(other._monsterMutex);
 
@@ -40,14 +55,17 @@ namespace RType
         Room &Room::operator=(Room &&other) noexcept
         {
             if (this != &other) {
+                // Stop current thread if running
                 stop();
 
+                // Transfer basic data
                 _id = other._id;
                 _name = std::move(other._name);
                 _mode.store(other._mode.load());
                 _isReady.store(other._isReady.load());
                 _shouldStop.store(other._shouldStop.load());
 
+                // Safely transfer players and monsters
                 std::scoped_lock lock(_playerMutex, other._playerMutex, _monsterMutex, other._monsterMutex);
                 _players = std::move(other._players);
                 _monsters = std::move(other._monsters);
@@ -106,29 +124,41 @@ namespace RType
             }
         }
 
-        bool Room::arePlayersAlive()
+        void Room::update()
         {
             int DeadPlayer = 0, TotalPlayer = 0;
+            if (!_isReady && _mode != Mode::PLAYING)
+                return;
+
+            for (auto &player : _players) {
+                if(player.second->getIsDeadForRun() == true) {
+                    std::cout << "Spawning " << _wave << " monsters" << std::endl;
+                    for (int i = 0; i <= _wave; i++)
+                        spawnMonster();
+                    player.second->setIsDeadForRun(false);
+                }
+            }
 
             for (auto &player : _players) {
                 if (player.second->getIsAlive() == false)
                     DeadPlayer += 1;
                 TotalPlayer += 1;
             }
+
             if (DeadPlayer == TotalPlayer && DeadPlayer != 0) {
                 std::cout << "All players are dead" << std::endl;
                 std::string arg = std::to_string(_wave);
                 command_processor->send(-1, "end", arg);
-                _mode.store(Mode::END);
-                return false;
+                _isReady = false;
+                _mode = Mode::WAITING;
+                _wave = 1;
+                for (auto &player : _players) {
+                    player.second->setHealth(100);
+                    player.second->setIsAlive(true);
+                }
+                // _mode.store(Mode::END);
+                return;
             }
-            return true;
-        }
-
-        bool Room::nextWave()
-        {
-            if (haveAskedForNextWave == false) {
-                _wave += 1;
             if (_monsters.empty() || (_monsters.begin()->second->getType() == Entity::Monster::BOSS)) {
                 if (!_monsters.empty()) {
                     if (_monsters.begin()->second->getIsAlive()) {
@@ -356,33 +386,6 @@ namespace RType
             }
         }
 
-        void Room::update()
-        {
-            if (!_isReady && _mode != Mode::PLAYING)
-                return;
-            if (!arePlayersAlive())
-                return;
-
-            if (_monsters.empty()) {
-                if (!nextWave())
-                    return;
-                std::cout << "Wave " << _wave << " started" << std::endl;
-
-                if (_wave < MAX_WAVE) {
-                    std::cout << "Spawning " << _wave << " monsters" << std::endl;
-                    for (int i = 0; i <= _wave; i++)
-                        spawnMonster();
-                } else {
-                    command_processor->send(-1, "end", std::to_string(_wave));
-                    _mode.store(Mode::END);
-                    return;
-                }
-                resetPlayers();
-            }
-            playersUpdate();
-            monstersUpdate();
-        }
-
         bool Room::checkCollision(const Game::Entity::Position &pos1, int size1, const Game::Entity::Position &pos2, int size2)
         {
             return (pos1.x >= pos2.x && pos1.x <= pos2.x + size2 && pos1.y >= pos2.y && pos1.y <= pos2.y + size2);
@@ -451,11 +454,14 @@ namespace RType
             _players.erase(playerId);
         }
 
+        // Destructor
         Room::~Room()
         {
+            // Ensure thread is stopped
             stop();
         }
 
+        // Getter implementations
         std::string Room::getName() const
         {
             return _name;
@@ -475,5 +481,7 @@ namespace RType
         {
             return _isReady.load() && !_shouldStop.load();
         }
+
     } // namespace Game
 } // namespace RType
+
