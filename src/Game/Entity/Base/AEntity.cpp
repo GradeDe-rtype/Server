@@ -71,6 +71,17 @@ namespace RType
                 _speed = speed;
             }
 
+            void AEntity::setHp(int hp)
+            {
+                if (hp < 0) 
+                {
+                    _isAlive = false;
+                    _hp = 0;
+                    return;
+                };
+                _hp = hp;
+            }
+
             /*  ---- GETTER ---- */
             int AEntity::getDamage() const
             {
@@ -127,6 +138,10 @@ namespace RType
                 return _speed;
             }
 
+            int AEntity::getHp() const
+            {
+                return _hp;
+            }
             /*  ---- FUNCTIONS ---- */
             void AEntity::update()
             {
