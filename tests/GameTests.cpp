@@ -17,7 +17,8 @@ namespace RType
     namespace Game
     {
 
-    // Colors class
+        /* ---- COLORS CLASS ---- */
+
         Test(Colors, GetValidColors) {
             Colors &colors = Colors::get();
 
@@ -54,7 +55,8 @@ namespace RType
 
         namespace Entity
         {
-        //Monster class
+            /* ---- MONSTER CLASS ---- */
+
             Test(Monster, ConstructorDefault) {
                 Monster monster(1);
 
@@ -111,6 +113,8 @@ namespace RType
                 cr_assert_eq(info["size"], "40", "Size should be 40.");
                 cr_assert_eq(info["health"], "100", "Health should be 100.");
             }
+
+            /* ---- PLAYER CLASS ---- */
             
             Test(Player, ConstructorDefault) {
                 boost::asio::io_context io_context;
@@ -191,7 +195,60 @@ namespace RType
 
             /* ---- SHOOT CLASS ---- */
 
-            
+            Test(Shoot, ConstructorDefaultValues) {
+                Shoot shoot(100, 200, 5, 10, Direction::RIGHT);
+
+                cr_assert_eq(shoot.getPosX(), 100, "Initial X position should be 100.");
+                cr_assert_eq(shoot.getPosY(), 200, "Initial Y position should be 200.");
+                cr_assert_eq(shoot.getDamage(), 10, "Initial damage should be 10.");
+                cr_assert_eq(shoot.getIsActive(), true, "Shoot should be active after creation.");
+            }
+
+            Test(Shoot, UpdateMoveRight) {
+                Shoot shoot(100, 200, 5, 10, Direction::RIGHT);
+
+                shoot.update();
+                cr_assert_eq(shoot.getPosX(), 105, "Shoot should move 5 units to the right.");
+                cr_assert_eq(shoot.getIsActive(), true, "Shoot should remain active when within screen bounds.");
+            }
+
+            Test(Shoot, UpdateMoveLeft) {
+                Shoot shoot(100, 200, 5, 10, Direction::LEFT);
+
+                shoot.update();
+                cr_assert_eq(shoot.getPosX(), 95, "Shoot should move 5 units to the left.");
+                cr_assert_eq(shoot.getIsActive(), true, "Shoot should remain active when within screen bounds.");
+            }
+
+            Test(Shoot, UpdateOutOfBoundsRight) {
+                Shoot shoot(795, 200, 10, 10, Direction::RIGHT);
+
+                shoot.update();
+                cr_assert_eq(shoot.getIsActive(), false, "Shoot should deactivate when exceeding the right boundary.");
+            }
+
+            Test(Shoot, UpdateOutOfBoundsLeft) {
+                Shoot shoot(5, 200, 10, 10, Direction::LEFT);
+
+                shoot.update();
+                cr_assert_eq(shoot.getIsActive(), false, "Shoot should deactivate when exceeding the left boundary.");
+            }
+
+            Test(Shoot, SetterSetIsActive) {
+                Shoot shoot(100, 200, 5, 10, Direction::RIGHT);
+
+                shoot.setIsActive(false);
+                cr_assert_eq(shoot.getIsActive(), false, "Shoot should be inactive after setIsActive(false).");
+
+                shoot.setIsActive(true);
+                cr_assert_eq(shoot.getIsActive(), true, "Shoot should be active after setIsActive(true).");
+            }
+
+            Test(Shoot, GetterGetIsActive) {
+                Shoot shoot(100, 200, 5, 10, Direction::RIGHT);
+
+                cr_assert_eq(shoot.getIsActive(), true, "Shoot should be active by default.");
+            }
 
 
         }
