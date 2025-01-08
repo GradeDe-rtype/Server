@@ -10,6 +10,7 @@
 
 #include "Room.hpp"
 #include <iostream>
+#include <utility>
 
 namespace RType
 {
@@ -160,8 +161,10 @@ namespace RType
             for (auto &player : _players) {
                 if (player.second->getIsAlive()) {
                     for (auto &shoot : player.second->getShoots()) {
+                        std::cout << "Shoot player" << std::endl;
+                        if (!shoot)
+                            continue;
                         shoot->update();
-                        _shoots.push_back(player.second->getShoots().back());
                         std::unordered_map<int, std::shared_ptr<Entity::Monster>> new_monsters = _monsters;
                         for (const auto &it : new_monsters) {
                             if (checkCollision(shoot->getPosition(), 1, it.second->getPosition(), it.second->getSize())) {
@@ -179,21 +182,21 @@ namespace RType
         {
             if (monster.second->getShootTimer().hasElapsed()) {
                 monster.second->shoot();
-                _shoots.push_back(monster.second->getShoots().back());
                 monster.second->getShootTimer().reset();
                 command_processor->send(-1, "shoot", rfcArgParser::CreateObject(monster.second->getShoots().back()->getShootInfo()));
                 std::cout << "Monster " << monster.second->getId() << " shoot" << std::endl;
             }
 
             for (auto &shoot : monster.second->getShoots()) {
+                std::cout << "Shoot monster" << std::endl;
+                if (!shoot)
+                    continue;
                 shoot->update();
                 for (auto player = _players.begin(); player != _players.end(); ++player) {
                     if (!player->second->getIsAlive())
                         continue;
                     if (checkCollision(shoot->getPosition(), 1, player->second->getPosition(), player->second->getSize())) {
                         command_processor->send(-1, "p_death", std::to_string(player->second->getId()));
-                        command_processor->send(-1, "s_death", rfcArgParser::CreateObject(shoot->getShootInfo()));
-                        monster.second->removeShoot(shoot->getId());
                         player->second->setIsAlive(false);
                     }
                 }
@@ -242,17 +245,36 @@ namespace RType
 
         void Room::shootsUpdate()
         {
-            for (auto &shoot : _shoots) {
-                std::unordered_map<std::string, std::string> tmp = shoot->getShootInfo();
-                std::unordered_map<std::string, std::string> data = {
-                    {"x", std::to_string(shoot->getPosition().x)},
-                    {"y", std::to_string(shoot->getPosition().y)}};
-                std::string data_str = rfcArgParser::CreateObject(tmp) + " " + rfcArgParser::CreateObject(data);
-                command_processor->send(-1, "s_position", data_str);
-
-                if (shoot->getPosition().x > 780 || shoot->getPosition().x < 20) {
-                    command_processor->send(-1, "s_death", rfcArgParser::CreateObject(shoot->getShootInfo()));
-                    _shoots.erase(std::remove_if(_shoots.begin(), _shoots.end(), [shoot](std::shared_ptr<Entity::Shoot> s) { return s->getId() == shoot->getId(); }), _shoots.end());
+            for (auto &player : _players) {
+                for (auto &shoot : player.second->getShoots()) {
+                    if (!shoot)
+                        continue;
+                    std::unordered_map<std::string, std::string> tmp = shoot->getShootInfo();
+                    std::unordered_map<std::string, std::string> data = {
+                        {"x", std::to_string(shoot->getPosition().x)},
+                        {"y", std::to_string(shoot->getPosition().y)}};
+                    std::string data_str = rfcArgParser::CreateObject(tmp) + " " + rfcArgParser::CreateObject(data);
+                    command_processor->send(-1, "s_position", data_str);
+                    if (shoot->getIsActive() == false) {
+                        command_processor->send(-1, "s_death", rfcArgParser::CreateObject(tmp));
+                        player.second->removeShoot(shoot->getId());
+                    }
+                }
+            }
+            for (auto &monster : _monsters) {
+                for (auto &shoot : monster.second->getShoots()) {
+                    if (!shoot)
+                        continue;
+                    std::unordered_map<std::string, std::string> tmp = shoot->getShootInfo();
+                    std::unordered_map<std::string, std::string> data = {
+                        {"x", std::to_string(shoot->getPosition().x)},
+                        {"y", std::to_string(shoot->getPosition().y)}};
+                    std::string data_str = rfcArgParser::CreateObject(tmp) + " " + rfcArgParser::CreateObject(data);
+                    command_processor->send(-1, "s_position", data_str);
+                    if (shoot->getIsActive() == false) {
+                        command_processor->send(-1, "s_death", rfcArgParser::CreateObject(tmp));
+                        monster.second->removeShoot(shoot->getId());
+                    }
                 }
             }
         }

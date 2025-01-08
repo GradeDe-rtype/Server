@@ -41,7 +41,6 @@ namespace RType
 
             void Player::update()
             {
-                _shoots.erase(std::remove_if(_shoots.begin(), _shoots.end(), [](std::shared_ptr<Shoot> shoot) { return !shoot->getIsActive(); }), _shoots.end());
             }
 
             /*  ---- SETTER ---- */

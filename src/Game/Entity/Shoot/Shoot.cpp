@@ -61,6 +61,16 @@ namespace RType
                 data["related"] = std::to_string(_related_id);
                 return data;
             }
+
+            int Shoot::getRelatedId() const
+            {
+                return _related_id;
+            }
+
+            ENTITY_TYPE Shoot::getRelatedEntity() const
+            {
+                return _related_entity;
+            }
         } // namespace Entity
     } // namespace Game
 } // namespace RType
