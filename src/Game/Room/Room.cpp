@@ -129,9 +129,19 @@ namespace RType
         {
             if (haveAskedForNextWave == false) {
                 _wave += 1;
-                haveAskedForNextWave = true;
-                command_processor->send(-1, "wave", std::to_string(_wave));
-            }
+            if (_monsters.empty() || (_monsters.begin()->second->getType() == Entity::Monster::BOSS)) {
+                if (!_monsters.empty()) {
+                    if (_monsters.begin()->second->getIsAlive()) {
+                        if(_monsters.begin()->second->getPhase() == 1 && _monsters.begin()->second->getHp() > 50)
+                            return;
+                        if(_monsters.begin()->second->getPhase() == 2 && _monsters.begin()->second->getHp() > 25)
+                            return;
+                        if(_monsters.begin()->second->getPhase() == 3 && _monsters.begin()->second->getHp() > 0)
+                            return;
+                        if(_monsters.begin()->second->getHp() < 0)
+                            std::cout << "verif" << std::endl;
+                    }
+                }
 
             for (auto &player : _players) {
                 if (player.second->getHaveJoined() == false) {
