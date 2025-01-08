@@ -55,6 +55,7 @@ namespace RType
                     Type getType() const;
                     std::vector<std::shared_ptr<Entity::Shoot>> getShoots() const;
                     Timer &getShootTimer();
+                    void removeShoot(int id);
 
                 private:
                     Type _type = Type::BASIC_MONSTER;

@@ -46,6 +46,7 @@ namespace RType
                     [[nodiscard]] std::vector<std::shared_ptr<Shoot>> getShoots() const;
                     [[nodiscard]] std::string getPosInfo() const;
                     std::string getColor() const;
+                    void removeShoot(int id);
 
                 private:
                     std::string _color;

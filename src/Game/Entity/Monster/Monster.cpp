@@ -89,6 +89,11 @@ namespace RType
             {
                 return _shootTimer;
             }
+
+            void Monster::removeShoot(int id)
+            {
+                _shoots.erase(std::remove_if(_shoots.begin(), _shoots.end(), [id](std::shared_ptr<Shoot> shoot) { return shoot->getId() == id; }), _shoots.end());
+            }
         } // namespace Entity
     } // namespace Game
 } // namespace RType

@@ -108,6 +108,9 @@ namespace RType
                 std::mutex _monsterMutex;
                 std::unordered_map<int, std::shared_ptr<Game::Entity::Monster>> _monsters;
 
+                std::mutex _shootMutex;
+                std::vector<std::shared_ptr<Game::Entity::Shoot>> _shoots;
+
                 // Thread management
                 std::optional<std::jthread> _gameThread;
                 std::mutex _threadMutex;

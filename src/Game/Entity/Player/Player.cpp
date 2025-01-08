@@ -100,6 +100,11 @@ namespace RType
                 std::string pos = std::to_string(_id) + " {x:" + std::to_string(_position.x) + ",y:" + std::to_string(_position.y) + "}";
                 return pos;
             }
+
+            void Player::removeShoot(int id)
+            {
+                _shoots.erase(std::remove_if(_shoots.begin(), _shoots.end(), [id](std::shared_ptr<Shoot> shoot) { return shoot->getId() == id; }), _shoots.end());
+            }
         } // namespace Entity
     } // namespace Game
 } // namespace RType
