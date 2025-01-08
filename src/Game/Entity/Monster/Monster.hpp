@@ -58,6 +58,7 @@ namespace RType
                     Type _type = Type::BASIC_MONSTER;
                     std::vector<std::shared_ptr<Shoot>> _shoots;
                     Timer _shootTimer{1000};
+                    int shoot_id = 0;
             };
         } // namespace Entity
     } // namespace Game

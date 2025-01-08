@@ -52,6 +52,7 @@ namespace RType
                     bool _haveJoined = false;
                     std::shared_ptr<boost::asio::ip::tcp::socket> _socket;
                     std::vector<std::shared_ptr<Shoot>> _shoots;
+                    int shoot_id = 0;
             };
         } // namespace Entity
     } // namespace Game
