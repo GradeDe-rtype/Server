@@ -25,6 +25,12 @@ namespace RType
                 LEFT,
                 RIGHT,
             } Direction;
+
+            typedef enum {
+                PLAYER,
+                MONSTER,
+                SHOOT,
+            } ENTITY_TYPE;
         } // namespace Entity
     } // namespace Game
 } // namespace RType
