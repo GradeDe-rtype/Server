@@ -14,10 +14,17 @@ set(RTYPE_LIBRARIES
 # Boost ASIO is part of Boost Libraries
 find_package(Boost REQUIRED)
 
-# Include subdirectories for libraries
+# Inclure pkg-config pour Criterion
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(CRITERION REQUIRED criterion)
+
+# Inclure subdirectories pour les bibliothèques
 foreach(LIB ${RTYPE_LIBRARIES})
     add_subdirectory(lib/${LIB})
 endforeach()
+
+# Ajouter les tests
+add_subdirectory(tests)
 
 # Collect all source files
 file(GLOB_RECURSE SOURCES
