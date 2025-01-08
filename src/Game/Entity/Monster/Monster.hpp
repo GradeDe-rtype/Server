@@ -47,6 +47,7 @@ namespace RType
                     /*  ---- SETTER ---- */
                     void setType(Type type);
                     void setPhase(int phase);
+                    void setRuee(bool ruee);
                     // void setSize(int size);
 
                     /*  ---- GETTER ---- */
@@ -54,6 +55,8 @@ namespace RType
                     Type getType() const;
                     std::vector<std::shared_ptr<Entity::Shoot>> getShoots() const;
                     Timer &getShootTimer();
+                    Timer &getSpawnTimer();
+                    Timer &getRushTimer();
                     int getPhase();
                     bool getRuee();
 
@@ -61,7 +64,10 @@ namespace RType
                     Type _type = Type::BASIC_MONSTER;
                     std::vector<std::shared_ptr<Shoot>> _shoots;
                     Timer _shootTimer{1000};
+                    Timer _rushTimer{5000};
+                    Timer _spawnTimer{10000};
                     int _phase = 1;
+                    bool _ruee = false;
             };
         } // namespace Entity
     } // namespace Game
