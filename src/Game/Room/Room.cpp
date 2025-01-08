@@ -179,7 +179,7 @@ namespace RType
             if (monster.second->getShootTimer().hasElapsed()) {
                 monster.second->shoot();
                 monster.second->getShootTimer().reset();
-                command_processor->send(-1, "e_shoot", rfcArgParser::CreateObject(monster.second->getShoots().back()->getShootInfo()));
+                command_processor->send(-1, "shoot", rfcArgParser::CreateObject(monster.second->getShoots().back()->getShootInfo()));
             }
 
             for (auto &shoot : monster.second->getShoots()) {
@@ -239,6 +239,16 @@ namespace RType
         {
             for (auto &player : _players) {
                 for (auto &shoots : player.second->getShoots()) {
+                    std::unordered_map<std::string, std::string> tmp = shoots->getShootInfo();
+                    std::unordered_map<std::string, std::string> data = {
+                        {"x", std::to_string(shoots->getPosition().x)},
+                        {"y", std::to_string(shoots->getPosition().y)}};
+                    std::string data_str = rfcArgParser::CreateObject(tmp) + " " + rfcArgParser::CreateObject(data);
+                    command_processor->send(-1, "s_position", data_str);
+                }
+            }
+            for (auto &monster : _monsters) {
+                for (auto &shoots : monster.second->getShoots()) {
                     std::unordered_map<std::string, std::string> tmp = shoots->getShootInfo();
                     std::unordered_map<std::string, std::string> data = {
                         {"x", std::to_string(shoots->getPosition().x)},

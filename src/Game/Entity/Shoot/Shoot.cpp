@@ -57,7 +57,7 @@ namespace RType
             {
                 std::unordered_map<std::string, std::string> data;
                 data["id"] = std::to_string(_id);
-                data["from"] = ENTITY_TYPE::PLAYER == _related_entity ? "player" : "monster";
+                data["from"] = ENTITY_TYPE::PLAYER == _related_entity ? "player" : "enemy";
                 data["related"] = std::to_string(_related_id);
                 return data;
             }
