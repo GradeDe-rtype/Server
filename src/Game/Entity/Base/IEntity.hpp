@@ -37,7 +37,6 @@ namespace RType
                     virtual void setPosY(int pos_y) = 0;
                     virtual void setSize(int size) = 0;
                     virtual void setSpeed(int speed) = 0;
-                    virtual void setHp(int hp) = 0;
 
                     virtual int getDamage() const = 0;
                     virtual Entity::Direction getDirection() const = 0;
@@ -50,7 +49,6 @@ namespace RType
                     virtual int getPosY() const = 0;
                     virtual int getSize() const = 0;
                     virtual int getSpeed() const = 0;
-                    virtual int getHp() const = 0;
             };
         } // namespace Entity
     } // namespace Game
