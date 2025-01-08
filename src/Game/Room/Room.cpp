@@ -164,70 +164,142 @@ namespace RType
                         std::unordered_map<int, std::shared_ptr<Entity::Monster>> new_monsters = _monsters;
                         for (const auto &it : new_monsters) {
                             if (checkCollision(shoot->getPosition(), 1, it.second->getPosition(), it.second->getSize())) {
-                                command_processor->send(-1, "e_death", std::to_string(it.second->getId()));
-                                _monsters.erase(it.first);
+                                it.second->TakeDamage(100);
+                                if (it.second->getHp() <= 0)
+                                    it.second->setIsAlive(false);
+                                if (!it.second->getIsAlive()) {
+                                    
+                                    command_processor->send(-1, "e_death", std::to_string(it.second->getId()));
+                                    _monsters.erase(it.first);
+                                } 
                             }
                         }
                     }
                     player.second->update();
                 }
             }
-        }
 
-        void Room::basicMonster(std::pair<int, std::shared_ptr<Entity::Monster>> monster)
-        {
-            if (monster.second->getShootTimer().hasElapsed()) {
-                monster.second->shoot();
-                monster.second->getShootTimer().reset();
-                std::unordered_map<std::string, std::string> tmp;
-                tmp["x"] = std::to_string(monster.second->getPosX());
-                tmp["y"] = std::to_string(monster.second->getPosY());
-                command_processor->send(-1, "e_shoot", rfcArgParser::CreateObject(tmp));
-            }
+            for (auto &monster : _monsters) {
+                //boss
+                if (monster.second->getType() == Entity::Monster::BOSS) {                    
+                    if (monster.second->getPosX() <= 0) {
+                        monster.second->setPosX(900);
+                        monster.second->setRuee(false);
+                    }
 
-            for (auto &shoot : monster.second->getShoots()) {
-                shoot->update();
+                    if (monster.second->getPosX() <= 750) {
+                        if (monster.second->getHp() > 50) {
+                            if (monster.second->getShootTimer().hasElapsed()) {
+                                monster.second->shoot();
+                                monster.second->getShootTimer().reset();
+                                command_processor->send(-1, "e_shoot", rfcArgParser::CreateObject({
+                                    {"x", std::to_string(monster.second->getPosX())},
+                                    {"y", std::to_string(monster.second->getPosY())}
+                                }));
+                            }
+                            if (monster.second->getSpawnTimer().hasElapsed()) {
+                                spawnMonster();
+                                monster.second->getSpawnTimer().reset();
+                            }
+                        } else if (monster.second->getHp() > 25) {
+                            if (monster.second->getShootTimer().hasElapsed()) {
+                                monster.second->shoot();
+                                monster.second->getShootTimer().reset();
+                                command_processor->send(-1, "e_shoot", rfcArgParser::CreateObject({
+                                    {"x", std::to_string(monster.second->getPosX())},
+                                    {"y", std::to_string(monster.second->getPosY())}
+                                }));
+                            }
+                            if (monster.second->getRushTimer().hasElapsed() && monster.second->getRuee() == false) {
+                                int newY = (std::rand() % 2 == 0) ? 200 : 400;
+                                monster.second->setPosY(newY);
+                                monster.second->setPosX(monster.second->getPosX() - 8);
+                                monster.second->getRushTimer().reset();
+                                monster.second->setRuee(true);
+                            }
+                        } else {
+                            if (monster.second->getRushTimer().hasElapsed() && monster.second->getRuee() == false) {
+                                int newY = (std::rand() % 2 == 0) ? 200 : 400;
+                                monster.second->setPosY(newY);
+                                monster.second->setPosX(monster.second->getPosX() - 8);
+                                monster.second->getRushTimer().reset();
+                                monster.second->setRuee(true);
+                            } else {
+                                if (monster.second->getShootTimer().hasElapsed()) {
+                                    monster.second->shoot();
+                                    monster.second->getShootTimer().reset();
+                                    command_processor->send(-1, "e_shoot", rfcArgParser::CreateObject({
+                                        {"x", std::to_string(monster.second->getPosX())},
+                                        {"y", std::to_string(monster.second->getPosY())}
+                                    }));
+                                }
+                                if (monster.second->getSpawnTimer().hasElapsed()) {
+                                    spawnMonster();
+                                    monster.second->getSpawnTimer().reset();
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // If bot is basic then shoot
+                if (monster.second->getType() == Entity::Monster::BASIC_MONSTER) {
+                    if (monster.second->getShootTimer().hasElapsed()) {
+                        monster.second->shoot();
+                        monster.second->getShootTimer().reset();
+                        std::unordered_map<std::string, std::string> tmp;
+                        tmp["x"] = std::to_string(monster.second->getPosX());
+                        tmp["y"] = std::to_string(monster.second->getPosY());
+                        command_processor->send(-1, "e_shoot", rfcArgParser::CreateObject(tmp));
+                    }
+
+                    for (auto &shoot : monster.second->getShoots()) {
+                        shoot->update();
+                        for (auto player = _players.begin(); player != _players.end(); ++player) {
+                            if (!player->second->getIsAlive())
+                                continue;
+                            if (checkCollision(shoot->getPosition(), 1, player->second->getPosition(), player->second->getSize())) {
+                                player->second->TakeDamage(25);
+                                if (player->second->getHp() <= 0)
+                                    player->second->setIsAlive(false);
+                                if (!player->second->getIsAlive()) {
+                                    command_processor->send(-1, "p_death", std::to_string(player->second->getId()));
+                                    player->second->setIsAlive(false);
+                                } 
+                            }
+                        }
+                    }
+                }
+
+                // Verification of collision for all type of ot
+                if (monster.second->getType() == Entity::Monster::KAMIKAZE_MONSTER)
+                    monster.second->setPosX(monster.second->getPosX() - 5);
+                if (monster.second->getType() == Entity::Monster::BOSS) {
+                    std::cout << "caca " << monster.second->getPosX() <<std::endl;
+                    if (monster.second->getPosX() > 750 && monster.second->getPosX() <= 900)
+                        monster.second->setPosX(monster.second->getPosX() - 3);
+                    if (monster.second->getRuee() == true)
+                        monster.second->setPosX(monster.second->getPosX() - 8);
+                }
                 for (auto player = _players.begin(); player != _players.end(); ++player) {
                     if (!player->second->getIsAlive())
                         continue;
-                    if (checkCollision(shoot->getPosition(), 1, player->second->getPosition(), player->second->getSize())) {
-                        command_processor->send(-1, "p_death", std::to_string(player->second->getId()));
-                        player->second->setIsAlive(false);
-                    }
-                }
-            }
-        }
-
-        void Room::kamikazeMonster(std::pair<int, std::shared_ptr<Entity::Monster>> monster)
-        {
-            monster.second->setPosX(monster.second->getPosX() - 5);
-        }
-
-        void Room::monstersUpdate()
-        {
-            int MonsterTypes[] = {Entity::Monster::BASIC_MONSTER, Entity::Monster::KAMIKAZE_MONSTER, -1};
-            void (Room::*monsterUpdate[])(std::pair<int, std::shared_ptr<Entity::Monster>>) = {&Room::basicMonster, &Room::kamikazeMonster};
-
-            for (int i = 0; MonsterTypes[i] != -1; i++) {
-                for (auto &monster : _monsters) {
-                    if (monster.second->getType() == MonsterTypes[i]) {
-                        (this->*monsterUpdate[i])(monster);
-                    }
-                    for (auto player = _players.begin(); player != _players.end(); ++player) {
-                        if (!player->second->getIsAlive())
-                            continue;
-                        if (checkCollision(monster.second->getPosition(), monster.second->getSize(), player->second->getPosition(), player->second->getSize())) {
+                    if (checkCollision(monster.second->getPosition(), monster.second->getSize(), player->second->getPosition(), player->second->getSize())) {
+                        player->second->TakeDamage(25);
+                        if (player->second->getHp() <= 0)
+                            player->second->setIsAlive(false);
+                        if (!player->second->getIsAlive()) {
                             command_processor->send(-1, "p_death", std::to_string(player->second->getId()));
                             player->second->setIsAlive(false);
-                        }
+                        } 
                     }
-
-                    monster.second->update();
-                    std::unordered_map<std::string, std::string> tmp;
-                    tmp["x"] = std::to_string(monster.second->getPosX());
-                    tmp["y"] = std::to_string(monster.second->getPosY());
-                    command_processor->send(-1, "e_position", std::to_string(monster.second->getId()) + " " + rfcArgParser::CreateObject(tmp));
                 }
+
+                monster.second->update();
+                std::unordered_map<std::string, std::string> tmp;
+                tmp["x"] = std::to_string(monster.second->getPosX());
+                tmp["y"] = std::to_string(monster.second->getPosY());
+                command_processor->send(-1, "e_position", std::to_string(monster.second->getId()) + " " + rfcArgParser::CreateObject(tmp));
             }
 
             for (auto &_monster : _monsters) {
