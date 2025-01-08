@@ -118,6 +118,7 @@ namespace RType
                 // Internal methods
                 void runGameLoop();
                 void spawnMonster();
+                void spawnBoss();
 
                 Timer _monsterTimer;
 
