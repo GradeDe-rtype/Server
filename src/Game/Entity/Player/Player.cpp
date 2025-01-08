@@ -30,6 +30,8 @@ namespace RType
                 _color = Game::Colors::get().getColor(_id);
                 _socket = socket;
                 _direction = Direction::RIGHT;
+                _hp = 100;
+                _damage = 25;
             }
 
             /*  ---- SETTER ---- */
