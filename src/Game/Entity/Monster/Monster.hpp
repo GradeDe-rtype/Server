@@ -10,7 +10,7 @@
 #ifndef RTYPE_GAME_ENTITY_MONSTER_HPP_
 #define RTYPE_GAME_ENTITY_MONSTER_HPP_
 
-#define SHOOT_TIMER 2000
+#define SHOOT_TIMER rand() % 1000 + 1000
 
 #include <algorithm>
 #include <memory>
