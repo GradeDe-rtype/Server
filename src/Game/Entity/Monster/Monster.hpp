@@ -60,6 +60,7 @@ namespace RType
                     int getPhase();
                     bool getRuee();
 
+
                 private:
                     Type _type = Type::BASIC_MONSTER;
                     std::vector<std::shared_ptr<Shoot>> _shoots;

@@ -26,8 +26,6 @@ namespace RType
                 _size = 40;
                 _isAlive = true;
                 _direction = Direction::LEFT;
-                _hp = 100;
-                _damage = 25;
             }
 
             Monster::Monster(int id, int level)
@@ -63,6 +61,11 @@ namespace RType
             void Monster::setType(Type type)
             {
                 _type = type;
+                if (type = Type::BOSS) {
+                    _damage = 50;
+                } else {
+                    _damage = 25;
+                }
             }
 
             void Monster::setPhase(int phase)
@@ -120,7 +123,6 @@ namespace RType
             {
                 return _ruee;
             }
-
         } // namespace Entity
     } // namespace Game
 } // namespace RType
