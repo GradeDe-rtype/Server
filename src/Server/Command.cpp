@@ -130,7 +130,7 @@ namespace Server
         shoot_data["y"] = std::to_string(player->getShoots().back()->getPosY());
         std::string shoot_data_str = rfcArgParser::CreateObject(shoot_data);
         rfcArgParser::DataPacket packet = rfcArgParser::SerializePacket("p_shoot", shoot_data_str);
-        server_.send_multicast_excluded(packet, {client_id});
+        server_.send_multicast_excluded(packet, {});
     }
 
     // void e_info(int client_id, const std::string &args)
