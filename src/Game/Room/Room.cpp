@@ -179,10 +179,7 @@ namespace RType
             if (monster.second->getShootTimer().hasElapsed()) {
                 monster.second->shoot();
                 monster.second->getShootTimer().reset();
-                std::unordered_map<std::string, std::string> tmp;
-                tmp["x"] = std::to_string(monster.second->getPosX());
-                tmp["y"] = std::to_string(monster.second->getPosY());
-                command_processor->send(-1, "e_shoot", rfcArgParser::CreateObject(tmp));
+                command_processor->send(-1, "e_shoot", rfcArgParser::CreateObject(monster.second->getShoots().back()->getShootInfo()));
             }
 
             for (auto &shoot : monster.second->getShoots()) {

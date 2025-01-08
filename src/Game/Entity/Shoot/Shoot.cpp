@@ -16,8 +16,11 @@ namespace RType
     {
         namespace Entity
         {
-            Shoot::Shoot(int pos_x, int pos_y, int speed, int damage, Direction direction)
+            Shoot::Shoot(int id, int related_id, ENTITY_TYPE related_entity, int pos_x, int pos_y, int speed, int damage, Direction direction)
             {
+                _id = id;
+                _related_id = related_id;
+                _related_entity = related_entity;
                 _position = {pos_x, pos_y};
                 _direction = direction;
                 _damage = damage;
@@ -48,6 +51,15 @@ namespace RType
             bool Shoot::getIsActive() const
             {
                 return _isActive;
+            }
+
+            std::unordered_map<std::string, std::string> Shoot::getShootInfo() const
+            {
+                std::unordered_map<std::string, std::string> data;
+                data["id"] = std::to_string(_id);
+                data["from"] = ENTITY_TYPE::PLAYER == _related_entity ? "player" : "monster";
+                data["related_id"] = std::to_string(_related_id);
+                return data;
             }
         } // namespace Entity
     } // namespace Game
