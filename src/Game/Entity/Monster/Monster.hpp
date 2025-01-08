@@ -10,6 +10,8 @@
 #ifndef RTYPE_GAME_ENTITY_MONSTER_HPP_
 #define RTYPE_GAME_ENTITY_MONSTER_HPP_
 
+#define SHOOT_TIMER 2000
+
 #include <algorithm>
 #include <memory>
 #include <string>
@@ -57,7 +59,7 @@ namespace RType
                 private:
                     Type _type = Type::BASIC_MONSTER;
                     std::vector<std::shared_ptr<Shoot>> _shoots;
-                    Timer _shootTimer{1000};
+                    Timer _shootTimer{SHOOT_TIMER};
                     int shoot_id = 0;
             };
         } // namespace Entity
