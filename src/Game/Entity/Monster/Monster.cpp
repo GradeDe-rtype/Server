@@ -26,6 +26,8 @@ namespace RType
                 _size = 40;
                 _isAlive = true;
                 _direction = Direction::LEFT;
+                _hp = 100;
+                _damage = 25;
             }
 
             Monster::Monster(int id, int level)
@@ -63,6 +65,11 @@ namespace RType
                 _type = type;
             }
 
+            void Monster::setPhase(int phase)
+            {
+                _phase = phase;
+            }
+
             /*  ---- GETTER ---- */
             std::unordered_map<std::string, std::string> Monster::getEnemyInfo() const
             {
@@ -89,6 +96,15 @@ namespace RType
             {
                 return _shootTimer;
             }
+            int Monster::getPhase()
+            {
+                return _phase;
+            }
+            bool Monster::getRuee()
+            {
+                return _ruee;
+            }
+
         } // namespace Entity
     } // namespace Game
 } // namespace RType
