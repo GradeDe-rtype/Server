@@ -143,30 +143,66 @@ namespace RType
                     }
                 }
 
-            for (auto &player : _players) {
-                if (player.second->getHaveJoined() == false) {
-                    command_processor->to_send(player.second->getId(),  "wave", std::to_string(_wave));
-                    return false;
+                if (haveAskedForNextWave == false) {
+                    _wave += 1;
+                    haveAskedForNextWave = true;
+                    command_processor->send(-1, "wave", std::to_string(_wave));
+                }
+
+                for (auto &player : _players) {
+                    if (player.second->getHaveJoined() == false) {
+                        command_processor->to_send(player.second->getId(), std::to_string(_wave), "wave");
+                        return;
+                    }
+                }
+
+                for (auto &player : _players) {
+                    player.second->setHaveJoined(false);
+                }
+                haveAskedForNextWave = false;
+
+                std::cout << "Wave " << _wave << " started" << std::endl;
+
+                if (_wave < 5) {
+                    // spawn the number of monster that match with the nbr of wave
+
+                    std::cout << "Spawning " << _wave << " monsters" << std::endl;
+                    for (int i = 0; i <= _wave; i++)
+                        spawnMonster();
+                } else if (_wave < 8 ) {
+                    if (_wave == 5) {
+                        spawnBoss();
+                        std::cout << "Spawning Boss" << std::endl;
+                    }
+                    if (_monsters.begin()->second->getHp() <= 50 && _monsters.begin()->second->getHp() > 25) {
+                        _monsters.begin()->second->setPhase(2);
+                        _monsters.begin()->second->setPosX(900);
+                    } else if (_monsters.begin()->second->getHp() <= 25) {
+                        _monsters.begin()->second->setPhase(3);
+                        _monsters.begin()->second->setPosX(900);
+                    }
+
+                    //ici
+                    
+                } else {
+                    // win and leave
+                    std::string arg = std::to_string(_wave);
+                    command_processor->send(-1, "end", arg);
+                    _mode.store(Mode::END);
+                    return;
+                }
+                for (auto &player : _players) {
+                    player.second->setHealth(100);
+                    player.second->setIsAlive(true);
+                    player.second->setIsDeadForRun(true);
                 }
             }
 
-            for (auto &player : _players) {
-                player.second->setHaveJoined(false);
-            }
-            haveAskedForNextWave = false;
-            return true;
-        }
-
-        void Room::resetPlayers()
-        {
-            for (auto &player : _players) {
-                player.second->setHealth(100);
-                player.second->setIsAlive(true);
-            }
-        }
-
-        void Room::playersUpdate()
-        {
+            //todo : faire dans l'abstracte de la classe entité damageTaken a la cre du 
+            // mob ou player, et au oins si il se fait hit j'appel juste la fonction got hit qui en fonction de l'entité prendra plus ou moins de degats
+            //ajouter aussi des hp aux mobs et players
+            //faire en sorte que si on passe sous les diff stage d'hp, faire une demande, envoyer le numero de wave au client 
+            //remettre le boss a 900 et le faire revenir que si les gens ont accpter et confimé
             for (auto &player : _players) {
                 if (player.second->getIsAlive()) {
                     for (auto &shoot : player.second->getShoots()) {
