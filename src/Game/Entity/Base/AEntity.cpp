@@ -146,6 +146,12 @@ namespace RType
             void AEntity::update()
             {
             }
+
+            void AEntity::TakeDamage(int damage)
+            {
+                _hp = _hp - damage;
+                return;
+            }
         } // namespace Entity
     } // namespace Game
 } // namespace RType
