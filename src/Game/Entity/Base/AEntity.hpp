@@ -38,6 +38,7 @@ namespace RType
                     ~AEntity() override = default;
 
                     void update() override;
+                    void TakeDamage(int damage) override;
 
                     void setDamage(int damage) override;
                     void setDirection(Entity::Direction direction) override;
