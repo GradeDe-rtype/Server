@@ -125,11 +125,8 @@ namespace Server
         }
 
         player->shoot(std::stoi(data["x"]), std::stoi(data["y"]));
-        std::unordered_map<std::string, std::string> shoot_data;
-        shoot_data["x"] = std::to_string(player->getShoots().back()->getPosX());
-        shoot_data["y"] = std::to_string(player->getShoots().back()->getPosY());
-        std::string shoot_data_str = rfcArgParser::CreateObject(shoot_data);
-        rfcArgParser::DataPacket packet = rfcArgParser::SerializePacket("p_shoot", shoot_data_str);
+        std::string shoot = rfcArgParser::CreateObject(player->getShoots().back()->getShootInfo());
+        rfcArgParser::DataPacket packet = rfcArgParser::SerializePacket("shoot", shoot);
         server_.send_multicast_excluded(packet, {});
     }
 
