@@ -235,6 +235,20 @@ namespace RType
             }
         }
 
+        void Room::shootsUpdate()
+        {
+            for (auto &player : _players) {
+                for (auto &shoots : player.second->getShoots()) {
+                    std::unordered_map<std::string, std::string> tmp = shoots->getShootInfo();
+                    std::unordered_map<std::string, std::string> data = {
+                        {"x", std::to_string(shoots->getPosition().x)},
+                        {"y", std::to_string(shoots->getPosition().y)}};
+                    std::string data_str = rfcArgParser::CreateObject(tmp) + " " + rfcArgParser::CreateObject(data);
+                    command_processor->send(-1, "s_position", data_str);
+                }
+            }
+        }
+
         void Room::update()
         {
             if (!_isReady && _mode != Mode::PLAYING)
@@ -260,6 +274,7 @@ namespace RType
             }
             playersUpdate();
             monstersUpdate();
+            shootsUpdate();
         }
 
         bool Room::checkCollision(const Game::Entity::Position &pos1, int size1, const Game::Entity::Position &pos2, int size2)

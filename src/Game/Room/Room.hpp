@@ -76,6 +76,7 @@ namespace RType
                 void basicMonster(std::pair<int, std::shared_ptr<Entity::Monster>> monster);
                 void kamikazeMonster(std::pair<int, std::shared_ptr<Entity::Monster>> monster);
                 void monstersUpdate();
+                void shootsUpdate();
 
                 // Setters
                 void setMode(Mode mode);
