@@ -31,7 +31,6 @@ namespace RType
                     int _speed;
                     int _size;
                     bool _isAlive;
-                    int _hp;
 
                 public:
                     AEntity() = default;
@@ -50,7 +49,6 @@ namespace RType
                     void setPosY(int pos_y) override;
                     void setSize(int size) override;
                     void setSpeed(int speed) override;
-                    void setHp(int hp) override;
 
                     int getDamage() const override;
                     Entity::Direction getDirection() const override;
@@ -63,7 +61,6 @@ namespace RType
                     int getPosY() const override;
                     int getSize() const override;
                     int getSpeed() const override;
-                    int getHp() const override;
             };
         } // namespace Entity
     } // namespace Game
