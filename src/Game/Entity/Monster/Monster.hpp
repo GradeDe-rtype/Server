@@ -21,6 +21,7 @@
 #include "Shoot.hpp"
 
 #include <Timer.hpp>
+#include <atomic>
 
 namespace RType
 {
@@ -53,15 +54,17 @@ namespace RType
                     /*  ---- GETTER ---- */
                     std::unordered_map<std::string, std::string> getEnemyInfo() const;
                     Type getType() const;
-                    std::vector<std::shared_ptr<Entity::Shoot>> getShoots() const;
+                    std::vector<std::shared_ptr<Shoot>> getShoots();
                     Timer &getShootTimer();
                     void removeShoot(int id);
 
                 private:
-                    Type _type = Type::BASIC_MONSTER;
-                    std::vector<std::shared_ptr<Shoot>> _shoots;
+                    static std::atomic<uint64_t> s_global_shoot_id;
+                    std::vector<std::shared_ptr<Entity::Shoot>> _shoots;
+                    mutable std::mutex _shoots_mutex;
                     Timer _shootTimer{SHOOT_TIMER};
-                    int shoot_id = 0;
+                    Type _type = Type::MONSTER;
+
             };
         } // namespace Entity
     } // namespace Game

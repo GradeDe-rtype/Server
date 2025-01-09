@@ -43,7 +43,7 @@ namespace Server
             GameServer(boost::asio::io_context &io_context, short port);
 
             void remove_client(int client_id);
-            RType::Game::Entity::Player &get_client(int client_id);
+            const RType::Game::Entity::Player& get_client(int client_id);
             std::shared_ptr<RType::Game::Entity::Player> &get_client_ptr(int client_id);
             bool client_exist(int client_id);
             void add_room(int id, const std::string &name);

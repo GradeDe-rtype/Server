@@ -26,7 +26,7 @@ namespace Server
         network_.broadcast(std::string(reinterpret_cast<char *>(&packet), sizeof(packet)));
     }
 
-    RType::Game::Entity::Player &GameServer::get_client(int client_id)
+    const RType::Game::Entity::Player &GameServer::get_client(int client_id)
     {
         for (auto &player : clients_) {
             if (player->getId() == client_id)

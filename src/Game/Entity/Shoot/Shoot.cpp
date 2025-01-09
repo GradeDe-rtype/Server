@@ -10,6 +10,9 @@
 
 #include "Shoot.hpp"
 
+#include <iostream>
+#include <ostream>
+
 namespace RType
 {
     namespace Game
@@ -37,8 +40,9 @@ namespace RType
                 else if (_direction == Direction::LEFT)
                     _position.x -= _speed;
 
-                if (_position.x > 800 || _position.x < 0)
+                if (_position.x > 780 || _position.x < 20) {
                     _isActive = false;
+                }
             }
 
             /*  ---- SETTER ---- */

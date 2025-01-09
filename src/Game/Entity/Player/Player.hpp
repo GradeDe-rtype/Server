@@ -17,6 +17,8 @@
 #include "AEntity.hpp"
 #include "Colors.hpp"
 #include "Shoot.hpp"
+#include <mutex>
+#include <atomic>
 
 namespace RType
 {
@@ -47,13 +49,15 @@ namespace RType
                     [[nodiscard]] std::string getPosInfo() const;
                     std::string getColor() const;
                     void removeShoot(int id);
+                    std::vector<std::shared_ptr<Shoot>> getShoots();
 
                 private:
+                    static std::atomic<uint64_t> s_global_shoot_id;
+                    std::vector<std::shared_ptr<Shoot>> _shoots;
+                    mutable std::mutex _shoots_mutex;
                     std::string _color;
                     bool _haveJoined = false;
                     std::shared_ptr<boost::asio::ip::tcp::socket> _socket;
-                    std::vector<std::shared_ptr<Shoot>> _shoots;
-                    int shoot_id = 0;
             };
         } // namespace Entity
     } // namespace Game

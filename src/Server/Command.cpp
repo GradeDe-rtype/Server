@@ -81,7 +81,7 @@ namespace Server
         }
         const int x = std::stoi(obj["x"]);
         const int y = std::stoi(obj["y"]);
-        RType::Game::Entity::Player player = server_.get_client(client_id);
+        const RType::Game::Entity::Player& player = server_.get_client(client_id);
         std::shared_ptr<RType::Game::Entity::Player> p = server_.get_client_ptr(client_id);
         p->setPosition({x, y});
 
@@ -105,7 +105,7 @@ namespace Server
             return;
         }
         int id = std::stoi(args);
-        RType::Game::Entity::Player player = server_.get_client(client_id); // TODO: make a get_player from the room class not the server
+        const RType::Game::Entity::Player& player = server_.get_client(client_id); // TODO: make a get_player from the room class not the server
         std::unordered_map<std::string, std::string> data = player.getPlayerInfo();
         std::string data_str = rfcArgParser::CreateObject(data);
         rfcArgParser::DataPacket packet = rfcArgParser::SerializePacket("p_info", data_str);
