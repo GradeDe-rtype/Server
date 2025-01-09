@@ -45,7 +45,8 @@ namespace RType
             }
 
             /*  ---- GAME LOGIC ---- */
-            void Monster::shoot() {
+            void Monster::shoot()
+            {
                 std::lock_guard<std::mutex> lock(_shoots_mutex);
                 uint64_t new_shoot_id = s_global_shoot_id.fetch_add(1, std::memory_order_relaxed);
                 auto new_shoot = std::make_shared<Entity::Shoot>(
@@ -54,10 +55,9 @@ namespace RType
                     ENTITY_TYPE::MONSTER,
                     _position.x,
                     _position.y,
-                    10,
+                    5,
                     _damage,
-                    _direction
-                );
+                    _direction);
                 if (new_shoot) {
                     _shoots.push_back(new_shoot);
                 }
@@ -108,7 +108,8 @@ namespace RType
                 return _type;
             }
 
-            std::vector<std::shared_ptr<Shoot>> Monster::getShoots() {
+            std::vector<std::shared_ptr<Entity::Shoot>> Monster::getShoots() const
+            {
                 std::lock_guard<std::mutex> lock(_shoots_mutex);
                 return _shoots;
             }
@@ -118,12 +119,13 @@ namespace RType
                 return _shootTimer;
             }
 
-            void Monster::removeShoot(int id) {
+            void Monster::removeShoot(int id)
+            {
                 std::lock_guard<std::mutex> lock(_shoots_mutex);
                 auto it = std::find_if(_shoots.begin(), _shoots.end(),
-                    [id](const std::shared_ptr<Shoot>& shoot) {
-                        return shoot && shoot->getId() == id;
-                    });
+                                       [id](const std::shared_ptr<Shoot> &shoot) {
+                                           return shoot && shoot->getId() == id;
+                                       });
                 if (it != _shoots.end()) {
                     _shoots.erase(it);
                 } else {

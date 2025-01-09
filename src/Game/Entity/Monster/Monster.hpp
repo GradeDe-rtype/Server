@@ -22,6 +22,8 @@
 
 #include <Timer.hpp>
 #include <atomic>
+#include <iostream>
+#include <mutex>
 
 namespace RType
 {
@@ -63,7 +65,6 @@ namespace RType
                     Timer &getRushTimer();
                     int getPhase();
                     bool getRuee();
-
 
                 private:
                     static std::atomic<uint64_t> s_global_shoot_id;

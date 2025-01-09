@@ -9,16 +9,16 @@
 #ifndef RTYPE_GAME_ENTITY_PLAYER_HPP_
 #define RTYPE_GAME_ENTITY_PLAYER_HPP_
 
+#include <atomic>
 #include <boost/asio.hpp>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <unordered_map>
 #include <vector>
 #include "AEntity.hpp"
 #include "Colors.hpp"
 #include "Shoot.hpp"
-#include <mutex>
-#include <atomic>
 
 namespace RType
 {

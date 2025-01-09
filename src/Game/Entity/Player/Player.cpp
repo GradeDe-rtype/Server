@@ -34,7 +34,8 @@ namespace RType
 
             /*  ---- SETTER ---- */
 
-            void Player::shoot(int x, int y) {
+            void Player::shoot(int x, int y)
+            {
                 std::lock_guard<std::mutex> lock(_shoots_mutex);
                 uint64_t new_shoot_id = s_global_shoot_id.fetch_add(1, std::memory_order_relaxed);
                 auto new_shoot = std::make_shared<Shoot>(
@@ -45,8 +46,7 @@ namespace RType
                     y,
                     20,
                     _damage,
-                    _direction
-                );
+                    _direction);
                 if (new_shoot) {
                     _shoots.push_back(new_shoot);
                 }
@@ -113,19 +113,21 @@ namespace RType
                 return pos;
             }
 
-            void Player::removeShoot(int id) {
+            void Player::removeShoot(int id)
+            {
                 std::lock_guard<std::mutex> lock(_shoots_mutex);
                 auto it = std::find_if(_shoots.begin(), _shoots.end(),
-                    [id](const std::shared_ptr<Shoot>& shoot) {
-                        return shoot && shoot->getId() == id;
-                    });
+                                       [id](const std::shared_ptr<Shoot> &shoot) {
+                                           return shoot && shoot->getId() == id;
+                                       });
 
                 if (it != _shoots.end()) {
                     _shoots.erase(it);
                 }
             }
 
-            std::vector<std::shared_ptr<Shoot>> Player::getShoots() {
+            std::vector<std::shared_ptr<Shoot>> Player::getShoots()
+            {
                 std::lock_guard<std::mutex> lock(_shoots_mutex);
                 return _shoots;
             }

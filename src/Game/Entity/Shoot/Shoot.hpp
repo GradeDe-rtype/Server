@@ -26,7 +26,6 @@ namespace RType
             {
                 public:
 
-
                 private:
                     bool _isActive = true;
                     int _id = 0;
