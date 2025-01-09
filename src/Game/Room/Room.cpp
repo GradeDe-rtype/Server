@@ -166,6 +166,13 @@ namespace RType
                         for (const auto &it : new_monsters) {
                             if (checkCollision(shoot->getPosition(), 1, it.second->getPosition(), it.second->getSize())) {
                                 command_processor->send(-1, "e_death", std::to_string(it.second->getId()));
+                                auto Mshoots = it.second->getShoots();
+                                for (auto &Mshoot : Mshoots) {
+                                    Mshoot->setIsActive(false);
+                                    std::unordered_map<std::string, std::string> mess = Mshoot->getShootInfo();
+                                    command_processor->send(-1, "s_death", rfcArgParser::CreateObject(mess));
+                                    it.second->removeShoot(Mshoot->getId());
+                                }
                                 _monsters.erase(it.first);
                             }
                         }
