@@ -135,7 +135,7 @@ namespace RType
 
             for (auto &player : _players) {
                 if (player.second->getHaveJoined() == false) {
-                    command_processor->to_send(player.second->getId(),  "wave", std::to_string(_wave));
+                    command_processor->to_send(player.second->getId(), "wave", std::to_string(_wave));
                     return false;
                 }
             }
