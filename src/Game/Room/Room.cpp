@@ -156,6 +156,32 @@ namespace RType
             }
         }
 
+        void Room::Monster_death(const std::pair<int, std::shared_ptr<Entity::Monster>> &it)
+        {
+            command_processor->send(-1, "e_death", std::to_string(it.second->getId()));
+            auto Mshoots = it.second->getShoots();
+            for (auto &Mshoot : Mshoots) {
+                Mshoot->setIsActive(false);
+                std::unordered_map<std::string, std::string> mess = Mshoot->getShootInfo();
+                command_processor->send(-1, "s_death", rfcArgParser::CreateObject(mess));
+                it.second->removeShoot(Mshoot->getId());
+            }
+            _monsters.erase(it.first);
+        }
+
+        void Room::Player_death(const std::pair<int, std::shared_ptr<Entity::Player>> &it)
+        {
+            command_processor->send(-1, "p_death", std::to_string(it.second->getId()));
+            it.second->setIsAlive(false);
+            auto Pshoots = it.second->getShoots();
+            for (auto &Pshoot : Pshoots) {
+                Pshoot->setIsActive(false);
+                std::unordered_map<std::string, std::string> mess = Pshoot->getShootInfo();
+                command_processor->send(-1, "s_death", rfcArgParser::CreateObject(mess));
+                it.second->removeShoot(Pshoot->getId());
+            }
+        }
+
         void Room::playersUpdate()
         {
             for (auto &player : _players) {
@@ -165,15 +191,7 @@ namespace RType
                         std::unordered_map<int, std::shared_ptr<Entity::Monster>> new_monsters = _monsters;
                         for (const auto &it : new_monsters) {
                             if (checkCollision(shoot->getPosition(), 1, it.second->getPosition(), it.second->getSize())) {
-                                command_processor->send(-1, "e_death", std::to_string(it.second->getId()));
-                                auto Mshoots = it.second->getShoots();
-                                for (auto &Mshoot : Mshoots) {
-                                    Mshoot->setIsActive(false);
-                                    std::unordered_map<std::string, std::string> mess = Mshoot->getShootInfo();
-                                    command_processor->send(-1, "s_death", rfcArgParser::CreateObject(mess));
-                                    it.second->removeShoot(Mshoot->getId());
-                                }
-                                _monsters.erase(it.first);
+                                Monster_death(it);
                             }
                         }
                     }
@@ -187,14 +205,12 @@ namespace RType
             if (monster.second->getShootTimer().hasElapsed()) {
                 monster.second->shoot();
                 monster.second->getShootTimer().reset();
-                auto shoots = monster.second->getShoots(); // This is now thread-safe
+                auto shoots = monster.second->getShoots();
                 if (!shoots.empty()) {
                     command_processor->send(-1, "shoot", rfcArgParser::CreateObject(shoots.back()->getShootInfo()));
-                    std::cout << "Monster " << monster.second->getId() << " shoot" << std::endl;
                 }
             }
-
-            auto shoots = monster.second->getShoots(); // Get a thread-safe copy
+            auto shoots = monster.second->getShoots();
             for (auto &shoot : shoots) {
                 if (!shoot->getIsActive()) {
                     monster.second->removeShoot(shoot->getId());
@@ -206,8 +222,7 @@ namespace RType
                     if (!player->second->getIsAlive())
                         continue;
                     if (checkCollision(shoot->getPosition(), 1, player->second->getPosition(), player->second->getSize())) {
-                        command_processor->send(-1, "p_death", std::to_string(player->second->getId()));
-                        player->second->setIsAlive(false);
+                        Player_death(*player);
                     }
                 }
             }
@@ -232,8 +247,7 @@ namespace RType
                         if (!player->second->getIsAlive())
                             continue;
                         if (checkCollision(monster.second->getPosition(), monster.second->getSize(), player->second->getPosition(), player->second->getSize())) {
-                            command_processor->send(-1, "p_death", std::to_string(player->second->getId()));
-                            player->second->setIsAlive(false);
+                            Player_death(*player);
                         }
                     }
 

@@ -72,6 +72,8 @@ namespace RType
                 bool arePlayersAlive();
                 bool nextWave();
                 void resetPlayers();
+                void Monster_death(const std::pair<int, std::shared_ptr<Entity::Monster>> &it);
+                void Player_death(const std::pair<int, std::shared_ptr<Entity::Player>> &it);
                 void playersUpdate();
                 void basicMonster(std::pair<int, std::shared_ptr<Entity::Monster>> monster);
                 void kamikazeMonster(std::pair<int, std::shared_ptr<Entity::Monster>> monster);

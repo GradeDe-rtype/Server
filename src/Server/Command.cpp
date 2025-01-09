@@ -128,7 +128,7 @@ namespace Server
         player->shoot(std::stoi(data["x"]), std::stoi(data["y"]));
         std::string shoot = rfcArgParser::CreateObject(player->getShoots().back()->getShootInfo());
         rfcArgParser::DataPacket packet = rfcArgParser::SerializePacket("shoot", shoot);
-        server_.send_multicast_excluded(packet, {});
+        server_.send_broadcast(packet);
     }
 
     // void e_info(int client_id, const std::string &args)
