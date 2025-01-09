@@ -1,7 +1,9 @@
 # Tests CMakeLists.txt
 
+#  ---- SOURCES ---- #
 file(GLOB TEST_SOURCES "*.cpp")
 
+#  ---- SRC SOURCES ---- #
 set(SRC_SOURCES
     ${CMAKE_SOURCE_DIR}/src/Game/Entity/Base/AEntity.cpp
     ${CMAKE_SOURCE_DIR}/src/Game/Colors/Colors.cpp
@@ -11,15 +13,16 @@ set(SRC_SOURCES
     ${CMAKE_SOURCE_DIR}/src/Game/Timer/Timer.cpp
 )
 
-
 foreach(FILE ${TEST_SOURCES} ${SRC_SOURCES})
     if (NOT EXISTS "${FILE}")
         message(FATAL_ERROR "Source file not found : ${FILE}")
     endif()
 endforeach()
 
+# ---- EXECUTABLE ---- #
 add_executable(r-type_tests ${TEST_SOURCES} ${SRC_SOURCES})
 
+# ---- INCLUDES ---- #
 target_include_directories(r-type_tests PRIVATE
     ${CMAKE_SOURCE_DIR}/include/
     ${CMAKE_SOURCE_DIR}/src/Game/
@@ -38,30 +41,30 @@ target_include_directories(r-type_tests PRIVATE
     ${CMAKE_SOURCE_DIR}/src/Utils/Path/
 )
 
-# Boost ASIO is part of Boost Libraries
-find_package(Boost REQUIRED)
+target_include_directories(r-type_tests PRIVATE 
+    ${CRITERION_INCLUDE_DIRS}
+)
 
-# Include pkg-config for Criterion
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(CRITERION REQUIRED criterion)
-
-target_include_directories(r-type_tests PRIVATE ${CRITERION_INCLUDE_DIRS})
+# ---- LINK LIBRARIES ---- #
 target_link_libraries(r-type_tests PRIVATE 
     ${CRITERION_LIBRARIES}
     ${Boost_LIBRARIES}
 )
 
+# ---- COMPILE OPTIONS ---- #
 target_compile_options(r-type_tests PRIVATE -g -O0)
 
+# ---- TESTS ---- #
 enable_testing()
 
+# ---- ADD TEST ---- #
 add_test(
     NAME RTypeTests
     COMMAND $<TARGET_FILE:r-type_tests>
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 
-# Manual testing
+# ---- MANUAL TESTS EXECUTION ---- #
 add_custom_target(run_tests
     COMMAND $<TARGET_FILE:r-type_tests>
     DEPENDS r-type_tests
