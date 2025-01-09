@@ -131,6 +131,12 @@ namespace RType
             void AEntity::update()
             {
             }
+
+            void AEntity::TakeDamage(int damage)
+            {
+                _health = _health - damage;
+                return;
+            }
         } // namespace Entity
     } // namespace Game
 } // namespace RType

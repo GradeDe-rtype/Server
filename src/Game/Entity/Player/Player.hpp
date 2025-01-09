@@ -9,8 +9,10 @@
 #ifndef RTYPE_GAME_ENTITY_PLAYER_HPP_
 #define RTYPE_GAME_ENTITY_PLAYER_HPP_
 
+#include <atomic>
 #include <boost/asio.hpp>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -46,12 +48,16 @@ namespace RType
                     [[nodiscard]] std::vector<std::shared_ptr<Shoot>> getShoots() const;
                     [[nodiscard]] std::string getPosInfo() const;
                     std::string getColor() const;
+                    void removeShoot(int id);
+                    std::vector<std::shared_ptr<Shoot>> getShoots();
 
                 private:
+                    static std::atomic<uint64_t> s_global_shoot_id;
+                    std::vector<std::shared_ptr<Shoot>> _shoots;
+                    mutable std::mutex _shoots_mutex;
                     std::string _color;
                     bool _haveJoined = false;
                     std::shared_ptr<boost::asio::ip::tcp::socket> _socket;
-                    std::vector<std::shared_ptr<Shoot>> _shoots;
             };
         } // namespace Entity
     } // namespace Game
