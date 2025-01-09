@@ -51,10 +51,6 @@ target_link_libraries(r-type_tests PRIVATE
     ${Boost_LIBRARIES}
 )
 
-target_link_libraries(r-type_tests PRIVATE
-    ${Boost_LIBRARIES}
-)
-
 target_compile_options(r-type_tests PRIVATE -g -O0)
 
 enable_testing()
