@@ -119,7 +119,7 @@ namespace RType
             if (DeadPlayer == TotalPlayer && DeadPlayer != 0) {
                 std::cout << "All players are dead" << std::endl;
                 std::string arg = std::to_string(_wave);
-                command_processor->send(-1, "end", arg);
+                command_processor->send(-1, "end", "lose");
                 _mode.store(Mode::END);
                 return false;
             }
@@ -408,7 +408,7 @@ namespace RType
                         _monsters.begin()->second->setPosX(900);
                     }
                 } else {
-                    command_processor->send(-1, "end", std::to_string(_wave));
+                    command_processor->send(-1, "end", "win");
                     _mode.store(Mode::END);
                     return;
                 }
