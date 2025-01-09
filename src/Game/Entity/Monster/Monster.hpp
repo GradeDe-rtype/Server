@@ -10,6 +10,8 @@
 #ifndef RTYPE_GAME_ENTITY_MONSTER_HPP_
 #define RTYPE_GAME_ENTITY_MONSTER_HPP_
 
+#define SHOOT_TIMER rand() % 1000 + 1000
+
 #include <algorithm>
 #include <memory>
 #include <string>
@@ -19,6 +21,9 @@
 #include "Shoot.hpp"
 
 #include <Timer.hpp>
+#include <atomic>
+#include <iostream>
+#include <mutex>
 
 namespace RType
 {
@@ -55,16 +60,18 @@ namespace RType
                     Type getType() const;
                     std::vector<std::shared_ptr<Entity::Shoot>> getShoots() const;
                     Timer &getShootTimer();
+                    void removeShoot(int id);
                     Timer &getSpawnTimer();
                     Timer &getRushTimer();
                     int getPhase();
                     bool getRuee();
 
-
                 private:
-                    Type _type = Type::BASIC_MONSTER;
-                    std::vector<std::shared_ptr<Shoot>> _shoots;
-                    Timer _shootTimer{1000};
+                    static std::atomic<uint64_t> s_global_shoot_id;
+                    std::vector<std::shared_ptr<Entity::Shoot>> _shoots;
+                    mutable std::mutex _shoots_mutex;
+                    Type _type = Type::MONSTER;
+                    Timer _shootTimer{SHOOT_TIMER};
                     Timer _rushTimer{5000};
                     Timer _spawnTimer{10000};
                     int _phase = 1;

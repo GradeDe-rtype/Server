@@ -41,17 +41,30 @@ namespace RType
                 _speed = 8;
                 _size = 40;
                 _isAlive = true;
+                _direction = Direction::LEFT;
             }
 
             /*  ---- GAME LOGIC ---- */
             void Monster::shoot()
             {
-                _shoots.push_back(std::make_shared<Entity::Shoot>(_position.x, _position.y, 10, _damage, _direction));
+                std::lock_guard<std::mutex> lock(_shoots_mutex);
+                uint64_t new_shoot_id = s_global_shoot_id.fetch_add(1, std::memory_order_relaxed);
+                auto new_shoot = std::make_shared<Entity::Shoot>(
+                    new_shoot_id,
+                    _id,
+                    ENTITY_TYPE::MONSTER,
+                    _position.x,
+                    _position.y,
+                    5,
+                    _damage,
+                    _direction);
+                if (new_shoot) {
+                    _shoots.push_back(new_shoot);
+                }
             }
 
             void Monster::update()
             {
-                _shoots.erase(std::remove_if(_shoots.begin(), _shoots.end(), [](std::shared_ptr<Entity::Shoot> shoot) { return !shoot->getIsActive(); }), _shoots.end());
                 if (_type == Type::KAMIKAZE_MONSTER)
                     setPosX(_position.x - _speed);
             }
@@ -95,8 +108,9 @@ namespace RType
                 return _type;
             }
 
-            std::vector<std::shared_ptr<Shoot>> Monster::getShoots() const
+            std::vector<std::shared_ptr<Entity::Shoot>> Monster::getShoots() const
             {
+                std::lock_guard<std::mutex> lock(_shoots_mutex);
                 return _shoots;
             }
 
@@ -104,6 +118,23 @@ namespace RType
             {
                 return _shootTimer;
             }
+
+            void Monster::removeShoot(int id)
+            {
+                std::lock_guard<std::mutex> lock(_shoots_mutex);
+                auto it = std::find_if(_shoots.begin(), _shoots.end(),
+                                       [id](const std::shared_ptr<Shoot> &shoot) {
+                                           return shoot && shoot->getId() == id;
+                                       });
+                if (it != _shoots.end()) {
+                    _shoots.erase(it);
+                } else {
+                    std::cout << "Attempt to remove non-existent shoot (ID: " << id
+                              << ") from monster " << _id << std::endl;
+                }
+            }
+
+            std::atomic<uint64_t> Monster::s_global_shoot_id{0};
 
             Timer &Monster::getSpawnTimer()
             {
