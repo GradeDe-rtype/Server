@@ -25,6 +25,7 @@ namespace RType
                     virtual ~IEntity() = default;
 
                     virtual void update() = 0;
+                    virtual void TakeDamage(int damage) = 0;
 
                     virtual void setDamage(int damage) = 0;
                     virtual void setDirection(Entity::Direction direction) = 0;

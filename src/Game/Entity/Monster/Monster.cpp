@@ -61,6 +61,21 @@ namespace RType
             void Monster::setType(Type type)
             {
                 _type = type;
+                if (type = Type::BOSS) {
+                    _damage = 50;
+                } else {
+                    _damage = 25;
+                }
+            }
+
+            void Monster::setPhase(int phase)
+            {
+                _phase = phase;
+            }
+
+            void Monster::setRuee(bool ruee)
+            {
+                _ruee = ruee;
             }
 
             /*  ---- GETTER ---- */
@@ -88,6 +103,25 @@ namespace RType
             Timer &Monster::getShootTimer()
             {
                 return _shootTimer;
+            }
+
+            Timer &Monster::getSpawnTimer()
+            {
+                return _spawnTimer;
+            }
+
+            Timer &Monster::getRushTimer()
+            {
+                return _rushTimer;
+            }
+
+            int Monster::getPhase()
+            {
+                return _phase;
+            }
+            bool Monster::getRuee()
+            {
+                return _ruee;
             }
         } // namespace Entity
     } // namespace Game
