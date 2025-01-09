@@ -8,7 +8,6 @@ set(SRC_SOURCES
     ${CMAKE_SOURCE_DIR}/src/Game/Entity/Monster/Monster.cpp
     ${CMAKE_SOURCE_DIR}/src/Game/Entity/Player/Player.cpp
     ${CMAKE_SOURCE_DIR}/src/Game/Entity/Shoot/Shoot.cpp
-    ${CMAKE_SOURCE_DIR}/src/Game/Room/Room.cpp
     ${CMAKE_SOURCE_DIR}/src/Game/Timer/Timer.cpp
 )
 
