@@ -49,22 +49,32 @@ namespace RType
 
                     /*  ---- SETTER ---- */
                     void setType(Type type);
+                    void setPhase(int phase);
+                    void setRuee(bool ruee);
                     // void setSize(int size);
 
                     /*  ---- GETTER ---- */
                     std::unordered_map<std::string, std::string> getEnemyInfo() const;
                     Type getType() const;
-                    std::vector<std::shared_ptr<Shoot>> getShoots();
+                    std::vector<std::shared_ptr<Entity::Shoot>> getShoots() const;
                     Timer &getShootTimer();
                     void removeShoot(int id);
+                    Timer &getSpawnTimer();
+                    Timer &getRushTimer();
+                    int getPhase();
+                    bool getRuee();
+
 
                 private:
                     static std::atomic<uint64_t> s_global_shoot_id;
                     std::vector<std::shared_ptr<Entity::Shoot>> _shoots;
                     mutable std::mutex _shoots_mutex;
-                    Timer _shootTimer{SHOOT_TIMER};
                     Type _type = Type::MONSTER;
-
+                    Timer _shootTimer{SHOOT_TIMER};
+                    Timer _rushTimer{5000};
+                    Timer _spawnTimer{10000};
+                    int _phase = 1;
+                    bool _ruee = false;
             };
         } // namespace Entity
     } // namespace Game

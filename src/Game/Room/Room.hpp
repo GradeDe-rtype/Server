@@ -11,7 +11,8 @@
 #ifndef RTYPE_GAME_ROOM_HPP_
 #define RTYPE_GAME_ROOM_HPP_
 
-#define MAX_WAVE 6
+#define BOSS_WAVE 6
+#define MAX_WAVE 9
 #define MAX_PLAYER 4
 
 #include <atomic>
@@ -77,7 +78,9 @@ namespace RType
                 void playersUpdate();
                 void basicMonster(std::pair<int, std::shared_ptr<Entity::Monster>> monster);
                 void kamikazeMonster(std::pair<int, std::shared_ptr<Entity::Monster>> monster);
+                void bossMonster(std::pair<int, std::shared_ptr<Entity::Monster>> monster);
                 void monstersUpdate();
+                void takeShoot(std::pair<int, std::shared_ptr<Entity::Monster>> monster);
                 void shootsUpdate();
 
                 // Setters
@@ -121,6 +124,7 @@ namespace RType
                 // Internal methods
                 void runGameLoop();
                 void spawnMonster();
+                void spawnBoss();
 
                 Timer _monsterTimer;
 
