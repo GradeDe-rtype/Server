@@ -55,6 +55,7 @@ namespace RType
 
         namespace Entity
         {
+            
             /* ---- MONSTER CLASS ---- */
 
             Test(Monster, ConstructorDefault) {
@@ -113,6 +114,7 @@ namespace RType
                 cr_assert_eq(info["size"], "40", "Size should be 40.");
                 cr_assert_eq(info["health"], "100", "Health should be 100.");
             }
+
 
             /* ---- PLAYER CLASS ---- */
             
@@ -192,6 +194,7 @@ namespace RType
                 cr_assert(posInfo.find("x:0") != std::string::npos, "The X position information is incorrect in getPosInfo.");
                 cr_assert(posInfo.find("y:0") != std::string::npos, "Position information Y is invalid in getPosInfo.");
             }
+
 
             /* ---- SHOOT CLASS ---- */
 
