@@ -26,12 +26,13 @@ namespace Server
         send_["disconnect"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
         send_["p_position"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
         send_["p_damage"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
-        send_["p_shoot"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
         send_["p_death"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
         send_["e_position"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
         send_["e_damage"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
-        send_["e_shoot"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
         send_["e_death"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
+        send_["s_position"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
+        send_["s_death"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
+        send_["shoot"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
         send_["color"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
         send_["wave"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
         send_["end"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
@@ -80,7 +81,7 @@ namespace Server
         }
         const int x = std::stoi(obj["x"]);
         const int y = std::stoi(obj["y"]);
-        RType::Game::Entity::Player player = server_.get_client(client_id);
+        const RType::Game::Entity::Player &player = server_.get_client(client_id);
         std::shared_ptr<RType::Game::Entity::Player> p = server_.get_client_ptr(client_id);
         p->setPosition({x, y});
 
@@ -104,7 +105,7 @@ namespace Server
             return;
         }
         int id = std::stoi(args);
-        RType::Game::Entity::Player player = server_.get_client(client_id); // TODO: make a get_player from the room class not the server
+        const RType::Game::Entity::Player &player = server_.get_client(client_id); // TODO: make a get_player from the room class not the server
         std::unordered_map<std::string, std::string> data = player.getPlayerInfo();
         std::string data_str = rfcArgParser::CreateObject(data);
         rfcArgParser::DataPacket packet = rfcArgParser::SerializePacket("p_info", data_str);
@@ -125,12 +126,9 @@ namespace Server
         }
 
         player->shoot(std::stoi(data["x"]), std::stoi(data["y"]));
-        std::unordered_map<std::string, std::string> shoot_data;
-        shoot_data["x"] = std::to_string(player->getShoots().back()->getPosX());
-        shoot_data["y"] = std::to_string(player->getShoots().back()->getPosY());
-        std::string shoot_data_str = rfcArgParser::CreateObject(shoot_data);
-        rfcArgParser::DataPacket packet = rfcArgParser::SerializePacket("p_shoot", shoot_data_str);
-        server_.send_multicast_excluded(packet, {client_id});
+        std::string shoot = rfcArgParser::CreateObject(player->getShoots().back()->getShootInfo());
+        rfcArgParser::DataPacket packet = rfcArgParser::SerializePacket("shoot", shoot);
+        server_.send_broadcast(packet);
     }
 
     // void e_info(int client_id, const std::string &args)

@@ -11,7 +11,7 @@
 #ifndef RTYPE_GAME_ROOM_HPP_
 #define RTYPE_GAME_ROOM_HPP_
 
-#define BOSS_WAVE 6
+#define BOSS_WAVE 5
 #define MAX_WAVE 9
 #define MAX_PLAYER 4
 
@@ -73,12 +73,15 @@ namespace RType
                 bool arePlayersAlive();
                 bool nextWave();
                 void resetPlayers();
+                void Monster_death(const std::pair<int, std::shared_ptr<Entity::Monster>> &it);
+                void Player_death(const std::pair<int, std::shared_ptr<Entity::Player>> &it);
                 void playersUpdate();
                 void basicMonster(std::pair<int, std::shared_ptr<Entity::Monster>> monster);
                 void kamikazeMonster(std::pair<int, std::shared_ptr<Entity::Monster>> monster);
                 void bossMonster(std::pair<int, std::shared_ptr<Entity::Monster>> monster);
                 void monstersUpdate();
                 void takeShoot(std::pair<int, std::shared_ptr<Entity::Monster>> monster);
+                void shootsUpdate();
 
                 // Setters
                 void setMode(Mode mode);
