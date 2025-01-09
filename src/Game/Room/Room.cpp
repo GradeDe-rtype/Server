@@ -218,13 +218,18 @@ namespace RType
 
         void Room::bossMonster(std::pair<int, std::shared_ptr<Entity::Monster>> monster)
         {
-            if (monster.second->getPosX() <= 0) {
-                monster.second->setPosX(900);
+            if (monster.second->getPosX() <= -100) {
+                monster.second->setPosX(800);
                 monster.second->setRuee(false);
+                monster.second->getRushTimer().reset();
+            }
+            if (monster.second->getPosX() > 750) {
+                monster.second->setPosX(monster.second->getPosX() - 3);
+                return;
             }
 
             if (monster.second->getPosX() <= 750) {
-                if (monster.second->getHealth() > 50) {
+                if (monster.second->getHealth() > 500 && monster.second->getPhase() == 1) {
                     if (monster.second->getShootTimer().hasElapsed()) {
                         monster.second->shoot();
                         monster.second->getShootTimer().reset();
@@ -236,7 +241,7 @@ namespace RType
                         spawnMonster();
                         monster.second->getSpawnTimer().reset();
                     }
-                } else if (monster.second->getHealth() > 25) {
+                } else if (monster.second->getHealth() > 250 && monster.second->getPhase() == 2) {
                     if (monster.second->getShootTimer().hasElapsed()) {
                         monster.second->shoot();
                         monster.second->getShootTimer().reset();
@@ -247,7 +252,7 @@ namespace RType
                     if (monster.second->getRushTimer().hasElapsed() && monster.second->getRuee() == false) {
                         int newY = (std::rand() % 2 == 0) ? 200 : 400;
                         monster.second->setPosY(newY);
-                        monster.second->setPosX(monster.second->getPosX() - 8);
+                        monster.second->setPosX(monster.second->getPosX() - 15);
                         monster.second->getRushTimer().reset();
                         monster.second->setRuee(true);
                     }
@@ -255,7 +260,7 @@ namespace RType
                     if (monster.second->getRushTimer().hasElapsed() && monster.second->getRuee() == false) {
                         int newY = (std::rand() % 2 == 0) ? 200 : 400;
                         monster.second->setPosY(newY);
-                        monster.second->setPosX(monster.second->getPosX() - 8);
+                        monster.second->setPosX(monster.second->getPosX() - 15);
                         monster.second->getRushTimer().reset();
                         monster.second->setRuee(true);
                     } else {
@@ -273,6 +278,8 @@ namespace RType
                     }
                 }
             }
+            if (monster.second->getRuee() == true)
+                monster.second->setPosX(monster.second->getPosX() - 15);
             takeShoot(monster);
         }
 
@@ -310,6 +317,7 @@ namespace RType
 
             for (int i = 0; MonsterTypes[i] != -1; i++) {
                 for (auto &monster : _monsters) {
+                    
                     if (monster.second->getType() == MonsterTypes[i]) {
                         (this->*monsterUpdate[i])(monster);
                     }
@@ -378,6 +386,32 @@ namespace RType
             }
         }
 
+        bool Room::Verification_Boss()
+        {
+            if (_wave == BOSS_WAVE) {
+                if (_monsters.begin()->second->getIsAlive()) {
+                    if(_monsters.begin()->second->getPhase() == 1 && _monsters.begin()->second->getHealth() > 500)
+                        playersUpdate();
+                        monstersUpdate();
+                        shootsUpdate();
+                        return 1;
+                    if(_monsters.begin()->second->getPhase() == 2 && _monsters.begin()->second->getHealth() > 250)
+                        playersUpdate();
+                        monstersUpdate();
+                        shootsUpdate();
+                        return 1;
+                    if(_monsters.begin()->second->getPhase() == 3 && _monsters.begin()->second->getHealth() > 0)
+                        playersUpdate();
+                        monstersUpdate();
+                        shootsUpdate();
+                        return 1;
+                    if(_monsters.begin()->second->getHealth() < 0)
+                        std::cout << "verif" << std::endl;
+                }
+            }
+            return 0;
+        }
+
         void Room::update()
         {
             if (!_isReady && _mode != Mode::PLAYING)
@@ -385,7 +419,7 @@ namespace RType
             if (!arePlayersAlive())
                 return;
 
-            if (_monsters.empty()) {
+            if (_monsters.empty() ) {
                 if (!nextWave())
                     return;
                 std::cout << "Wave " << _wave << " started" << std::endl;
@@ -394,18 +428,11 @@ namespace RType
                     std::cout << "Spawning " << _wave << " monsters" << std::endl;
                     for (int i = 0; i <= _wave; i++)
                         spawnMonster();
-                } else if (_wave < MAX_WAVE) {
-                    if (_wave == 5) {
+                } else if (_wave == BOSS_WAVE) {
+                    if (_wave == BOSS_WAVE) {
                         std::cout << "Spawning Boss" << std::endl;
                         spawnBoss();
-                        std::cout << "Spawning Boss" << std::endl;
-                    }
-                    if (_monsters.begin()->second->getHealth() <= 50 && _monsters.begin()->second->getHealth() > 25) {
-                        _monsters.begin()->second->setPhase(2);
-                        _monsters.begin()->second->setPosX(900);
-                    } else if (_monsters.begin()->second->getHealth() <= 25) {
-                        _monsters.begin()->second->setPhase(3);
-                        _monsters.begin()->second->setPosX(900);
+                        return;
                     }
                 } else {
                     command_processor->send(-1, "end", "win");
@@ -414,6 +441,31 @@ namespace RType
                 }
                 resetPlayers();
             }
+
+            if (_wave == BOSS_WAVE) {
+                std::cout << _monsters.begin()->second->getHealth() << " hp " << std::endl;
+                if ((_monsters.begin()->second->getType() == RType::Game::Entity::Monster::BOSS)) {
+                    if (Verification_Boss() == 1)
+                        return;
+
+                    if (_monsters.begin()->second->getHealth() <= 50 && _monsters.begin()->second->getHealth() > 25) {
+                        _monsters.begin()->second->setPhase(2);
+                        _monsters.begin()->second->setPosX(800);
+                        std::cout << "Boss phase 2" << std::endl;
+                        // if (!nextWave())
+                        //     return;
+                        return;
+                    } else if (_monsters.begin()->second->getHealth() <= 25) {
+                        _monsters.begin()->second->setPhase(3);
+                        _monsters.begin()->second->setPosX(800);
+                        std::cout << "Boss phase 3" << std::endl;
+                        // if (!nextWave())
+                        //     return;
+                        return;
+                    }
+                }
+            }
+
             playersUpdate();
             monstersUpdate();
             shootsUpdate();
@@ -464,7 +516,7 @@ namespace RType
                 monster->setHealth(1000);
                 monster->setDamage(50);
                 monster->setPosY(300);
-                monster->setPosX(700);
+                monster->setPosX(800);
                 monster->setPhase(1);
 
                 std::cout << "Monster " << monsterId << " spawned at " << monster->getPosX() << ", " << monster->getPosY()
