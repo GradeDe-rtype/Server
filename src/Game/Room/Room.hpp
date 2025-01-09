@@ -11,7 +11,7 @@
 #ifndef RTYPE_GAME_ROOM_HPP_
 #define RTYPE_GAME_ROOM_HPP_
 
-#define BOSS_WAVE 6
+#define BOSS_WAVE 5
 #define MAX_WAVE 9
 #define MAX_PLAYER 4
 
@@ -100,7 +100,7 @@ namespace RType
                 // Core room data
                 int _id;
                 std::string _name;
-                int _wave = 5;
+                int _wave = 0;
                 bool haveAskedForNextWave = false;
                 std::atomic<Mode> _mode{Mode::WAITING};
                 std::atomic<bool> _isReady{false};

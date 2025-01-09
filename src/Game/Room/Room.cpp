@@ -396,6 +396,7 @@ namespace RType
                         spawnMonster();
                 } else if (_wave < MAX_WAVE) {
                     if (_wave == 5) {
+                        std::cout << "Spawning Boss" << std::endl;
                         spawnBoss();
                         std::cout << "Spawning Boss" << std::endl;
                     }
@@ -436,7 +437,7 @@ namespace RType
                     monster->setType(RType::Game::Entity::Monster::BASIC_MONSTER);
                     monster->setPosX(750);
                 }
-                monster->setHealth(100);
+                monster->setHealth(25);
                 monster->setDamage(25);
 
                 monster->setPosY(std::rand() % 500 + 50);
@@ -453,9 +454,12 @@ namespace RType
 
         void Room::spawnBoss()
         {
+            std::cout << "Spawning Boss" << std::endl;
             try {
-                int monsterId = _monsters.size() + 10;
+                int monsterId = _monsters.size() + 1;
+                std::cout << "Monster " << monsterId << " spawned" << std::endl;
                 auto monster = std::make_shared<Game::Entity::Monster>(monsterId, _wave);
+                std::cout << "Monster " << monsterId << " spawned" << std::endl;
                 monster->setType(RType::Game::Entity::Monster::BOSS);
                 monster->setHealth(1000);
                 monster->setDamage(50);
