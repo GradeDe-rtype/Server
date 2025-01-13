@@ -79,6 +79,8 @@ namespace RType
                 void basicMonster(std::pair<int, std::shared_ptr<Entity::Monster>> monster);
                 void kamikazeMonster(std::pair<int, std::shared_ptr<Entity::Monster>> monster);
                 void bossMonster(std::pair<int, std::shared_ptr<Entity::Monster>> monster);
+                void bonusHandler(std::pair<int, std::shared_ptr<Entity::Monster>> monster);
+                void weaponHandler(std::pair<int, std::shared_ptr<Entity::Monster>> monster);
                 void monstersUpdate();
                 void takeShoot(std::pair<int, std::shared_ptr<Entity::Monster>> monster);
                 void shootsUpdate();
