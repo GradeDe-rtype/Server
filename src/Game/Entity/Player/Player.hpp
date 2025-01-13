@@ -20,6 +20,8 @@
 #include "Colors.hpp"
 #include "Shoot.hpp"
 
+#include <Room.hpp>
+
 namespace RType
 {
     namespace Game
@@ -57,6 +59,8 @@ namespace RType
                     void setInRoom(bool inRoom);
                     bool isInMenu() const;
                     void setInMenu(bool inMenu);
+                    void setRoom(Room *room);
+                    Room *getRoom() const;
 
                 private:
                     CONTEXT _context = CONTEXT::MENU;
@@ -66,6 +70,7 @@ namespace RType
                     std::string _color;
                     bool _haveJoined = false;
                     std::shared_ptr<boost::asio::ip::tcp::socket> _socket;
+                    RType::Game::Room *_room = nullptr;
             };
         } // namespace Entity
     } // namespace Game

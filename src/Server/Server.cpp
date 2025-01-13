@@ -141,25 +141,6 @@ namespace Server
         clients_.push_back(new_client);
 
         // Send connection notifications
-        auto packet = rfcArgParser::SerializePacket(
-            "connect",
-            rfcArgParser::CreateObject(new_client->getPlayerSmallInfo()));
-        send_multicast_excluded(packet, {client_id});
-
-        new_client->setColor("#FFFFFF");
-        packet = rfcArgParser::SerializePacket(
-            "connect_you",
-            rfcArgParser::CreateObject(new_client->getPlayerSmallInfo()));
-        send_message(-1, client_id, packet);
-
-        // Send existing clients to new client
-        for (const auto &client : clients_) {
-            if (client->getId() == client_id) continue;
-            packet = rfcArgParser::SerializePacket(
-                "connect",
-                rfcArgParser::CreateObject(client->getPlayerSmallInfo()));
-            send_message(-1, client_id, packet);
-        }
     }
 
     void GameServer::handleMessage(int client_id, const std::string &data)
@@ -205,6 +186,23 @@ namespace Server
             return (*room_it)->getRoomInfo();
         } else {
             return {};
+        }
+    }
+
+    std::vector<std::unique_ptr<RType::Game::Room>> &GameServer::getRooms()
+    {
+        return rooms_;
+    }
+
+    RType::Game::Room *GameServer::getRoom(int room_id)
+    {
+        auto room_it = std::find_if(rooms_.begin(), rooms_.end(),
+                                    [room_id](const auto &room) { return room->getID() == room_id; });
+
+        if (room_it != rooms_.end()) {
+            return room_it->get();
+        } else {
+            return nullptr;
         }
     }
 } // namespace Server

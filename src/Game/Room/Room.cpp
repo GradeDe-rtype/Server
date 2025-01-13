@@ -524,5 +524,10 @@ namespace RType
             data["count"] = std::to_string(_players.size());
             return data;
         }
+
+        std::unordered_map<int, std::shared_ptr<Game::Entity::Player>> &Room::getPlayers()
+        {
+            return _players;
+        }
     } // namespace Game
 } // namespace RType

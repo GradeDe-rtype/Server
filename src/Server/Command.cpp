@@ -184,7 +184,6 @@ namespace Server
         }
         UNUSED(args);
         server_.add_room(std::to_string(client_id) + "'s room");
-        ;
         server_.send_message(SERVER_ID, client_id, rfcArgParser::SerializePacket("create", std::to_string(client_id)));
     }
 
@@ -200,12 +199,26 @@ namespace Server
         }
         int room_id = std::stoi(args);
         server_.add_player_to_room(room_id, client_id);
+        server_.get_client_ptr(client_id)->setInRoom(true);
         std::unordered_map<std::string, std::string> data = server_.get_room_info(room_id);
         if (data.empty()) {
             std::cerr << "Room not found.\n";
             return;
         }
+        std::vector<int> includes;
+        for (const auto &[_, player] : server_.getRoom(room_id)->getPlayers())
+            includes.push_back(player->getId());
         server_.send_message(SERVER_ID, client_id, rfcArgParser::SerializePacket("join", rfcArgParser::CreateObject(data)));
+        auto packet = rfcArgParser::SerializePacket(
+            "connect",
+            rfcArgParser::CreateObject(server_.get_client_ptr(client_id)->getPlayerSmallInfo()));
+        server_.send_multicast(packet, includes);
+
+        server_.get_client_ptr(client_id)->setColor("#FFFFFF");
+        packet = rfcArgParser::SerializePacket(
+            "connect_you",
+            rfcArgParser::CreateObject(server_.get_client_ptr(client_id)->getPlayerSmallInfo()));
+        server_.send_message(SERVER_ID, client_id, packet);
     }
 
     void Command::to_send(const int receiver_id, const std::string &command, const std::string &args)

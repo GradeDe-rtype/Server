@@ -9,6 +9,7 @@
 */
 
 #include "Player.hpp"
+#include <Room.hpp>
 #include <iostream>
 
 namespace RType
@@ -162,6 +163,16 @@ namespace RType
             void Player::setInMenu(bool inMenu)
             {
                 _context = inMenu ? CONTEXT::MENU : _context;
+            }
+
+            void Player::setRoom(Room *room)
+            {
+                _room = room;
+            }
+
+            Room *Player::getRoom() const
+            {
+                return _room;
             }
         } // namespace Entity
     } // namespace Game
