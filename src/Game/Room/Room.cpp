@@ -22,13 +22,13 @@ namespace RType
         }
 
         Room::Room(int id, std::string name, Server::Command *command_processor)
-            : _id(id), _name(std::move(name)), _monsterTimer(1000), command_processor(command_processor)
+            : _id(id), _name(std::move(name)), _monsterTimer(50), command_processor(command_processor), _bonusSpawn(10000)
         {
         }
 
         Room::Room(Room &&other) noexcept
             : _id(other._id), _name(std::move(other._name)), _mode(other._mode.load()), _isReady(other._isReady.load()), _shouldStop(other._shouldStop.load()),
-              _monsterTimer(other._monsterTimer), command_processor(other.command_processor)
+              _monsterTimer(other._monsterTimer), command_processor(other.command_processor), _bonusSpawn(10000)
         {
             std::lock_guard<std::mutex> playerLock(other._playerMutex);
             std::lock_guard<std::mutex> monsterLock(other._monsterMutex);
@@ -499,7 +499,6 @@ namespace RType
             }
 
             if (_wave == BOSS_WAVE) {
-                std::cout << _monsters.begin()->second->getHealth() << " hp " << std::endl;
                 if ((_monsters.begin()->second->getType() == RType::Game::Entity::Monster::BOSS)) {
                     if (Verification_Boss() == 1)
                         return;
@@ -518,6 +517,14 @@ namespace RType
                         // if (!nextWave())
                         //     return;
                         return;
+                    } else if (_monsters.begin()->second->getHealth() <= 0) {
+                        _monsters.begin()->second->setHealth(0);
+                        _monsters.begin()->second->setIsAlive(0);
+                        //TODO : del all mobs when boss dead
+                        command_processor->send(-1, "end", "win");
+                        _mode.store(Mode::END);
+                        return;
+
                     }
                 }
             }
