@@ -21,8 +21,8 @@ namespace Server
         commands_["ready"] = [this](const int client_id, const std::string &args) { ready(client_id, args); };
         commands_["create"] = [this](const int client_id, const std::string &args) { create(client_id, args); };
         commands_["join"] = [this](const int client_id, const std::string &args) { join(client_id, args); };
-        // commands_["list"] = [this](const int client_id, const std::string &args) { list(client_id, args); };
-        // commands_["r_info"] = [this](const int client_id, const std::string &args) { r_info(client_id, args); };
+        commands_["list"] = [this](const int client_id, const std::string &args) { list(client_id, args); };
+        commands_["r_info"] = [this](const int client_id, const std::string &args) { r_info(client_id, args); };
         // commands_["e_info"] = [this](const int client_id, const std::string &args) { e_info(client_id, args); };
 
         /* COMMANDS TO SEND */
@@ -218,6 +218,41 @@ namespace Server
         packet = rfcArgParser::SerializePacket(
             "connect_you",
             rfcArgParser::CreateObject(server_.get_client_ptr(client_id)->getPlayerSmallInfo()));
+        server_.send_message(SERVER_ID, client_id, packet);
+    }
+
+    void Command::list(int client_id, const std::string &args)
+    {
+        if (server_.isInMenu(client_id) == false) {
+            std::cerr << client_id << " is not in menu.\n";
+            return;
+        }
+        std::vector<std::unique_ptr<RType::Game::Room>> &rooms = server_.getRooms();
+        std::vector<int> room_ids;
+        for (const auto &room : rooms) {
+            room_ids.push_back(room->getID());
+        }
+        std::string data;
+        data += "[";
+        for (const auto &id : room_ids) {
+            if (id != room_ids.back())
+                data += " ";
+        }
+        data += "]";
+        rfcArgParser::DataPacket packet = rfcArgParser::SerializePacket("list", data);
+        server_.send_message(SERVER_ID, client_id, packet);
+    }
+
+    void Command::r_info(int client_id, const std::string &args)
+    {
+        if (server_.isInRoom(client_id) == false) {
+            std::cerr << client_id << " is not in room.\n";
+            return;
+        }
+        int id = std::stoi(args);
+        std::shared_ptr<RType::Game::Entity::Player> player = server_.get_client_ptr(client_id);
+        rfcArgParser::DataPacket packet =
+            rfcArgParser::SerializePacket("r_info", rfcArgParser::CreateObject(server_.get_room_info(id)));
         server_.send_message(SERVER_ID, client_id, packet);
     }
 

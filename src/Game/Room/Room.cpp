@@ -522,6 +522,7 @@ namespace RType
             data["id"] = std::to_string(_id);
             data["name"] = _name;
             data["count"] = std::to_string(_players.size());
+            data["mode"] = "Quick-Play";
             return data;
         }
 
