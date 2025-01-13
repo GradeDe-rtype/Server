@@ -237,7 +237,7 @@ namespace Server
         data += "[";
         for (const auto &id : room_ids) {
             if (id != room_ids.front())
-                data += ", ";
+                data += ",";
             if (id != room_ids.back())
                 data += std::to_string(id) + " ";
             else
