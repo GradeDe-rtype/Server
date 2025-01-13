@@ -310,29 +310,85 @@ namespace RType
         {
         }
 
+        void Room::bonusHandler(std::pair<int, std::shared_ptr<Entity::Monster>> monster)
+        {
+            if (monster.second->getPosX() <= -100) {
+                monster.second->setIsAlive(false);
+                monster.second->setHealth(0);
+            }
+            monster.second->setPosX(monster.second->getPosX() - 15);
+        }
+
+
+        void Room::weaponHandler(std::pair<int, std::shared_ptr<Entity::Monster>> monster)
+        {
+            if (monster.second->getPosX() <= -100) {
+                monster.second->setIsAlive(false);
+                monster.second->setHealth(0);
+                
+            }
+            monster.second->setPosX(monster.second->getPosX() - 15);
+        }
+
         void Room::monstersUpdate()
         {
-            int MonsterTypes[] = {Entity::Monster::BASIC_MONSTER, Entity::Monster::KAMIKAZE_MONSTER, Entity::Monster::BOSS, -1};
+            getMonsterUpdate().reset();
+            if (!getMonsterUpdate().hasElapsed()) {
+                return;
+            }
+
+            if (getSpawnBonus().hasElapsed()) {
+                getSpawnBonus().reset();
+                spawnBonusMonster();
+            }
+            
+            int MonsterTypes[] = {Entity::Monster::BASIC_MONSTER, Entity::Monster::KAMIKAZE_MONSTER, Entity::Monster::BOSS, Entity::Monster::HEALTH_BONUS, Entity::Monster::DAMAGE_BONUS, Entity::Monster::ROCKET_WEAPON, Entity::Monster::SHOTGUN_WEAPON, -1};
             void (Room::*monsterUpdate[])(std::pair<int, std::shared_ptr<Entity::Monster>>) = {&Room::basicMonster, &Room::kamikazeMonster, &Room::bossMonster};
 
             for (int i = 0; MonsterTypes[i] != -1; i++) {
                 for (auto &monster : _monsters) {
-                    
                     if (monster.second->getType() == MonsterTypes[i]) {
                         (this->*monsterUpdate[i])(monster);
                     }
+
                     for (auto player = _players.begin(); player != _players.end(); ++player) {
                         if (!player->second->getIsAlive())
                             continue;
                         if (checkCollision(monster.second->getPosition(), monster.second->getSize(), player->second->getPosition(), player->second->getSize())) {
-                            player->second->TakeDamage(monster.second->getDamage());
-                            command_processor->send(-1, "p_damage", std::to_string(player->second->getId()) + " " + std::to_string(monster.second->getDamage()));
-                            if (player->second->getHealth() <= 0)
-                                Player_death(*player);
+                            switch (monster.second->getType()) {
+                                case Entity::Monster::HEALTH_BONUS:
+                                    player->second->setHealth(player->second->getHealth() + 50);
+                                    monster.second->setIsAlive(false);
+                                    monster.second->setHealth(0);
+                                    break;
+                                case Entity::Monster::DAMAGE_BONUS:
+                                    player->second->setDamage(player->second->getDamage() + 10);
+                                    monster.second->setIsAlive(false);
+                                    monster.second->setHealth(0);
+                                    break;
+                                case Entity::Monster::ROCKET_WEAPON:
+                                    // TODO: Implement rocket weapon mode
+                                    // player->second->activateRocketMode();
+                                    player->second->setDamage(player->second->getDamage() * 2);
+                                    monster.second->setIsAlive(false);
+                                    monster.second->setHealth(0);
+                                    break;
+                                case Entity::Monster::SHOTGUN_WEAPON:
+                                    // TODO: Implement shotgun weapon mode
+                                    // player->second->activateLaserMode();
+                                    monster.second->setIsAlive(false);
+                                    monster.second->setHealth(0);
+                                    break;
+                                default:
+                                    player->second->TakeDamage(monster.second->getDamage());
+                                    command_processor->send(-1, "p_damage", std::to_string(player->second->getId()) + " " + std::to_string(monster.second->getDamage()));
+                                    if (player->second->getHealth() <= 0)
+                                        Player_death(*player);
+                                    break;
+                            }
                         }
                     }
 
-                    monster.second->update();
                     std::unordered_map<std::string, std::string> tmp;
                     tmp["x"] = std::to_string(monster.second->getPosX());
                     tmp["y"] = std::to_string(monster.second->getPosY());
