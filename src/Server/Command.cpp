@@ -21,8 +21,8 @@ namespace Server
         commands_["ready"] = [this](const int client_id, const std::string &args) { ready(client_id, args); };
         commands_["create"] = [this](const int client_id, const std::string &args) { create(client_id, args); };
         commands_["join"] = [this](const int client_id, const std::string &args) { join(client_id, args); };
-        commands_["list"] = [this](const int client_id, const std::string &args) { list(client_id, args); };
-        commands_["r_info"] = [this](const int client_id, const std::string &args) { r_info(client_id, args); };
+        // commands_["list"] = [this](const int client_id, const std::string &args) { list(client_id, args); };
+        // commands_["r_info"] = [this](const int client_id, const std::string &args) { r_info(client_id, args); };
         // commands_["e_info"] = [this](const int client_id, const std::string &args) { e_info(client_id, args); };
 
         /* COMMANDS TO SEND */
