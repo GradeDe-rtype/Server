@@ -38,7 +38,11 @@ namespace RType
                         MONSTER = 0,
                         BOSS = 1,
                         KAMIKAZE_MONSTER = 2,
-                        BASIC_MONSTER = 3
+                        BASIC_MONSTER = 3,
+                        HEALTH_BONUS = 4,
+                        DAMAGE_BONUS = 5,
+                        ROCKET_WEAPON = 6,
+                        SHOTGUN_WEAPON = 7
                     } Type;
 
                     Monster(int id);
