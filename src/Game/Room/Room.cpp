@@ -515,5 +515,14 @@ namespace RType
         {
             return _isReady.load() && !_shouldStop.load();
         }
+
+        std::unordered_map<std::string, std::string> Room::getRoomInfo() const
+        {
+            std::unordered_map<std::string, std::string> data;
+            data["id"] = std::to_string(_id);
+            data["name"] = _name;
+            data["count"] = std::to_string(_players.size());
+            return data;
+        }
     } // namespace Game
 } // namespace RType

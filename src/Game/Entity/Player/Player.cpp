@@ -133,6 +133,36 @@ namespace RType
             }
 
             std::atomic<uint64_t> Player::s_global_shoot_id{0};
+
+            bool Player::isInGame() const
+            {
+                return _context == CONTEXT::GAME;
+            }
+
+            void Player::setInGame(bool inGame)
+            {
+                _context = inGame ? CONTEXT::GAME : _context;
+            }
+
+            bool Player::isInRoom() const
+            {
+                return _context == CONTEXT::ROOM;
+            }
+
+            void Player::setInRoom(bool inRoom)
+            {
+                _context = inRoom ? CONTEXT::ROOM : _context;
+            }
+
+            bool Player::isInMenu() const
+            {
+                return _context == CONTEXT::MENU;
+            }
+
+            void Player::setInMenu(bool inMenu)
+            {
+                _context = inMenu ? CONTEXT::MENU : _context;
+            }
         } // namespace Entity
     } // namespace Game
 } // namespace RType

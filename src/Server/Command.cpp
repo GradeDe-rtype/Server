@@ -19,6 +19,10 @@ namespace Server
         commands_["p_info"] = [this](const int client_id, const std::string &args) { p_info(client_id, args); };
         commands_["shoot"] = [this](const int client_id, const std::string &args) { shoot(client_id, args); };
         commands_["ready"] = [this](const int client_id, const std::string &args) { ready(client_id, args); };
+        commands_["create"] = [this](const int client_id, const std::string &args) { create(client_id, args); };
+        commands_["join"] = [this](const int client_id, const std::string &args) { join(client_id, args); };
+        commands_["list"] = [this](const int client_id, const std::string &args) { list(client_id, args); };
+        commands_["r_info"] = [this](const int client_id, const std::string &args) { r_info(client_id, args); };
         // commands_["e_info"] = [this](const int client_id, const std::string &args) { e_info(client_id, args); };
 
         /* COMMANDS TO SEND */
@@ -70,6 +74,10 @@ namespace Server
 
     void Command::position(int client_id, const std::string &args)
     {
+        if (server_.isInGame(client_id) == false) {
+            std::cerr << client_id << " is not in game.\n";
+            return;
+        }
         std::unordered_map<std::string, std::string> obj = rfcArgParser::ParseObject(args);
         if (!obj.contains("x") || !obj.contains("y")) {
             std::cerr << "Usage: position {\"x\": <x>, \"y\": <y>}\n";
@@ -96,6 +104,10 @@ namespace Server
 
     void Command::p_info(int client_id, const std::string &args)
     {
+        if (server_.isInGame(client_id) == false && server_.isInRoom(client_id) == false) {
+            std::cerr << client_id << " is not in game or room.\n";
+            return;
+        }
         if (!args.empty()) {
             std::cerr << "Usage: p_info\n";
             return;
@@ -114,6 +126,10 @@ namespace Server
 
     void Command::shoot(int client_id, const std::string &args)
     {
+        if (server_.isInGame(client_id) == false) {
+            std::cerr << client_id << " is not in game.\n";
+            return;
+        }
         std::shared_ptr<RType::Game::Entity::Player> player = server_.get_client_ptr(client_id);
         std::unordered_map<std::string, std::string> data = rfcArgParser::ParseObject(args);
         if (!data.contains("x") || !data.contains("y")) {
@@ -151,9 +167,45 @@ namespace Server
 
     void Command::ready(int client_id, const std::string &args)
     {
+        if (server_.isInGame(client_id) == false && server_.isInRoom(client_id) == false) {
+            std::cerr << client_id << " is not in game or room.\n";
+            return;
+        }
         UNUSED(args);
         std::shared_ptr<RType::Game::Entity::Player> player = server_.get_client_ptr(client_id);
         player->setHaveJoined(true);
+    }
+
+    void Command::create(int client_id, const std::string &args)
+    {
+        if (server_.isInMenu(client_id) == false) {
+            std::cerr << client_id << " is not in game.\n";
+            return;
+        }
+        UNUSED(args);
+        server_.add_room(std::to_string(client_id) + "'s room");
+        ;
+        server_.send_message(SERVER_ID, client_id, rfcArgParser::SerializePacket("create", std::to_string(client_id)));
+    }
+
+    void Command::join(int client_id, const std::string &args)
+    {
+        if (server_.isInMenu(client_id) == false) {
+            std::cerr << client_id << " is not in menu.\n";
+            return;
+        }
+        if (!RType::Utils::isNumber(args)) {
+            std::cerr << "Invalid argument.\n";
+            return;
+        }
+        int room_id = std::stoi(args);
+        server_.add_player_to_room(room_id, client_id);
+        std::unordered_map<std::string, std::string> data = server_.get_room_info(room_id);
+        if (data.empty()) {
+            std::cerr << "Room not found.\n";
+            return;
+        }
+        server_.send_message(SERVER_ID, client_id, rfcArgParser::SerializePacket("join", rfcArgParser::CreateObject(data)));
     }
 
     void Command::to_send(const int receiver_id, const std::string &command, const std::string &args)

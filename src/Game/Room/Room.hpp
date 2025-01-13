@@ -92,6 +92,7 @@ namespace RType
                 int getID() const;
                 Mode getMode() const;
                 bool isRunning() const;
+                std::unordered_map<std::string, std::string> getRoomInfo() const;
 
             private:
                 // Private constructor to enforce using create() method

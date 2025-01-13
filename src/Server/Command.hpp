@@ -37,6 +37,8 @@ namespace Server
             void p_info(int client_id, const std::string &args);
             void shoot(int client_id, const std::string &args);
             void ready(int client_id, const std::string &args);
+            void create(int client_id, const std::string &args);
+            void join(int client_id, const std::string &args);
             void e_info(int client_id, const std::string &args);
             std::unordered_map<std::string, std::function<void(int, const std::string &)>> commands_;
             std::unordered_map<std::string, std::function<void(int, const std::string &, const std::string &)>> send_;

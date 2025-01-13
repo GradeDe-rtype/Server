@@ -9,8 +9,6 @@ namespace Server
     {
         setupNetworkCallbacks();
         network_.start();
-        add_room(0, "First Room");
-        start_room(0);
     }
 
     // Client management
@@ -51,10 +49,11 @@ namespace Server
     }
 
     // Room management
-    void GameServer::add_room(int id, const std::string &name)
+    int GameServer::add_room(const std::string &name)
     {
-        auto room = RType::Game::Room::create(id, name, command_processor_.get());
+        auto room = RType::Game::Room::create(room_id++, name, command_processor_.get());
         rooms_.push_back(std::move(room));
+        return room_id - 1;
     }
 
     void GameServer::start_room(size_t index) const
@@ -80,6 +79,8 @@ namespace Server
 
         if (room_it != rooms_.end()) {
             (*room_it)->addPlayer(get_client_ptr(player_id));
+        } else {
+            std::cerr << "Room not found." << std::endl;
         }
     }
 
@@ -159,8 +160,6 @@ namespace Server
                 rfcArgParser::CreateObject(client->getPlayerSmallInfo()));
             send_message(-1, client_id, packet);
         }
-
-        add_player_to_room(0, client_id);
     }
 
     void GameServer::handleMessage(int client_id, const std::string &data)
@@ -177,5 +176,35 @@ namespace Server
     bool GameServer::isRunning()
     {
         return this->running_;
+    }
+
+    bool GameServer::isInRoom(int player_id)
+    {
+        std::shared_ptr<RType::Game::Entity::Player> player = get_client_ptr(player_id);
+        return player->isInRoom();
+    }
+
+    bool GameServer::isInGame(int player_id)
+    {
+        std::shared_ptr<RType::Game::Entity::Player> player = get_client_ptr(player_id);
+        return player->isInGame();
+    }
+
+    bool GameServer::isInMenu(int player_id)
+    {
+        std::shared_ptr<RType::Game::Entity::Player> player = get_client_ptr(player_id);
+        return player->isInMenu();
+    }
+
+    std::unordered_map<std::string, std::string> GameServer::get_room_info(int room_id)
+    {
+        auto room_it = std::find_if(rooms_.begin(), rooms_.end(),
+                                    [room_id](const auto &room) { return room->getID() == room_id; });
+
+        if (room_it != rooms_.end()) {
+            return (*room_it)->getRoomInfo();
+        } else {
+            return {};
+        }
     }
 } // namespace Server
