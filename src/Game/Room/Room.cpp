@@ -586,6 +586,42 @@ namespace RType
             }
         }
 
+        void Room::spawnBonusMonster()
+        {
+            try {
+                int monsterId = _monsters.size() + 1;
+                auto monster = std::make_shared<Game::Entity::Monster>(monsterId, _wave);
+
+                std::vector<std::pair<RType::Game::Entity::Monster::Type, std::string>> bonusTypes = {
+                    {RType::Game::Entity::Monster::HEALTH_BONUS, "bonus_health"},
+                    {RType::Game::Entity::Monster::DAMAGE_BONUS, "bonus_damage"},
+                    {RType::Game::Entity::Monster::ROCKET_WEAPON, "weapon_rocket"},
+                    {RType::Game::Entity::Monster::SHOTGUN_WEAPON, "weapon_shotgun"}
+                };
+
+                auto selectedBonus = bonusTypes[std::rand() % bonusTypes.size()];
+                monster->setType(selectedBonus.first);
+
+                monster->setHealth(1);
+                monster->setDamage(0);
+                monster->setPosX(800);
+                monster->setPosY(std::rand() % 500 + 50);
+
+                std::cout << "Bonus Monster " << monsterId << " spawned at " << monster->getPosX() << ", " << monster->getPosY()
+                        << " Type: " << monster->getType() << std::endl;
+
+                std::lock_guard<std::mutex> lock(_monsterMutex);
+                _monsters[monsterId] = monster;
+                command_processor->send(-1, selectedBonus.second, rfcArgParser::CreateObject(monster->getEnemyInfo()));
+
+            } catch (const std::exception &e) {
+                std::cerr << "Error spawning bonus monster: " << e.what() << std::endl;
+                return;
+            }
+        }
+
+
+
         void Room::addPlayer(std::shared_ptr<Game::Entity::Player> player)
         {
             std::lock_guard<std::mutex> lock(_playerMutex);
