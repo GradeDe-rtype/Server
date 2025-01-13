@@ -93,6 +93,7 @@ namespace RType
                 int getID() const;
                 Mode getMode() const;
                 bool isRunning() const;
+                Timer getSpawnBonus();
 
             private:
                 // Private constructor to enforce using create() method
@@ -128,6 +129,7 @@ namespace RType
                 void spawnBoss();
 
                 Timer _monsterTimer;
+                Timer _bonusSpawn;
 
                 Server::Command *command_processor;
         };
