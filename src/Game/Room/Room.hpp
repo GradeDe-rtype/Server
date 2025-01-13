@@ -95,7 +95,9 @@ namespace RType
                 int getID() const;
                 Mode getMode() const;
                 bool isRunning() const;
+                Timer getMonsterUpdate();
                 Timer getSpawnBonus();
+
 
             private:
                 // Private constructor to enforce using create() method
