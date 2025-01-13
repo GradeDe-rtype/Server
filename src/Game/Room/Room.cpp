@@ -655,6 +655,16 @@ namespace RType
             return _mode.load();
         }
 
+        Timer Room::getMonsterUpdate()
+        {
+            return _monsterTimer;
+        }
+
+        Timer Room::getSpawnBonus()
+        {
+            return _bonusSpawn;
+        }
+
         bool Room::isRunning() const
         {
             return _isReady.load() && !_shouldStop.load();
