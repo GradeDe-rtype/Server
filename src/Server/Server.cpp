@@ -139,8 +139,6 @@ namespace Server
         Network::SocketPtr socket = network_.getClientSocket(client_id);
         auto new_client = std::make_shared<RType::Game::Entity::Player>(client_id, socket);
         clients_.push_back(new_client);
-
-        // Send connection notifications
     }
 
     void GameServer::handleMessage(int client_id, const std::string &data)

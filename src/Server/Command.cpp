@@ -199,22 +199,23 @@ namespace Server
         }
         int room_id = std::stoi(args);
         server_.add_player_to_room(room_id, client_id);
-        server_.get_client_ptr(client_id)->setInRoom(true);
         std::unordered_map<std::string, std::string> data = server_.get_room_info(room_id);
         if (data.empty()) {
             std::cerr << "Room not found.\n";
             return;
         }
+        server_.get_client_ptr(client_id)->setInRoom(true);
         std::vector<int> includes;
         for (const auto &[_, player] : server_.getRoom(room_id)->getPlayers())
             includes.push_back(player->getId());
+        unsigned long color_size = includes.size();
         server_.send_message(SERVER_ID, client_id, rfcArgParser::SerializePacket("join", rfcArgParser::CreateObject(data)));
+        server_.get_client_ptr(client_id)->setColor(RType::Game::Colors::get().getColor(color_size));
         auto packet = rfcArgParser::SerializePacket(
             "connect",
             rfcArgParser::CreateObject(server_.get_client_ptr(client_id)->getPlayerSmallInfo()));
         server_.send_multicast(packet, includes);
 
-        server_.get_client_ptr(client_id)->setColor("#FFFFFF");
         packet = rfcArgParser::SerializePacket(
             "connect_you",
             rfcArgParser::CreateObject(server_.get_client_ptr(client_id)->getPlayerSmallInfo()));
