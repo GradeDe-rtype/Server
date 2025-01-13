@@ -129,6 +129,7 @@ namespace RType
                 void runGameLoop();
                 void spawnMonster();
                 void spawnBoss();
+                void spawnBonusMonster();
 
                 Timer _monsterTimer;
                 Timer _bonusSpawn;
