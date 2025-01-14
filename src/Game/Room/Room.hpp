@@ -12,7 +12,7 @@
 #define RTYPE_GAME_ROOM_HPP_
 
 #define BOSS_WAVE 5
-#define MAX_WAVE 9
+#define MAX_WAVE 6
 #define MAX_PLAYER 4
 
 #include <atomic>
@@ -82,6 +82,7 @@ namespace RType
                 void monstersUpdate();
                 void takeShoot(std::pair<int, std::shared_ptr<Entity::Monster>> monster);
                 void shootsUpdate();
+                bool Verification_Boss();
 
                 // Setters
                 void setMode(Mode mode);
