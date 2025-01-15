@@ -22,13 +22,13 @@ namespace RType
         }
 
         Room::Room(int id, std::string name, Server::Command *command_processor)
-            : _id(id), _name(std::move(name)), _monsterTimer(50), command_processor(command_processor), _bonusSpawn(10000)
+            : _id(id), _name(std::move(name)), command_processor(command_processor)
         {
         }
 
         Room::Room(Room &&other) noexcept
             : _id(other._id), _name(std::move(other._name)), _mode(other._mode.load()), _isReady(other._isReady.load()), _shouldStop(other._shouldStop.load()),
-              _monsterTimer(other._monsterTimer), command_processor(other.command_processor), _bonusSpawn(10000)
+            command_processor(other.command_processor)
         {
             std::lock_guard<std::mutex> playerLock(other._playerMutex);
             std::lock_guard<std::mutex> monsterLock(other._monsterMutex);
@@ -136,7 +136,6 @@ namespace RType
 
             for (auto &player : _players) {
                 if (player.second->getHaveJoined() == false) {
-                    command_processor->send(-1, "p_shoot", std::to_string(player.second->getId()) + "basic");
                     command_processor->to_send(player.second->getId(), "wave", std::to_string(_wave));
                     player.second->setWeapon(RType::Game::Entity::Player::Shoot_Type::BASIC_SHOOT);
                     return false;
