@@ -51,7 +51,13 @@ namespace RType
                     void removeShoot(int id);
                     std::vector<std::shared_ptr<Shoot>> getShoots();
 
+                    bool isInRoom() const;
+                    void setInRoom(bool inRoom);
+                    bool isInMenu() const;
+                    void setInMenu(bool inMenu);
+
                 private:
+                    CONTEXT _context = CONTEXT::MENU;
                     static std::atomic<uint64_t> s_global_shoot_id;
                     std::vector<std::shared_ptr<Shoot>> _shoots;
                     mutable std::mutex _shoots_mutex;

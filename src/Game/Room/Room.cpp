@@ -676,5 +676,20 @@ namespace RType
         {
             return _isReady.load() && !_shouldStop.load();
         }
+
+        std::unordered_map<std::string, std::string> Room::getRoomInfo() const
+        {
+            std::unordered_map<std::string, std::string> data;
+            data["id"] = std::to_string(_id);
+            data["name"] = _name;
+            data["count"] = std::to_string(_players.size());
+            data["mode"] = "Quick-Play";
+            return data;
+        }
+
+        std::unordered_map<int, std::shared_ptr<Game::Entity::Player>> &Room::getPlayers()
+        {
+            return _players;
+        }
     } // namespace Game
 } // namespace RType

@@ -46,7 +46,7 @@ namespace Server
             const RType::Game::Entity::Player &get_client(int client_id);
             std::shared_ptr<RType::Game::Entity::Player> &get_client_ptr(int client_id);
             bool client_exist(int client_id);
-            void add_room(int id, const std::string &name);
+            int add_room(const std::string &name);
             void start_room(size_t index) const;
             void remove_room(int room_id);
             void add_player_to_room(int room_id, int player_id);
@@ -56,6 +56,11 @@ namespace Server
             void send_multicast_excluded(const rfcArgParser::DataPacket &data, const std::vector<int> &excludes);
             void send_broadcast(const rfcArgParser::DataPacket &data);
             bool isRunning();
+            bool isInRoom(int player_id);
+            bool isInMenu(int player_id);
+            std::unordered_map<std::string, std::string> get_room_info(int room_id);
+            std::vector<std::unique_ptr<RType::Game::Room>> &getRooms();
+            RType::Game::Room *getRoom(int room_id);
 
         private:
             void setupNetworkCallbacks();
@@ -65,6 +70,7 @@ namespace Server
             std::unique_ptr<Command> command_processor_;
             std::vector<std::shared_ptr<RType::Game::Entity::Player>> clients_;
             std::vector<std::unique_ptr<RType::Game::Room>> rooms_;
+            int room_id = 0;
             bool running_ = true;
     };
 } // namespace Server
