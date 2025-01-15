@@ -74,8 +74,8 @@ namespace Server
 
     void Command::position(int client_id, const std::string &args)
     {
-        if (server_.isInGame(client_id) == false) {
-            std::cerr << client_id << " is not in game.\n";
+        if (server_.isInRoom(client_id) == false) {
+            std::cerr << client_id << " is not in room.\n";
             return;
         }
         std::unordered_map<std::string, std::string> obj = rfcArgParser::ParseObject(args);
@@ -104,8 +104,8 @@ namespace Server
 
     void Command::p_info(int client_id, const std::string &args)
     {
-        if (server_.isInGame(client_id) == false && server_.isInRoom(client_id) == false) {
-            std::cerr << client_id << " is not in game or room.\n";
+        if (server_.isInRoom(client_id) == false) {
+            std::cerr << client_id << " is not in room.\n";
             return;
         }
         if (!args.empty()) {
@@ -126,8 +126,8 @@ namespace Server
 
     void Command::shoot(int client_id, const std::string &args)
     {
-        if (server_.isInGame(client_id) == false) {
-            std::cerr << client_id << " is not in game.\n";
+        if (server_.isInRoom(client_id) == false) {
+            std::cerr << client_id << " is not in room.\n";
             return;
         }
         std::shared_ptr<RType::Game::Entity::Player> player = server_.get_client_ptr(client_id);
@@ -167,8 +167,8 @@ namespace Server
 
     void Command::ready(int client_id, const std::string &args)
     {
-        if (server_.isInGame(client_id) == false && server_.isInRoom(client_id) == false) {
-            std::cerr << client_id << " is not in game or room.\n";
+        if (server_.isInRoom(client_id) == false) {
+            std::cerr << client_id << " is not in room.\n";
             return;
         }
         UNUSED(args);
@@ -179,7 +179,7 @@ namespace Server
     void Command::create(int client_id, const std::string &args)
     {
         if (server_.isInMenu(client_id) == false) {
-            std::cerr << client_id << " is not in game.\n";
+            std::cerr << client_id << " is not in menu.\n";
             return;
         }
         UNUSED(args);
@@ -221,6 +221,9 @@ namespace Server
             "connect_you",
             rfcArgParser::CreateObject(server_.get_client_ptr(client_id)->getPlayerSmallInfo()));
         server_.send_message(SERVER_ID, client_id, packet);
+        RType::Game::Room *room = server_.getRoom(room_id);
+        if (room->isRunning() == false)
+            room->start();
     }
 
     void Command::list(int client_id, const std::string &args)
