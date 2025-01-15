@@ -660,12 +660,12 @@ namespace RType
             return _mode.load();
         }
 
-        Timer Room::getMonsterUpdate()
+        Timer &Room::getMonsterUpdate()
         {
             return _monsterTimer;
         }
 
-        Timer Room::getSpawnBonus()
+        Timer &Room::getSpawnBonus()
         {
             return _bonusSpawn;
         }
