@@ -606,7 +606,7 @@ namespace RType
 
                 std::lock_guard<std::mutex> lock(_monsterMutex);
                 _monsters[monsterId] = monster;
-                command_processor->send(-1, selectedBonus.second, rfcArgParser::CreateObject(monster->getEnemyInfo()));
+                command_processor->send(-1, "enemy", rfcArgParser::CreateObject(monster->getEnemyInfo()));
 
             } catch (const std::exception &e) {
                 std::cerr << "Error spawning bonus monster: " << e.what() << std::endl;
