@@ -221,6 +221,15 @@ namespace Server
             "connect_you",
             rfcArgParser::CreateObject(server_.get_client_ptr(client_id)->getPlayerSmallInfo()));
         server_.send_message(SERVER_ID, client_id, packet);
+
+        for (const auto &[_, player] : server_.getRoom(room_id)->getPlayers()) {
+            if (player->getId() != client_id) {
+                packet = rfcArgParser::SerializePacket(
+                    "connect",
+                    rfcArgParser::CreateObject(player->getPlayerSmallInfo()));
+                server_.send_message(SERVER_ID, client_id, packet);
+            }
+        }
         RType::Game::Room *room = server_.getRoom(room_id);
         if (room->isRunning() == false)
             room->start();
