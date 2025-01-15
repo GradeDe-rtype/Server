@@ -141,6 +141,12 @@ namespace Server
             return;
         }
 
+        if (player->getWeapon() == RType::Game::Entity::Player::SHOTGUN_SHOOT) {
+            for (int i = 0; i < 3; i++) {
+                int offset = (i == 0) ? -10 : (i == 2) ? 10 : 0;
+                player->shoot(std::stoi(data["x"]) + offset, std::stoi(data["y"]));
+            }
+        }
         player->shoot(std::stoi(data["x"]), std::stoi(data["y"]));
         std::string shoot = rfcArgParser::CreateObject(player->getShoots().back()->getShootInfo());
         rfcArgParser::DataPacket packet = rfcArgParser::SerializePacket("shoot", shoot);
