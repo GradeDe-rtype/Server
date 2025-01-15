@@ -31,6 +31,12 @@ namespace RType
                 MONSTER,
                 SHOOT,
             } ENTITY_TYPE;
+
+            typedef enum {
+                MENU,
+                ROOM,
+                END
+            } CONTEXT;
         } // namespace Entity
     } // namespace Game
 } // namespace RType

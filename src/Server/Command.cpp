@@ -19,6 +19,10 @@ namespace Server
         commands_["p_info"] = [this](const int client_id, const std::string &args) { p_info(client_id, args); };
         commands_["shoot"] = [this](const int client_id, const std::string &args) { shoot(client_id, args); };
         commands_["ready"] = [this](const int client_id, const std::string &args) { ready(client_id, args); };
+        commands_["create"] = [this](const int client_id, const std::string &args) { create(client_id, args); };
+        commands_["join"] = [this](const int client_id, const std::string &args) { join(client_id, args); };
+        commands_["list"] = [this](const int client_id, const std::string &args) { list(client_id, args); };
+        commands_["r_info"] = [this](const int client_id, const std::string &args) { r_info(client_id, args); };
         // commands_["e_info"] = [this](const int client_id, const std::string &args) { e_info(client_id, args); };
 
         /* COMMANDS TO SEND */
@@ -70,6 +74,10 @@ namespace Server
 
     void Command::position(int client_id, const std::string &args)
     {
+        if (server_.isInRoom(client_id) == false) {
+            std::cerr << client_id << " is not in room.\n";
+            return;
+        }
         std::unordered_map<std::string, std::string> obj = rfcArgParser::ParseObject(args);
         if (!obj.contains("x") || !obj.contains("y")) {
             std::cerr << "Usage: position {\"x\": <x>, \"y\": <y>}\n";
@@ -96,6 +104,10 @@ namespace Server
 
     void Command::p_info(int client_id, const std::string &args)
     {
+        if (server_.isInRoom(client_id) == false) {
+            std::cerr << client_id << " is not in room.\n";
+            return;
+        }
         if (!args.empty()) {
             std::cerr << "Usage: p_info\n";
             return;
@@ -114,6 +126,10 @@ namespace Server
 
     void Command::shoot(int client_id, const std::string &args)
     {
+        if (server_.isInRoom(client_id) == false) {
+            std::cerr << client_id << " is not in room.\n";
+            return;
+        }
         std::shared_ptr<RType::Game::Entity::Player> player = server_.get_client_ptr(client_id);
         std::unordered_map<std::string, std::string> data = rfcArgParser::ParseObject(args);
         if (!data.contains("x") || !data.contains("y")) {
@@ -151,9 +167,111 @@ namespace Server
 
     void Command::ready(int client_id, const std::string &args)
     {
+        if (server_.isInRoom(client_id) == false) {
+            std::cerr << client_id << " is not in room.\n";
+            return;
+        }
         UNUSED(args);
         std::shared_ptr<RType::Game::Entity::Player> player = server_.get_client_ptr(client_id);
         player->setHaveJoined(true);
+    }
+
+    void Command::create(int client_id, const std::string &args)
+    {
+        if (server_.isInMenu(client_id) == false) {
+            std::cerr << client_id << " is not in menu.\n";
+            return;
+        }
+        UNUSED(args);
+        std::cout << "Creating room for " << client_id << std::endl;
+        server_.add_room(std::to_string(client_id) + "'s-room");
+        server_.send_message(SERVER_ID, client_id, rfcArgParser::SerializePacket("create", std::to_string(client_id)));
+    }
+
+    void Command::join(int client_id, const std::string &args)
+    {
+        if (server_.isInMenu(client_id) == false) {
+            std::cerr << client_id << " is not in menu.\n";
+            return;
+        }
+        if (!RType::Utils::isNumber(args)) {
+            std::cerr << "Invalid argument.\n";
+            return;
+        }
+        int room_id = std::stoi(args);
+        server_.add_player_to_room(room_id, client_id);
+        std::unordered_map<std::string, std::string> data = server_.get_room_info(room_id);
+        if (data.empty()) {
+            std::cerr << "Room not found.\n";
+            return;
+        }
+        server_.get_client_ptr(client_id)->setInRoom(true);
+        std::vector<int> includes;
+        for (const auto &[_, player] : server_.getRoom(room_id)->getPlayers())
+            includes.push_back(player->getId());
+        unsigned long color_size = includes.size();
+        server_.send_message(SERVER_ID, client_id, rfcArgParser::SerializePacket("join", rfcArgParser::CreateObject(data)));
+        server_.get_client_ptr(client_id)->setColor(RType::Game::Colors::get().getColor(color_size));
+        auto packet = rfcArgParser::SerializePacket(
+            "connect",
+            rfcArgParser::CreateObject(server_.get_client_ptr(client_id)->getPlayerSmallInfo()));
+        server_.send_multicast(packet, includes);
+
+        packet = rfcArgParser::SerializePacket(
+            "connect_you",
+            rfcArgParser::CreateObject(server_.get_client_ptr(client_id)->getPlayerSmallInfo()));
+        server_.send_message(SERVER_ID, client_id, packet);
+
+        for (const auto &[_, player] : server_.getRoom(room_id)->getPlayers()) {
+            if (player->getId() != client_id) {
+                packet = rfcArgParser::SerializePacket(
+                    "connect",
+                    rfcArgParser::CreateObject(player->getPlayerSmallInfo()));
+                server_.send_message(SERVER_ID, client_id, packet);
+            }
+        }
+        RType::Game::Room *room = server_.getRoom(room_id);
+        if (room->isRunning() == false)
+            room->start();
+    }
+
+    void Command::list(int client_id, const std::string &args)
+    {
+        if (server_.isInMenu(client_id) == false) {
+            std::cerr << client_id << " is not in menu.\n";
+            return;
+        }
+        std::vector<std::unique_ptr<RType::Game::Room>> &rooms = server_.getRooms();
+        std::vector<int> room_ids;
+        for (const auto &room : rooms)
+            room_ids.push_back(room->getID());
+        std::string data;
+        data += "[";
+        for (const auto &id : room_ids) {
+            if (id != room_ids.front())
+                data += ";";
+            if (id != room_ids.back())
+                data += std::to_string(id);
+            else
+                data += std::to_string(id);
+        }
+        data += "]";
+        std::cout << "List of rooms: " << data << std::endl;
+        rfcArgParser::DataPacket packet = rfcArgParser::SerializePacket("list", data);
+        server_.send_message(SERVER_ID, client_id, packet);
+    }
+
+    void Command::r_info(int client_id, const std::string &args)
+    {
+        if (server_.isInMenu(client_id) == false) {
+            std::cerr << client_id << " is not in room.\n";
+            return;
+        }
+        int id = std::stoi(args);
+        std::shared_ptr<RType::Game::Entity::Player> player = server_.get_client_ptr(client_id);
+        rfcArgParser::DataPacket packet =
+            rfcArgParser::SerializePacket("r_info", rfcArgParser::CreateObject(server_.get_room_info(id)));
+        server_.send_message(SERVER_ID, client_id, packet);
     }
 
     void Command::to_send(const int receiver_id, const std::string &command, const std::string &args)
