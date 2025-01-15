@@ -136,7 +136,9 @@ namespace RType
 
             for (auto &player : _players) {
                 if (player.second->getHaveJoined() == false) {
+                    command_processor->send(-1, "p_shoot", std::to_string(player.second->getId()) + "basic");
                     command_processor->to_send(player.second->getId(), "wave", std::to_string(_wave));
+                    player.second->setWeapon(RType::Game::Entity::Player::Shoot_Type::BASIC_SHOOT);
                     return false;
                 }
             }
@@ -362,26 +364,28 @@ namespace RType
                                     monster.second->setHealth(0);
                                     break;
                                 case Entity::Monster::DAMAGE_BONUS:
-                                    player->second->setDamage(player->second->getDamage() + 10);
+                                    player->second->setDamage(player->second->getDamage() + 5);
                                     monster.second->setIsAlive(false);
                                     monster.second->setHealth(0);
                                     break;
                                 case Entity::Monster::ROCKET_WEAPON:
-                                    // TODO: Implement rocket weapon mode
-                                    // player->second->activateRocketMode();
+                                    player->second->setWeapon(RType::Game::Entity::Player::Shoot_Type::ROCKET_SHOOT);
+                                    command_processor->send(-1, "p_shoot", std::to_string(player->second->getId()) + "rocket");
                                     player->second->setDamage(player->second->getDamage() * 2);
                                     monster.second->setIsAlive(false);
                                     monster.second->setHealth(0);
                                     break;
                                 case Entity::Monster::SHOTGUN_WEAPON:
-                                    // TODO: Implement shotgun weapon mode
-                                    // player->second->activateLaserMode();
+                                    player->second->setWeapon(RType::Game::Entity::Player::Shoot_Type::SHOTGUN_SHOOT);
+                                    command_processor->send(-1, "p_shoot", std::to_string(player->second->getId()) + "basic");
                                     monster.second->setIsAlive(false);
                                     monster.second->setHealth(0);
                                     break;
                                 default:
                                     player->second->TakeDamage(monster.second->getDamage());
                                     command_processor->send(-1, "p_damage", std::to_string(player->second->getId()) + " " + std::to_string(monster.second->getDamage()));
+                                    player->second->setWeapon(RType::Game::Entity::Player::Shoot_Type::BASIC_SHOOT);
+                                    command_processor->send(-1, "p_shoot", std::to_string(player->second->getId()) + "basic");
                                     if (player->second->getHealth() <= 0)
                                         Player_death(*player);
                                     break;
@@ -614,7 +618,7 @@ namespace RType
                 monster->setPosX(800);
                 monster->setPosY(std::rand() % 500 + 50);
 
-                std::cout << "Bonus Monster " << monsterId << " spawned at " << monster->getPosX() << ", " << monster->getPosY()
+                std::cout << "Bonus " << monsterId << " spawned at " << monster->getPosX() << ", " << monster->getPosY()
                         << " Type: " << monster->getType() << std::endl;
 
                 std::lock_guard<std::mutex> lock(_monsterMutex);
