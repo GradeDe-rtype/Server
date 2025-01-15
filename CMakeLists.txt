@@ -11,15 +11,22 @@ set(RTYPE_LIBRARIES
     rfcArgParser
 )
 
-# Boost ASIO is part of Boost Libraries
-find_package(Boost REQUIRED)
-
 # Include subdirectories for libraries
 foreach(LIB ${RTYPE_LIBRARIES})
     add_subdirectory(lib/${LIB})
 endforeach()
 
-# Collect all source files
+#  ---- FIND BOOST ---- #
+find_package(Boost REQUIRED)
+
+#  ---- FIND CRITERION ---- #
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(CRITERION REQUIRED criterion)
+
+# Add tests
+add_subdirectory(tests)
+
+# ---- SOURCES ---- #
 file(GLOB_RECURSE SOURCES
     "src/**/**/**/**/*.cpp"
     "src/**/**/**/*.cpp"
@@ -28,10 +35,10 @@ file(GLOB_RECURSE SOURCES
     "src/*.cpp"
 )
 
-# Define the main executable
+# ---- EXECUTABLE ---- #
 add_executable(r-type_server ${SOURCES})
 
-# Include directories for the project and libraries
+# ---- INCLUDES ---- #
 target_include_directories(r-type_server PRIVATE
     "include/"
     "src/Game/"
@@ -50,25 +57,24 @@ target_include_directories(r-type_server PRIVATE
     "src/Utils/Path/"
 )
 
-# Include Boost headers
 include_directories(${Boost_INCLUDE_DIRS})
 
 foreach(LIB ${RTYPE_LIBRARIES})
     target_include_directories(r-type_server PRIVATE "lib/${LIB}/include/")
 endforeach()
 
-# Link the libraries
+# ---- LINK LIBRARIES ---- #
 target_link_libraries(r-type_server PRIVATE
     ${RTYPE_LIBRARIES}
     ${Boost_LIBRARIES}
 )
 
-# Copy the resulting executable to the project root
+# ---- COMPILE OPTIONS ---- #
 add_custom_command(TARGET r-type_server POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:r-type_server> ${CMAKE_SOURCE_DIR}
 )
 
-# Custom clean target
+# ---- CLEAN TARGET ---- #
 add_custom_target(fclean
     COMMAND ${CMAKE_COMMAND} -E remove r-type_server
     COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_SOURCE_DIR}/r-type_server
