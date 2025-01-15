@@ -381,6 +381,9 @@ namespace RType
             }
 
             for (auto &_monster : _monsters) {
+                if (_monster.second->getType() == Entity::Monster::HEALTH_BONUS || _monster.second->getType() == Entity::Monster::DAMAGE_BONUS ||
+                _monster.second->getType() == Entity::Monster::SHOTGUN_WEAPON)
+                    continue;
                 if (_monster.second->getPosX() < -100) {
                     _monster.second->setPosX(900);
                     _monster.second->setPosY(std::rand() % 600);
