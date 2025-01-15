@@ -95,8 +95,8 @@ namespace RType
                 int getID() const;
                 Mode getMode() const;
                 bool isRunning() const;
-                Timer getMonsterUpdate();
-                Timer getSpawnBonus();
+                Timer &getMonsterUpdate();
+                Timer &getSpawnBonus();
                 std::unordered_map<std::string, std::string> getRoomInfo() const;
                 std::unordered_map<int, std::shared_ptr<Game::Entity::Player>> &getPlayers();
 
@@ -134,8 +134,8 @@ namespace RType
                 void spawnBoss();
                 void spawnBonusMonster();
 
-                Timer _monsterTimer;
-                Timer _bonusSpawn;
+                Timer _monsterTimer{5000};
+                Timer _bonusSpawn{10000};
 
                 Server::Command *command_processor;
         };
