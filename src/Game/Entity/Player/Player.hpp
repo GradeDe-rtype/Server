@@ -32,7 +32,7 @@ namespace RType
                     typedef enum {
                         BASIC_SHOOT = 0,
                         ROCKET_SHOOT = 1,
-                        SHOTGUN_SHOOT =2
+                        SHOTGUN_SHOOT = 2
                     } Shoot_Type;
                     Player(int id, std::shared_ptr<boost::asio::ip::tcp::socket> socket);
                     ~Player() = default;
@@ -45,7 +45,6 @@ namespace RType
                     void setColor(std::string color);
                     void setHaveJoined(bool haveJoined);
                     void setWeapon(Shoot_Type weapon);
-
 
                     /*  ---- GETTER ---- */
                     [[nodiscard]] std::unordered_map<std::string, std::string> getPlayerInfo() const;
