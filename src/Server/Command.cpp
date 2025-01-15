@@ -140,7 +140,18 @@ namespace Server
             std::cerr << "Invalid x or y value.\n";
             return;
         }
+        if (player->getWeapon() == RType::Game::Entity::Player::SHOTGUN_SHOOT) {
+            for (int i = 0; i < 3; i++) {
+                int offset = (i == 0) ? -10 : (i == 2) ? 10 : 0;
+                player->shoot(std::stoi(data["x"]), std::stoi(data["y"]) + offset);
 
+                std::string shoot = rfcArgParser::CreateObject(player->getShoots().back()->getShootInfo());
+                rfcArgParser::DataPacket packet = rfcArgParser::SerializePacket("shoot", shoot);
+
+                server_.send_broadcast(packet);
+            }
+
+        }
         player->shoot(std::stoi(data["x"]), std::stoi(data["y"]));
         std::string shoot = rfcArgParser::CreateObject(player->getShoots().back()->getShootInfo());
         rfcArgParser::DataPacket packet = rfcArgParser::SerializePacket("shoot", shoot);

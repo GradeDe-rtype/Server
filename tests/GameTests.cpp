@@ -31,10 +31,8 @@ namespace RType
         {
             Colors &colors = Colors::get();
 
-            cr_assert_eq(colors.getColor(8), "#FF0000",
-                         "Index 8 should loop and return the color of index 0 (#FF0000)");
-            cr_assert_eq(colors.getColor(9), "#00FF00",
-                         "Index 9 should loop and return the color of index 1 (#00FF00)");
+            cr_assert_eq(colors.getColor(8), "#FF0000", "Index 8 should loop and return the color of index 0 (#FF0000)");
+            cr_assert_eq(colors.getColor(9), "#00FF00", "Index 9 should loop and return the color of index 1 (#00FF00)");
         }
 
         Test(Colors, SingletonInstance)
@@ -49,10 +47,8 @@ namespace RType
         {
             Colors &colors = Colors::get();
 
-            cr_assert_eq(colors.getColor(15), "#800080",
-                         "Index 15 should loop properly (15 % 8 = 7 -> #800080)");
-            cr_assert_eq(colors.getColor(20), "#FF00FF",
-                         "Index 20 should loop properly (20 % 8 = 4 -> #FF00FF)");
+            cr_assert_eq(colors.getColor(15), "#800080", "Index 15 should loop properly (15 % 8 = 7 -> #800080)");
+            cr_assert_eq(colors.getColor(20), "#FF00FF", "Index 20 should loop properly (20 % 8 = 4 -> #FF00FF)");
         }
 
         namespace Entity
@@ -212,7 +208,7 @@ namespace RType
 
             Test(Shoot, ConstructorDefaultValues)
             {
-                Shoot shoot(100, 200, 5, 10, Direction::RIGHT);
+                Shoot shoot(0, 0, RType::Game::Entity::ENTITY_TYPE::PLAYER, 100, 200, 5, 10, Direction::RIGHT);
 
                 cr_assert_eq(shoot.getPosX(), 100, "Initial X position should be 100.");
                 cr_assert_eq(shoot.getPosY(), 200, "Initial Y position should be 200.");
@@ -222,7 +218,7 @@ namespace RType
 
             Test(Shoot, UpdateMoveRight)
             {
-                Shoot shoot(100, 200, 5, 10, Direction::RIGHT);
+                Shoot shoot(0, 0, RType::Game::Entity::ENTITY_TYPE::PLAYER, 100, 200, 5, 10, Direction::RIGHT);
 
                 shoot.update();
                 cr_assert_eq(shoot.getPosX(), 105, "Shoot should move 5 units to the right.");
@@ -231,7 +227,7 @@ namespace RType
 
             Test(Shoot, UpdateMoveLeft)
             {
-                Shoot shoot(100, 200, 5, 10, Direction::LEFT);
+                Shoot shoot(0, 0, RType::Game::Entity::ENTITY_TYPE::PLAYER, 100, 200, 5, 10, Direction::LEFT);
 
                 shoot.update();
                 cr_assert_eq(shoot.getPosX(), 95, "Shoot should move 5 units to the left.");
@@ -240,7 +236,7 @@ namespace RType
 
             Test(Shoot, UpdateOutOfBoundsRight)
             {
-                Shoot shoot(795, 200, 10, 10, Direction::RIGHT);
+                Shoot shoot(0, 0, RType::Game::Entity::ENTITY_TYPE::PLAYER, 795, 200, 10, 10, Direction::RIGHT);
 
                 shoot.update();
                 cr_assert_eq(shoot.getIsActive(), false, "Shoot should deactivate when exceeding the right boundary.");
@@ -248,7 +244,7 @@ namespace RType
 
             Test(Shoot, UpdateOutOfBoundsLeft)
             {
-                Shoot shoot(5, 200, 10, 10, Direction::LEFT);
+                Shoot shoot(0, 0, RType::Game::Entity::ENTITY_TYPE::PLAYER, 5, 200, 10, 10, Direction::LEFT);
 
                 shoot.update();
                 cr_assert_eq(shoot.getIsActive(), false, "Shoot should deactivate when exceeding the left boundary.");
@@ -256,7 +252,7 @@ namespace RType
 
             Test(Shoot, SetterSetIsActive)
             {
-                Shoot shoot(100, 200, 5, 10, Direction::RIGHT);
+                Shoot shoot(0, 0, RType::Game::Entity::ENTITY_TYPE::PLAYER, 100, 200, 5, 10, Direction::RIGHT);
 
                 shoot.setIsActive(false);
                 cr_assert_eq(shoot.getIsActive(), false, "Shoot should be inactive after setIsActive(false).");
@@ -267,7 +263,7 @@ namespace RType
 
             Test(Shoot, GetterGetIsActive)
             {
-                Shoot shoot(100, 200, 5, 10, Direction::RIGHT);
+                Shoot shoot(0, 0, RType::Game::Entity::ENTITY_TYPE::PLAYER, 100, 200, 5, 10, Direction::RIGHT);
 
                 cr_assert_eq(shoot.getIsActive(), true, "Shoot should be active by default.");
             }
