@@ -22,7 +22,7 @@ namespace RType
                 _id = id;
                 _level = 1;
                 _position = {0, 0};
-                _health = 100;
+                _health = 10000;
                 _damage = 25;
                 _size = 40;
                 _speed = 1;
@@ -31,8 +31,6 @@ namespace RType
                 _socket = socket;
                 _direction = Direction::RIGHT;
             }
-
-            /*  ---- SETTER ---- */
 
             void Player::shoot(int x, int y)
             {
@@ -66,6 +64,11 @@ namespace RType
             void Player::setHaveJoined(bool haveJoined)
             {
                 _haveJoined = haveJoined;
+            }
+
+            void Player::setWeapon(Player::Shoot_Type weapon)
+            {
+                _weapon = weapon;
             }
 
             /*  ---- GETTER ---- */
@@ -130,6 +133,11 @@ namespace RType
             {
                 std::lock_guard<std::mutex> lock(_shoots_mutex);
                 return _shoots;
+            }
+
+            Player::Shoot_Type Player::getWeapon()
+            {
+                return _weapon;
             }
 
             std::atomic<uint64_t> Player::s_global_shoot_id{0};
