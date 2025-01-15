@@ -29,6 +29,11 @@ namespace RType
             class Player : public AEntity
             {
                 public:
+                    typedef enum {
+                        BASIC_SHOOT = 0,
+                        ROCKET_SHOOT = 1,
+                        SHOTGUN_SHOOT =2
+                    } Shoot_Type;
                     Player(int id, std::shared_ptr<boost::asio::ip::tcp::socket> socket);
                     ~Player() = default;
 
@@ -39,6 +44,8 @@ namespace RType
                     /*  ---- SETTER ---- */
                     void setColor(std::string color);
                     void setHaveJoined(bool haveJoined);
+                    void setWeapon(Shoot_Type weapon);
+
 
                     /*  ---- GETTER ---- */
                     [[nodiscard]] std::unordered_map<std::string, std::string> getPlayerInfo() const;
@@ -50,6 +57,7 @@ namespace RType
                     std::string getColor() const;
                     void removeShoot(int id);
                     std::vector<std::shared_ptr<Shoot>> getShoots();
+                    Shoot_Type getWeapon();
 
                     bool isInRoom() const;
                     void setInRoom(bool inRoom);
@@ -64,6 +72,7 @@ namespace RType
                     std::string _color;
                     bool _haveJoined = false;
                     std::shared_ptr<boost::asio::ip::tcp::socket> _socket;
+                    Shoot_Type _weapon = BASIC_SHOOT;
             };
         } // namespace Entity
     } // namespace Game
