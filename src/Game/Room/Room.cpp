@@ -320,19 +320,10 @@ namespace RType
             monster.second->setPosX(monster.second->getPosX() - 15);
         }
 
-        void Room::weaponHandler(std::pair<int, std::shared_ptr<Entity::Monster>> monster)
-        {
-            if (monster.second->getPosX() <= -100) {
-                monster.second->setIsAlive(false);
-                monster.second->setHealth(0);
-            }
-            monster.second->setPosX(monster.second->getPosX() - 15);
-        }
-
         void Room::monstersUpdate()
         {
-            getMonsterUpdate().reset();
-            if (!getMonsterUpdate().hasElapsed()) {
+            if (getMonsterUpdate().hasElapsed()) {
+                getMonsterUpdate().reset();
                 return;
             }
 
@@ -341,8 +332,8 @@ namespace RType
                 spawnBonusMonster();
             }
 
-            int MonsterTypes[] = {Entity::Monster::BASIC_MONSTER, Entity::Monster::KAMIKAZE_MONSTER, Entity::Monster::BOSS, Entity::Monster::HEALTH_BONUS, Entity::Monster::DAMAGE_BONUS, Entity::Monster::ROCKET_WEAPON, Entity::Monster::SHOTGUN_WEAPON, -1};
-            void (Room::*monsterUpdate[])(std::pair<int, std::shared_ptr<Entity::Monster>>) = {&Room::basicMonster, &Room::kamikazeMonster, &Room::bossMonster};
+            int MonsterTypes[] = {Entity::Monster::BASIC_MONSTER, Entity::Monster::KAMIKAZE_MONSTER, Entity::Monster::BOSS, Entity::Monster::HEALTH_BONUS, Entity::Monster::DAMAGE_BONUS, Entity::Monster::SHOTGUN_WEAPON, -1};
+            void (Room::*monsterUpdate[])(std::pair<int, std::shared_ptr<Entity::Monster>>) = {&Room::basicMonster, &Room::kamikazeMonster, &Room::bossMonster, &Room::bonusHandler, &Room::bonusHandler, &Room::bonusHandler };
 
             for (int i = 0; MonsterTypes[i] != -1; i++) {
                 for (auto &monster : _monsters) {
