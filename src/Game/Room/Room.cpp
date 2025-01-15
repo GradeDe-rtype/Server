@@ -438,21 +438,24 @@ namespace RType
         {
             if (_wave == BOSS_WAVE) {
                 if (_monsters.begin()->second->getIsAlive()) {
-                    if (_monsters.begin()->second->getPhase() == 1 && _monsters.begin()->second->getHealth() > 500)
+                    if (_monsters.begin()->second->getPhase() == 1 && _monsters.begin()->second->getHealth() > 500){
                         playersUpdate();
-                    monstersUpdate();
-                    shootsUpdate();
-                    return 1;
-                    if (_monsters.begin()->second->getPhase() == 2 && _monsters.begin()->second->getHealth() > 250)
+                        monstersUpdate();
+                        shootsUpdate();
+                        return 1;
+                    }
+                    if (_monsters.begin()->second->getPhase() == 2 && _monsters.begin()->second->getHealth() > 250){
                         playersUpdate();
-                    monstersUpdate();
-                    shootsUpdate();
-                    return 1;
-                    if (_monsters.begin()->second->getPhase() == 3 && _monsters.begin()->second->getHealth() > 0)
+                        monstersUpdate();
+                        shootsUpdate();
+                        return 1;
+                    }
+                    if (_monsters.begin()->second->getPhase() == 3 && _monsters.begin()->second->getHealth() > 0){
                         playersUpdate();
-                    monstersUpdate();
-                    shootsUpdate();
-                    return 1;
+                        monstersUpdate();
+                        shootsUpdate();
+                        return 1;
+                    }
                     if (_monsters.begin()->second->getHealth() < 0)
                         std::cout << "verif" << std::endl;
                 }
