@@ -57,7 +57,6 @@ namespace Server
             void send_broadcast(const rfcArgParser::DataPacket &data);
             bool isRunning();
             bool isInRoom(int player_id);
-            bool isInGame(int player_id);
             bool isInMenu(int player_id);
             std::unordered_map<std::string, std::string> get_room_info(int room_id);
             std::vector<std::unique_ptr<RType::Game::Room>> &getRooms();

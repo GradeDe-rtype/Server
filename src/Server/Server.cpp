@@ -163,12 +163,6 @@ namespace Server
         return player->isInRoom();
     }
 
-    bool GameServer::isInGame(int player_id)
-    {
-        std::shared_ptr<RType::Game::Entity::Player> player = get_client_ptr(player_id);
-        return player->isInGame();
-    }
-
     bool GameServer::isInMenu(int player_id)
     {
         std::shared_ptr<RType::Game::Entity::Player> player = get_client_ptr(player_id);
