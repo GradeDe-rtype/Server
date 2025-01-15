@@ -31,8 +31,7 @@ namespace RType
                 public:
                     typedef enum {
                         BASIC_SHOOT = 0,
-                        ROCKET_SHOOT = 1,
-                        SHOTGUN_SHOOT = 2
+                        SHOTGUN_SHOOT = 1
                     } Shoot_Type;
                     Player(int id, std::shared_ptr<boost::asio::ip::tcp::socket> socket);
                     ~Player() = default;
