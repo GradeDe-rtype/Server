@@ -348,24 +348,17 @@ namespace RType
                             switch (monster.second->getType()) {
                                 case Entity::Monster::HEALTH_BONUS:
                                     player->second->setHealth(player->second->getHealth() + 50);
+                                    command_processor->send(-1, "p_damage", std::to_string(player->second->getId()) + " " + "-50");
                                     monster.second->setIsAlive(false);
                                     monster.second->setHealth(0);
                                     break;
                                 case Entity::Monster::DAMAGE_BONUS:
-                                    player->second->setDamage(player->second->getDamage() + 5);
-                                    monster.second->setIsAlive(false);
-                                    monster.second->setHealth(0);
-                                    break;
-                                case Entity::Monster::ROCKET_WEAPON:
-                                    player->second->setWeapon(RType::Game::Entity::Player::Shoot_Type::ROCKET_SHOOT);
-                                    command_processor->send(-1, "p_shoot", std::to_string(player->second->getId()) + "rocket");
-                                    player->second->setDamage(player->second->getDamage() * 2);
+                                    player->second->setDamage(player->second->getDamage() + 10);
                                     monster.second->setIsAlive(false);
                                     monster.second->setHealth(0);
                                     break;
                                 case Entity::Monster::SHOTGUN_WEAPON:
                                     player->second->setWeapon(RType::Game::Entity::Player::Shoot_Type::SHOTGUN_SHOOT);
-                                    command_processor->send(-1, "p_shoot", std::to_string(player->second->getId()) + "basic");
                                     monster.second->setIsAlive(false);
                                     monster.second->setHealth(0);
                                     break;
@@ -373,7 +366,6 @@ namespace RType
                                     player->second->TakeDamage(monster.second->getDamage());
                                     command_processor->send(-1, "p_damage", std::to_string(player->second->getId()) + " " + std::to_string(monster.second->getDamage()));
                                     player->second->setWeapon(RType::Game::Entity::Player::Shoot_Type::BASIC_SHOOT);
-                                    command_processor->send(-1, "p_shoot", std::to_string(player->second->getId()) + "basic");
                                     if (player->second->getHealth() <= 0)
                                         Player_death(*player);
                                     break;
@@ -596,7 +588,6 @@ namespace RType
                 std::vector<std::pair<RType::Game::Entity::Monster::Type, std::string>> bonusTypes = {
                     {RType::Game::Entity::Monster::HEALTH_BONUS, "bonus_health"},
                     {RType::Game::Entity::Monster::DAMAGE_BONUS, "bonus_damage"},
-                    {RType::Game::Entity::Monster::ROCKET_WEAPON, "weapon_rocket"},
                     {RType::Game::Entity::Monster::SHOTGUN_WEAPON, "weapon_shotgun"}};
 
                 auto selectedBonus = bonusTypes[std::rand() % bonusTypes.size()];
