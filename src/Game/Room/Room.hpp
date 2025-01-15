@@ -79,6 +79,8 @@ namespace RType
                 void basicMonster(std::pair<int, std::shared_ptr<Entity::Monster>> monster);
                 void kamikazeMonster(std::pair<int, std::shared_ptr<Entity::Monster>> monster);
                 void bossMonster(std::pair<int, std::shared_ptr<Entity::Monster>> monster);
+                void bonusHandler(std::pair<int, std::shared_ptr<Entity::Monster>> monster);
+                void weaponHandler(std::pair<int, std::shared_ptr<Entity::Monster>> monster);
                 void monstersUpdate();
                 void takeShoot(std::pair<int, std::shared_ptr<Entity::Monster>> monster);
                 void shootsUpdate();
@@ -93,6 +95,8 @@ namespace RType
                 int getID() const;
                 Mode getMode() const;
                 bool isRunning() const;
+                Timer getMonsterUpdate();
+                Timer getSpawnBonus();
                 std::unordered_map<std::string, std::string> getRoomInfo() const;
                 std::unordered_map<int, std::shared_ptr<Game::Entity::Player>> &getPlayers();
 
@@ -128,8 +132,10 @@ namespace RType
                 void runGameLoop();
                 void spawnMonster();
                 void spawnBoss();
+                void spawnBonusMonster();
 
                 Timer _monsterTimer;
+                Timer _bonusSpawn;
 
                 Server::Command *command_processor;
         };
