@@ -35,7 +35,6 @@ namespace RType
             typedef enum {
                 MENU,
                 ROOM,
-                GAME,
                 END
             } CONTEXT;
         } // namespace Entity

@@ -51,8 +51,6 @@ namespace RType
                     void removeShoot(int id);
                     std::vector<std::shared_ptr<Shoot>> getShoots();
 
-                    bool isInGame() const;
-                    void setInGame(bool inGame);
                     bool isInRoom() const;
                     void setInRoom(bool inRoom);
                     bool isInMenu() const;

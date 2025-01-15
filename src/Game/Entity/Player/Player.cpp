@@ -134,16 +134,6 @@ namespace RType
 
             std::atomic<uint64_t> Player::s_global_shoot_id{0};
 
-            bool Player::isInGame() const
-            {
-                return _context == CONTEXT::GAME;
-            }
-
-            void Player::setInGame(bool inGame)
-            {
-                _context = inGame ? CONTEXT::GAME : _context;
-            }
-
             bool Player::isInRoom() const
             {
                 return _context == CONTEXT::ROOM;
