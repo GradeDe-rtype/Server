@@ -41,6 +41,7 @@ namespace Server
         send_["wave"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
         send_["end"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
         send_["enemy"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
+        send_["p_info"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
     }
 
     void Command::process_command(const int client_id, rfcArgParser::DataPacket packet)
@@ -142,7 +143,8 @@ namespace Server
         }
         if (player->getWeapon() == RType::Game::Entity::Player::SHOTGUN_SHOOT) {
             for (int i = 0; i < 3; i++) {
-                int offset = (i == 0) ? -10 : (i == 2) ? 10 : 0;
+                int offset = (i == 0) ? -10 : (i == 2) ? 10
+                                                       : 0;
                 player->shoot(std::stoi(data["x"]), std::stoi(data["y"]) + offset);
 
                 std::string shoot = rfcArgParser::CreateObject(player->getShoots().back()->getShootInfo());
@@ -150,7 +152,6 @@ namespace Server
 
                 server_.send_broadcast(packet);
             }
-
         }
         player->shoot(std::stoi(data["x"]), std::stoi(data["y"]));
         std::string shoot = rfcArgParser::CreateObject(player->getShoots().back()->getShootInfo());

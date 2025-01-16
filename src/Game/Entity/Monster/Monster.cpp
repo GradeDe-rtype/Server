@@ -72,7 +72,7 @@ namespace RType
                         _type == Type::SHOTGUN_WEAPON) {
                         setPosX(_position.x - _speed);
                         _updateTimer.reset();
-                        }
+                    }
                 }
             }
 

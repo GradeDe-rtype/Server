@@ -74,7 +74,7 @@ namespace RType
                     bool _haveJoined = false;
                     std::shared_ptr<boost::asio::ip::tcp::socket> _socket;
                     Shoot_Type _weapon = BASIC_SHOOT;
-                    Timer _collision{1000};
+                    Timer _collision{500};
             };
         } // namespace Entity
     } // namespace Game
