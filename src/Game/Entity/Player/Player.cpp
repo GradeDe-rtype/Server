@@ -161,6 +161,11 @@ namespace RType
             {
                 _context = inMenu ? CONTEXT::MENU : _context;
             }
+
+            Timer &Player::getCollisionTimer()
+            {
+                return _collision;
+            }
         } // namespace Entity
     } // namespace Game
 } // namespace RType

@@ -96,6 +96,10 @@ namespace RType
                 if (_shouldStop.load())
                     break;
 
+                if (_mode.load() == Mode::END) {
+                    break;
+                }
+
                 try {
                     update();
                 } catch (const std::exception &e) {
@@ -340,6 +344,8 @@ namespace RType
 
         void Room::monstersUpdate()
         {
+            if (_monsters.empty())
+                return;
             int MonsterTypes[] =
                 {Entity::Monster::BASIC_MONSTER,
                 Entity::Monster::KAMIKAZE_MONSTER,
@@ -366,6 +372,19 @@ namespace RType
                     tmp["x"] = std::to_string(monster.second->getPosX());
                     tmp["y"] = std::to_string(monster.second->getPosY());
                     command_processor->send(-1, "e_position", std::to_string(monster.second->getId()) + " " + rfcArgParser::CreateObject(tmp));
+                    for (auto &player : _players) {
+                        if (!player.second->getIsAlive())
+                            continue;
+                        if (player.second->getCollisionTimer().hasElapsed()) {
+                            player.second->getCollisionTimer().reset();
+                            if (checkCollision(player.second->getPosition(), player.second->getSize(), monster.second->getPosition(), monster.second->getSize())) {
+                                player.second->TakeDamage(monster.second->getDamage());
+                                command_processor->send(-1, "p_damage", std::to_string(player.second->getId()) + " " + std::to_string(monster.second->getDamage()));
+                                if (player.second->getHealth() <= 0)
+                                    Player_death(player);
+                            }
+                        }
+                    }
                 }
             }
 
@@ -418,13 +437,17 @@ namespace RType
         void Room::bossUpdate()
         {
             if (_wave == BOSS_WAVE) {
+                if (_monsters.empty())
+                    return;
                 if (_monsters.begin()->second->getType() == RType::Game::Entity::Monster::BOSS) {
-                    if (_monsters.begin()->second->getHealth() <= 500) {
-                        _monsters.begin()->second->setPhase(2);
-                        std::cout << "Boss phase 2" << std::endl;
-                    } else if (_monsters.begin()->second->getHealth() <= 250) {
+                    if (_monsters.begin()->second->getHealth() <= 250) {
                         _monsters.begin()->second->setPhase(3);
                         std::cout << "Boss phase 3" << std::endl;
+                        return;
+                    } else if (_monsters.begin()->second->getHealth() <= 500) {
+                        _monsters.begin()->second->setPhase(2);
+                        std::cout << "Boss phase 2" << std::endl;
+                        return;
                     }
                 }
             }
@@ -438,6 +461,12 @@ namespace RType
                 return;
 
             if (_monsters.empty()) {
+                if (_wave == MAX_WAVE) {
+                    command_processor->send(-1, "end", "win");
+                    _mode.store(Mode::END);
+                    return;
+                }
+                std::cout << "Wave " << _wave << " ended" << std::endl;
                 if (!nextWave())
                     return;
                 std::cout << "Wave " << _wave << " started" << std::endl;
@@ -450,17 +479,13 @@ namespace RType
                     std::cout << "Spawning Boss" << std::endl;
                     spawnBoss();
                     return;
-                } else {
-                    command_processor->send(-1, "end", "win");
-                    _mode.store(Mode::END);
-                    return;
                 }
                 resetPlayers();
             }
             playersUpdate();
             monstersUpdate();
-            shootsUpdate();
             bossUpdate();
+            shootsUpdate();
         }
 
         bool Room::checkCollision(const Game::Entity::Position &pos1, int size1, const Game::Entity::Position &pos2, int size2)
@@ -503,7 +528,7 @@ namespace RType
                 auto monster = std::make_shared<Game::Entity::Monster>(monsterId, _wave);
                 std::cout << "Monster " << monsterId << " spawned" << std::endl;
                 monster->setType(RType::Game::Entity::Monster::BOSS);
-                monster->setHealth(1000);
+                monster->setHealth(1);
                 monster->setDamage(25);
                 monster->setPosY(300);
                 monster->setPosX(600);

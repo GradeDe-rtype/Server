@@ -136,6 +136,7 @@ namespace RType
 
                 Timer _monsterTimer{5000};
                 Timer _bonusSpawn{10000};
+                Timer _collisionTimer{1000};
 
                 Server::Command *command_processor;
         };
