@@ -97,6 +97,10 @@ namespace RType
                     break;
 
                 if (_mode.load() == Mode::END) {
+                    for (auto &player : _players) {
+                        player.second->setInRoom(false);
+                        player.second->setInMenu(true);
+                    }
                     break;
                 }
 
@@ -146,9 +150,8 @@ namespace RType
                 }
             }
 
-            for (auto &player : _players) {
+            for (auto &player : _players)
                 player.second->setHaveJoined(false);
-            }
             haveAskedForNextWave = false;
             return true;
         }
