@@ -107,7 +107,7 @@ namespace RType
                 // Core room data
                 int _id;
                 std::string _name;
-                int _wave = 0;
+                int _wave = 4;
                 bool haveAskedForNextWave = false;
                 std::atomic<Mode> _mode{Mode::WAITING};
                 std::atomic<bool> _isReady{false};

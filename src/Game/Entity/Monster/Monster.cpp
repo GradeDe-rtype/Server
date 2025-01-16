@@ -20,7 +20,7 @@ namespace RType
                 _id = id;
                 _level = 1;
                 _position = {0, 0};
-                _health = 100;
+                _health = 25;
                 _damage = 10;
                 _speed = 8;
                 _size = 40;
@@ -36,7 +36,7 @@ namespace RType
                 else
                     _level = level;
                 _position = {0, 0};
-                _health = 100 * level;
+                _health = 25 * level;
                 _damage = 10 * level;
                 _speed = 8;
                 _size = 40;
@@ -55,7 +55,7 @@ namespace RType
                     ENTITY_TYPE::MONSTER,
                     _position.x,
                     _position.y,
-                    5,
+                    10,
                     _damage,
                     _direction);
                 if (new_shoot) {
@@ -65,11 +65,14 @@ namespace RType
 
             void Monster::update()
             {
-                if (_type == Type::KAMIKAZE_MONSTER ||
-                    _type == Type::HEALTH_BONUS ||
-                    _type == Type::DAMAGE_BONUS ||
-                    _type == Type::SHOTGUN_WEAPON) {
-                    setPosX(_position.x - _speed);
+                if (_updateTimer.hasElapsed()) {
+                    if (_type == Type::KAMIKAZE_MONSTER ||
+                        _type == Type::HEALTH_BONUS ||
+                        _type == Type::DAMAGE_BONUS ||
+                        _type == Type::SHOTGUN_WEAPON) {
+                        setPosX(_position.x - _speed);
+                        _updateTimer.reset();
+                        }
                 }
             }
 
@@ -148,6 +151,11 @@ namespace RType
             Timer &Monster::getRushTimer()
             {
                 return _rushTimer;
+            }
+
+            Timer &Monster::getUpdateTimer()
+            {
+                return _updateTimer;
             }
 
             int Monster::getPhase()

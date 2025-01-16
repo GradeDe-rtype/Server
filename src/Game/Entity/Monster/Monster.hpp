@@ -11,6 +11,9 @@
 #define RTYPE_GAME_ENTITY_MONSTER_HPP_
 
 #define SHOOT_TIMER rand() % 1000 + 1000
+#define UPDATE_TIMER 50
+#define RUSH_TIMER 5000
+#define SPAWN_TIMER 10000
 
 #include <algorithm>
 #include <memory>
@@ -66,6 +69,7 @@ namespace RType
                     void removeShoot(int id);
                     Timer &getSpawnTimer();
                     Timer &getRushTimer();
+                    Timer &getUpdateTimer();
                     int getPhase();
                     bool getRuee();
 
@@ -75,8 +79,9 @@ namespace RType
                     mutable std::mutex _shoots_mutex;
                     Type _type = Type::MONSTER;
                     Timer _shootTimer{SHOOT_TIMER};
-                    Timer _rushTimer{5000};
-                    Timer _spawnTimer{10000};
+                    Timer _updateTimer{UPDATE_TIMER};
+                    Timer _rushTimer{RUSH_TIMER};
+                    Timer _spawnTimer{SPAWN_TIMER};
                     int _phase = 1;
                     bool _ruee = false;
             };
