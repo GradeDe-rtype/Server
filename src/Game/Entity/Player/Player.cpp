@@ -22,7 +22,7 @@ namespace RType
                 _id = id;
                 _level = 1;
                 _position = {0, 0};
-                _health = 10000;
+                _health = 100;
                 _damage = 25;
                 _size = 40;
                 _speed = 1;

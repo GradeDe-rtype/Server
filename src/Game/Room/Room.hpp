@@ -84,7 +84,7 @@ namespace RType
                 void monstersUpdate();
                 void takeShoot(std::pair<int, std::shared_ptr<Entity::Monster>> monster);
                 void shootsUpdate();
-                bool Verification_Boss();
+                void bossUpdate();
 
                 // Setters
                 void setMode(Mode mode);

@@ -65,8 +65,12 @@ namespace RType
 
             void Monster::update()
             {
-                if (_type == Type::KAMIKAZE_MONSTER)
+                if (_type == Type::KAMIKAZE_MONSTER ||
+                    _type == Type::HEALTH_BONUS ||
+                    _type == Type::DAMAGE_BONUS ||
+                    _type == Type::SHOTGUN_WEAPON) {
                     setPosX(_position.x - _speed);
+                }
             }
 
             /*  ---- SETTER ---- */
@@ -74,7 +78,7 @@ namespace RType
             void Monster::setType(Type type)
             {
                 _type = type;
-                if (type = Type::BOSS) {
+                if (type == Type::BOSS) {
                     _damage = 50;
                 } else {
                     _damage = 25;
@@ -150,6 +154,7 @@ namespace RType
             {
                 return _phase;
             }
+
             bool Monster::getRuee()
             {
                 return _ruee;
