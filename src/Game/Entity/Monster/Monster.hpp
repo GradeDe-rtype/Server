@@ -13,7 +13,7 @@
 #define SHOOT_TIMER rand() % 1000 + 1000
 #define UPDATE_TIMER 50
 #define RUSH_TIMER 5000
-#define SPAWN_TIMER 10000
+#define SPAWN_TIMER 3000
 
 #include <algorithm>
 #include <memory>

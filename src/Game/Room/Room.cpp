@@ -165,22 +165,22 @@ namespace RType
             }
         }
 
+        void Room::killAllMonsters(void)
+        {
+            for (auto &monster : _monsters) {
+                for (auto &shoot : monster.second->getShoots()) {
+                    shoot->setIsActive(false);
+                    std::unordered_map<std::string, std::string> mess = shoot->getShootInfo();
+                    command_processor->send(-1, "s_death", rfcArgParser::CreateObject(mess));
+                    monster.second->removeShoot(shoot->getId());
+                }
+                command_processor->send(-1, "e_death", std::to_string(monster.second->getId()));
+                _monsters.erase(monster.first);
+            }
+        }
+
         void Room::Monster_death(const std::pair<int, std::shared_ptr<Entity::Monster>> &it)
         {
-            if (it.second->getType() == RType::Game::Entity::Monster::Type::BOSS) {
-                auto Bshoots = it.second->getShoots();
-                for (auto &Bshoot : Bshoots) {
-                    Bshoot->setIsActive(false);
-                    std::unordered_map<std::string, std::string> mess = Bshoot->getShootInfo();
-                    command_processor->send(-1, "s_death", rfcArgParser::CreateObject(mess));
-                    it.second->removeShoot(Bshoot->getId());
-                }
-                command_processor->send(-1, "e_death", std::to_string(it.second->getId()));
-                _monsters.erase(it.first);
-                for (auto &monster : _monsters)
-                    Monster_death(monster);
-                return;
-            }
             auto Mshoots = it.second->getShoots();
             for (auto &Mshoot : Mshoots) {
                 Mshoot->setIsActive(false);
@@ -241,13 +241,21 @@ namespace RType
                                 player.second->setWeapon(Entity::Player::SHOTGUN_SHOOT);
                                 command_processor->send(-1, "p_info", rfcArgParser::CreateObject(player.second->getPlayerInfo()));
                                 Monster_death(monster);
-                            } else {
+                            } else if (monster.second->getType() == Entity::Monster::KAMIKAZE_MONSTER) {
                                 if (player.second->getCollisionTimer().hasElapsed()) {
                                     player.second->TakeDamage(monster.second->getDamage());
                                     command_processor->send(-1, "p_damage", std::to_string(player.second->getId()) + " " + std::to_string(monster.second->getDamage()));
                                     if (player.second->getHealth() <= 0)
                                         Player_death(player);
                                     Monster_death(monster);
+                                    player.second->getCollisionTimer().reset();
+                                }
+                            } else if (monster.second->getType() == Entity::Monster::BOSS) {
+                                if (player.second->getCollisionTimer().hasElapsed()) {
+                                    player.second->TakeDamage(monster.second->getDamage());
+                                    command_processor->send(-1, "p_damage", std::to_string(player.second->getId()) + " " + std::to_string(monster.second->getDamage()));
+                                    if (player.second->getHealth() <= 0)
+                                        Player_death(player);
                                     player.second->getCollisionTimer().reset();
                                 }
                             }
@@ -267,20 +275,31 @@ namespace RType
                 if (!shoots.empty())
                     command_processor->send(-1, "shoot", rfcArgParser::CreateObject(shoots.back()->getShootInfo()));
             }
-
             takeShoot(monster);
         }
 
         void Room::bossMonster(std::pair<int, std::shared_ptr<Entity::Monster>> monster)
         {
+            if (monster.second->getHealth() <= 250) {
+                monster.second->setPhase(3);
+            } else if (monster.second->getHealth() <= 500) {
+                monster.second->setPhase(2);
+            } else {
+                monster.second->setPhase(1);
+            }
             if (monster.second->getPosX() <= -100) {
-                monster.second->setPosX(800);
+                monster.second->setPosX(700);
                 monster.second->setRuee(false);
                 monster.second->getRushTimer().reset();
             }
-            if (monster.second->getPosX() >= 500) {
-                monster.second->setPosX(monster.second->getPosX() - 3);
-                monster.second->setPosY(monster.second->getPosY() + rand() % 10);
+            if (monster.second->getPhase() >= 1) {
+                if (monster.second->getPosY() >= 100 && monster.second->getPosY() <= 800) {
+                    int random = rand() % 2;
+                    if (random == 0)
+                        monster.second->setPosY(monster.second->getPosY() - rand() % 10);
+                    else
+                        monster.second->setPosY(monster.second->getPosY() + rand() % 10);
+                }
             }
             if (monster.second->getShootTimer().hasElapsed()) {
                 monster.second->shoot();
@@ -288,7 +307,8 @@ namespace RType
                 auto shoots = monster.second->getShoots();
                 if (!shoots.empty())
                     command_processor->send(-1, "shoot", rfcArgParser::CreateObject(shoots.back()->getShootInfo()));
-            } if (monster.second->getPhase() <= 2) {
+                takeShoot(monster);
+            } if (monster.second->getPhase() >= 2) {
                 if (monster.second->getRushTimer().hasElapsed() && monster.second->getRuee() == false) {
                     int newY = (std::rand() % 2 == 0) ? 200 : 400;
                     monster.second->setPosY(newY);
@@ -304,20 +324,6 @@ namespace RType
             }
             if (monster.second->getRuee() == true)
                 monster.second->setPosX(monster.second->getPosX() - 15);
-
-            for (auto &player : _players) {
-                if (!player.second->getIsAlive())
-                    continue;
-                if (player.second->getCollisionTimer().hasElapsed()) {
-                    if (checkCollision(player.second->getPosition(), player.second->getSize(), monster.second->getPosition(), monster.second->getSize())) {
-                        player.second->TakeDamage(monster.second->getDamage());
-                        command_processor->send(-1, "p_damage", std::to_string(player.second->getId()) + " " + std::to_string(monster.second->getDamage()));
-                        if (player.second->getHealth() <= 0)
-                            Player_death(player);
-                        player.second->getCollisionTimer().reset();
-                    }
-                }
-            }
             takeShoot(monster);
         }
 
@@ -326,6 +332,7 @@ namespace RType
             auto shoots = monster.second->getShoots();
             for (auto &shoot : shoots) {
                 if (!shoot->getIsActive()) {
+                    command_processor->send(-1, "s_death", rfcArgParser::CreateObject(shoot->getShootInfo()));
                     monster.second->removeShoot(shoot->getId());
                     continue;
                 }
@@ -352,10 +359,6 @@ namespace RType
 
         void Room::bonusHandler(std::pair<int, std::shared_ptr<Entity::Monster>> monster)
         {
-            std::pair<int, std::shared_ptr<Entity::Monster>> it = monster;
-            if (it.second->getPosX() <= -100) {
-                it.second->setIsAlive(false);
-            }
         }
 
         void Room::monstersUpdate()
@@ -363,19 +366,12 @@ namespace RType
             if (_monsters.empty())
                 return;
             int MonsterTypes[] =
-                {Entity::Monster::BASIC_MONSTER,
-                Entity::Monster::KAMIKAZE_MONSTER,
-                Entity::Monster::BOSS,
-                Entity::Monster::HEALTH_BONUS,
-                Entity::Monster::DAMAGE_BONUS,
-                Entity::Monster::SHOTGUN_WEAPON, -1};
+                {Entity::Monster::BASIC_MONSTER, Entity::Monster::KAMIKAZE_MONSTER,
+                Entity::Monster::BOSS, Entity::Monster::HEALTH_BONUS,
+                Entity::Monster::DAMAGE_BONUS, Entity::Monster::SHOTGUN_WEAPON, -1};
             void (Room::*monsterUpdate[])(std::pair<int, std::shared_ptr<Entity::Monster>>) =
-                {&Room::basicMonster,
-                &Room::kamikazeMonster,
-                &Room::bossMonster,
-                &Room::bonusHandler,
-                &Room::bonusHandler,
-                &Room::bonusHandler };
+                {&Room::basicMonster, &Room::kamikazeMonster, &Room::bossMonster,
+                &Room::bonusHandler, &Room::bonusHandler, &Room::bonusHandler };
 
             for (int i = 0; MonsterTypes[i] != -1; i++) {
                 for (auto &monster : _monsters) {
@@ -432,25 +428,6 @@ namespace RType
             }
         }
 
-        void Room::bossUpdate()
-        {
-            if (_wave == BOSS_WAVE) {
-                if (_monsters.empty())
-                    return;
-                if (_monsters.begin()->second->getType() == RType::Game::Entity::Monster::BOSS) {
-                    if (_monsters.begin()->second->getHealth() <= 250) {
-                        _monsters.begin()->second->setPhase(3);
-                        std::cout << "Boss phase 3" << std::endl;
-                        return;
-                    } else if (_monsters.begin()->second->getHealth() <= 500) {
-                        _monsters.begin()->second->setPhase(2);
-                        std::cout << "Boss phase 2" << std::endl;
-                        return;
-                    }
-                }
-            }
-        }
-
         void Room::update()
         {
             if (!_isReady && _mode != Mode::PLAYING)
@@ -483,7 +460,6 @@ namespace RType
             spawnBonusMonster();
             playersUpdate();
             monstersUpdate();
-            bossUpdate();
             shootsUpdate();
         }
 
