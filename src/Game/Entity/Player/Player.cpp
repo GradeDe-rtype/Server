@@ -32,6 +32,19 @@ namespace RType
                 _direction = Direction::RIGHT;
             }
 
+            void Player::setDefault()
+            {
+                _position = {0, 0};
+                _health = 100;
+                _damage = 25;
+                _size = 40;
+                _speed = 1;
+                _isAlive = true;
+                _color = Game::Colors::get().getColor(_id);
+                _direction = Direction::RIGHT;
+                setInRoom(false);
+            }
+
             void Player::shoot(int x, int y)
             {
                 std::lock_guard<std::mutex> lock(_shoots_mutex);
@@ -144,22 +157,12 @@ namespace RType
 
             bool Player::isInRoom() const
             {
-                return _context == CONTEXT::ROOM;
+                return _context;
             }
 
             void Player::setInRoom(bool inRoom)
             {
-                _context = inRoom ? CONTEXT::ROOM : _context;
-            }
-
-            bool Player::isInMenu() const
-            {
-                return _context == CONTEXT::MENU;
-            }
-
-            void Player::setInMenu(bool inMenu)
-            {
-                _context = inMenu ? CONTEXT::MENU : _context;
+                _context = inRoom;
             }
 
             Timer &Player::getCollisionTimer()

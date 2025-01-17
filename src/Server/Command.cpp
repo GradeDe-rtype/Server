@@ -26,22 +26,22 @@ namespace Server
         // commands_["e_info"] = [this](const int client_id, const std::string &args) { e_info(client_id, args); };
 
         /* COMMANDS TO SEND */
-        send_["connect"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
-        send_["disconnect"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
-        send_["p_position"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
-        send_["p_damage"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
-        send_["p_death"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
-        send_["e_position"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
-        send_["e_damage"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
-        send_["e_death"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
-        send_["s_position"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
-        send_["s_death"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
-        send_["shoot"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
-        send_["color"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
-        send_["wave"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
-        send_["end"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
-        send_["enemy"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
-        send_["p_info"] = [this](const int receiver_id, const std::string &command, const std::string &args) { to_broadcast(receiver_id, command, args); };
+        send_["connect"] = [this](std::vector<int> receiver_id, const std::string &command, const std::string &args) { to_multicast(receiver_id, command, args); };
+        send_["disconnect"] = [this](std::vector<int> receiver_id, const std::string &command, const std::string &args) { to_multicast(receiver_id, command, args); };
+        send_["p_position"] = [this](std::vector<int> receiver_id, const std::string &command, const std::string &args) { to_multicast(receiver_id, command, args); };
+        send_["p_damage"] = [this](std::vector<int> receiver_id, const std::string &command, const std::string &args) { to_multicast(receiver_id, command, args); };
+        send_["p_death"] = [this](std::vector<int> receiver_id, const std::string &command, const std::string &args) { to_multicast(receiver_id, command, args); };
+        send_["e_position"] = [this](std::vector<int> receiver_id, const std::string &command, const std::string &args) { to_multicast(receiver_id, command, args); };
+        send_["e_damage"] = [this](std::vector<int> receiver_id, const std::string &command, const std::string &args) { to_multicast(receiver_id, command, args); };
+        send_["e_death"] = [this](std::vector<int> receiver_id, const std::string &command, const std::string &args) { to_multicast(receiver_id, command, args); };
+        send_["s_position"] = [this](std::vector<int> receiver_id, const std::string &command, const std::string &args) { to_multicast(receiver_id, command, args); };
+        send_["s_death"] = [this](std::vector<int> receiver_id, const std::string &command, const std::string &args) { to_multicast(receiver_id, command, args); };
+        send_["shoot"] = [this](std::vector<int> receiver_id, const std::string &command, const std::string &args) { to_multicast(receiver_id, command, args); };
+        send_["color"] = [this](std::vector<int> receiver_id, const std::string &command, const std::string &args) { to_multicast(receiver_id, command, args); };
+        send_["wave"] = [this](std::vector<int> receiver_id, const std::string &command, const std::string &args) { to_multicast(receiver_id, command, args); };
+        send_["end"] = [this](std::vector<int> receiver_id, const std::string &command, const std::string &args) { to_multicast(receiver_id, command, args); };
+        send_["enemy"] = [this](std::vector<int> receiver_id, const std::string &command, const std::string &args) { to_multicast(receiver_id, command, args); };
+        send_["p_info"] = [this](std::vector<int> receiver_id, const std::string &command, const std::string &args) { to_multicast(receiver_id, command, args); };
     }
 
     void Command::process_command(const int client_id, rfcArgParser::DataPacket packet)
@@ -60,7 +60,7 @@ namespace Server
         }
     }
 
-    void Command::send(const int receiver_id, const std::string &command, const std::string &args)
+    void Command::send(std::vector<int> receiver_id, const std::string &command, const std::string &args)
     {
         if (const auto it = send_.find(command); it != send_.end()) {
             it->second(receiver_id, command, args);
@@ -159,24 +159,6 @@ namespace Server
         server_.send_broadcast(packet);
     }
 
-    // void e_info(int client_id, const std::string &args)
-    // {
-    //     if (!args.empty()) {
-    //         std::cerr << "Usage: e_info\n";
-    //         return;
-    //     }
-    //     if (!RType::Utils::isNumber(args)) {
-    //         std::cerr << "Invalid argument.\n";
-    //         return;
-    //     }
-    //     int id = std::stoi(args);
-    //     // Monster monster = Room.getEnemyInfo(id); // TODO: depends on room class
-    //     // std::unordered_map<std::string, std::string> data = monster.getEnemyInfo();
-    //     // std::string data_str = rfcArgParser::CreateObject(data);
-    //     // rfcArgParser::DataPacket packet = rfcArgParser::SerializePacket("e_info", data_str);
-    //     // server_.send_message(SERVER_ID, client_id, packet);
-    // }
-
     void Command::ready(int client_id, const std::string &args)
     {
         if (server_.isInRoom(client_id) == false) {
@@ -190,28 +172,21 @@ namespace Server
 
     void Command::create(int client_id, const std::string &args)
     {
-        if (server_.isInMenu(client_id) == false) {
-            std::cerr << client_id << " is not in menu.\n";
-            return;
-        }
         UNUSED(args);
         std::cout << "Creating room for " << client_id << std::endl;
-        server_.add_room(std::to_string(client_id) + "'s-room");
-        server_.send_message(SERVER_ID, client_id, rfcArgParser::SerializePacket("create", std::to_string(client_id)));
+        int id = server_.add_room();
+        server_.send_message(SERVER_ID, client_id, rfcArgParser::SerializePacket("create", std::to_string(id)));
     }
 
     void Command::join(int client_id, const std::string &args)
     {
-        if (server_.isInMenu(client_id) == false) {
-            std::cerr << client_id << " is not in menu.\n";
-            return;
-        }
         if (!RType::Utils::isNumber(args)) {
             std::cerr << "Invalid argument.\n";
             return;
         }
-        int room_id = std::stoi(args);
-        server_.add_player_to_room(room_id, client_id);
+        const int room_id = std::stoi(args);
+        if (server_.add_player_to_room(room_id, client_id) == false)
+            return;
         std::unordered_map<std::string, std::string> data = server_.get_room_info(room_id);
         if (data.empty()) {
             std::cerr << "Room not found.\n";
@@ -249,11 +224,11 @@ namespace Server
 
     void Command::list(int client_id, const std::string &args)
     {
-        if (server_.isInMenu(client_id) == false) {
-            std::cerr << client_id << " is not in menu.\n";
-            return;
-        }
         std::vector<std::unique_ptr<RType::Game::Room>> &rooms = server_.getRooms();
+        for (const auto &room : rooms) {
+            if (room->getMode() == RType::Game::Room::Mode::END)
+                server_.remove_room(room->getID());
+        }
         std::vector<int> room_ids;
         for (const auto &room : rooms)
             room_ids.push_back(room->getID());
@@ -275,10 +250,6 @@ namespace Server
 
     void Command::r_info(int client_id, const std::string &args)
     {
-        if (server_.isInMenu(client_id) == false) {
-            std::cerr << client_id << " is not in room.\n";
-            return;
-        }
         int id = std::stoi(args);
         std::shared_ptr<RType::Game::Entity::Player> player = server_.get_client_ptr(client_id);
         rfcArgParser::DataPacket packet =
@@ -296,6 +267,12 @@ namespace Server
     {
         rfcArgParser::DataPacket packet = rfcArgParser::SerializePacket(command, args);
         server_.send_broadcast(packet);
+    }
+
+    void Command::to_multicast(const std::vector<int> receiver_id, const std::string &command, const std::string &args)
+    {
+        rfcArgParser::DataPacket packet = rfcArgParser::SerializePacket(command, args);
+        server_.send_multicast(packet, receiver_id);
     }
 
 } // namespace Server

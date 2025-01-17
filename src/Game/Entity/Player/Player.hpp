@@ -36,6 +36,7 @@ namespace RType
                         SHOTGUN_SHOOT = 1
                     } Shoot_Type;
                     Player(int id, std::shared_ptr<boost::asio::ip::tcp::socket> socket);
+                    void setDefault();
                     ~Player() = default;
 
                     /*  ---- GAME LOGIC ---- */
@@ -61,12 +62,10 @@ namespace RType
 
                     bool isInRoom() const;
                     void setInRoom(bool inRoom);
-                    bool isInMenu() const;
-                    void setInMenu(bool inMenu);
                     Timer &getCollisionTimer();
 
                 private:
-                    CONTEXT _context = CONTEXT::MENU;
+                    bool _context = false;
                     static std::atomic<uint64_t> s_global_shoot_id;
                     std::vector<std::shared_ptr<Shoot>> _shoots;
                     mutable std::mutex _shoots_mutex;

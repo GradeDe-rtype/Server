@@ -66,7 +66,7 @@ namespace RType
                 // Game Logic Methods
                 void start();
                 void stop();
-                void addPlayer(std::shared_ptr<Game::Entity::Player> player);
+                bool addPlayer(std::shared_ptr<Game::Entity::Player> player);
                 void removePlayer(int playerId);
                 void update();
                 bool checkCollision(const Game::Entity::Position &pos1, int size1, const Game::Entity::Position &pos2, int size2);
@@ -131,6 +131,7 @@ namespace RType
 
                 // Internal methods
                 void runGameLoop();
+                std::vector<int> getPlayersId();
                 void spawnMonster();
                 void spawnBoss();
                 void spawnBonusMonster();

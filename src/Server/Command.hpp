@@ -28,9 +28,10 @@ namespace Server
         public:
             Command(Server::GameServer &server);
             void process_command(int client_id, rfcArgParser::DataPacket packet);
-            void send(int receiver_id, const std::string &command, const std::string &args);
+            void send(std::vector<int> receiver_id, const std::string &command, const std::string &args);
             void to_send(int receiver_id, const std::string &command, const std::string &args);
             void to_broadcast(int receiver_id, const std::string &command, const std::string &args);
+            void to_multicast(std::vector<int> receiver_id, const std::string &command, const std::string &args);
 
         private:
             void position(int client_id, const std::string &args);
@@ -43,7 +44,7 @@ namespace Server
             void r_info(int client_id, const std::string &args);
             void e_info(int client_id, const std::string &args);
             std::unordered_map<std::string, std::function<void(int, const std::string &)>> commands_;
-            std::unordered_map<std::string, std::function<void(int, const std::string &, const std::string &)>> send_;
+            std::unordered_map<std::string, std::function<void(std::vector<int>, const std::string &, const std::string &)>> send_;
             GameServer &server_;
     };
 } // namespace Server

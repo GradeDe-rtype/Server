@@ -28,7 +28,7 @@ namespace RType
 
         Room::Room(Room &&other) noexcept
             : _id(other._id), _name(std::move(other._name)), _mode(other._mode.load()), _isReady(other._isReady.load()), _shouldStop(other._shouldStop.load()),
-            command_processor(other.command_processor)
+              command_processor(other.command_processor)
         {
             std::lock_guard<std::mutex> playerLock(other._playerMutex);
             std::lock_guard<std::mutex> monsterLock(other._monsterMutex);
@@ -97,10 +97,9 @@ namespace RType
                     break;
 
                 if (_mode.load() == Mode::END) {
-                    for (auto &player : _players) {
-                        player.second->setInRoom(false);
-                        player.second->setInMenu(true);
-                    }
+                    for (auto &player : _players)
+                        player.second->setDefault();
+                    stop();
                     break;
                 }
 
@@ -115,6 +114,15 @@ namespace RType
             }
         }
 
+        std::vector<int> Room::getPlayersId()
+        {
+            std::vector<int> playersId;
+            for (const auto &player : _players) {
+                playersId.push_back(player.first);
+            }
+            return playersId;
+        }
+
         bool Room::arePlayersAlive()
         {
             int DeadPlayer = 0, TotalPlayer = 0;
@@ -127,8 +135,11 @@ namespace RType
             if (DeadPlayer == TotalPlayer && DeadPlayer != 0) {
                 std::cout << "All players are dead" << std::endl;
                 std::string arg = std::to_string(_wave);
-                command_processor->send(-1, "end", "lost");
+                command_processor->send(getPlayersId(), "end", "lost");
+                for (auto &player : _players)
+                    player.second->setDefault();
                 _mode.store(Mode::END);
+                _stateCondVar.notify_all();
                 return false;
             }
             return true;
@@ -139,7 +150,7 @@ namespace RType
             if (haveAskedForNextWave == false) {
                 _wave += 1;
                 haveAskedForNextWave = true;
-                command_processor->send(-1, "wave", std::to_string(_wave));
+                command_processor->send(getPlayersId(), "wave", std::to_string(_wave));
             }
 
             for (auto &player : _players) {
@@ -171,10 +182,10 @@ namespace RType
                 for (auto &shoot : monster.second->getShoots()) {
                     shoot->setIsActive(false);
                     std::unordered_map<std::string, std::string> mess = shoot->getShootInfo();
-                    command_processor->send(-1, "s_death", rfcArgParser::CreateObject(mess));
+                    command_processor->send(getPlayersId(), "s_death", rfcArgParser::CreateObject(mess));
                     monster.second->removeShoot(shoot->getId());
                 }
-                command_processor->send(-1, "e_death", std::to_string(monster.second->getId()));
+                command_processor->send(getPlayersId(), "e_death", std::to_string(monster.second->getId()));
                 _monsters.erase(monster.first);
             }
         }
@@ -185,22 +196,22 @@ namespace RType
             for (auto &Mshoot : Mshoots) {
                 Mshoot->setIsActive(false);
                 std::unordered_map<std::string, std::string> mess = Mshoot->getShootInfo();
-                command_processor->send(-1, "s_death", rfcArgParser::CreateObject(mess));
+                command_processor->send(getPlayersId(), "s_death", rfcArgParser::CreateObject(mess));
                 it.second->removeShoot(Mshoot->getId());
             }
-            command_processor->send(-1, "e_death", std::to_string(it.second->getId()));
+            command_processor->send(getPlayersId(), "e_death", std::to_string(it.second->getId()));
             _monsters.erase(it.first);
         }
 
         void Room::Player_death(const std::pair<int, std::shared_ptr<Entity::Player>> &it)
         {
-            command_processor->send(-1, "p_death", std::to_string(it.second->getId()));
+            command_processor->send(getPlayersId(), "p_death", std::to_string(it.second->getId()));
             it.second->setIsAlive(false);
             auto Pshoots = it.second->getShoots();
             for (auto &Pshoot : Pshoots) {
                 Pshoot->setIsActive(false);
                 std::unordered_map<std::string, std::string> mess = Pshoot->getShootInfo();
-                command_processor->send(-1, "s_death", rfcArgParser::CreateObject(mess));
+                command_processor->send(getPlayersId(), "s_death", rfcArgParser::CreateObject(mess));
                 it.second->removeShoot(Pshoot->getId());
             }
         }
@@ -215,9 +226,9 @@ namespace RType
                         for (const auto &it : new_monsters) {
                             if (checkCollision(shoot->getPosition(), 1, it.second->getPosition(), it.second->getSize())) {
                                 it.second->TakeDamage(player.second->getDamage());
-                                command_processor->send(-1, "s_death", rfcArgParser::CreateObject(shoot->getShootInfo()));
+                                command_processor->send(getPlayersId(), "s_death", rfcArgParser::CreateObject(shoot->getShootInfo()));
                                 player.second->removeShoot(shoot->getId());
-                                command_processor->send(-1, "e_damage", std::to_string(it.second->getId()) + " " + std::to_string(player.second->getDamage()));
+                                command_processor->send(getPlayersId(), "e_damage", std::to_string(it.second->getId()) + " " + std::to_string(player.second->getDamage()));
                                 if (it.second->getHealth() <= 0)
                                     Monster_death(it);
                             }
@@ -231,20 +242,20 @@ namespace RType
                                     player.second->setHealth(100);
                                 else
                                     player.second->setHealth(player.second->getHealth() + 25);
-                                command_processor->send(-1, "p_info", rfcArgParser::CreateObject(player.second->getPlayerInfo()));
+                                command_processor->send(getPlayersId(), "p_info", rfcArgParser::CreateObject(player.second->getPlayerInfo()));
                                 Monster_death(monster);
                             } else if (monster.second->getType() == Entity::Monster::DAMAGE_BONUS) {
                                 player.second->setDamage(player.second->getDamage() + 10);
-                                command_processor->send(-1, "p_info", rfcArgParser::CreateObject(player.second->getPlayerInfo()));
+                                command_processor->send(getPlayersId(), "p_info", rfcArgParser::CreateObject(player.second->getPlayerInfo()));
                                 Monster_death(monster);
                             } else if (monster.second->getType() == Entity::Monster::SHOTGUN_WEAPON) {
                                 player.second->setWeapon(Entity::Player::SHOTGUN_SHOOT);
-                                command_processor->send(-1, "p_info", rfcArgParser::CreateObject(player.second->getPlayerInfo()));
+                                command_processor->send(getPlayersId(), "p_info", rfcArgParser::CreateObject(player.second->getPlayerInfo()));
                                 Monster_death(monster);
                             } else if (monster.second->getType() == Entity::Monster::KAMIKAZE_MONSTER) {
                                 if (player.second->getCollisionTimer().hasElapsed()) {
                                     player.second->TakeDamage(monster.second->getDamage());
-                                    command_processor->send(-1, "p_damage", std::to_string(player.second->getId()) + " " + std::to_string(monster.second->getDamage()));
+                                    command_processor->send(getPlayersId(), "p_damage", std::to_string(player.second->getId()) + " " + std::to_string(monster.second->getDamage()));
                                     if (player.second->getHealth() <= 0)
                                         Player_death(player);
                                     Monster_death(monster);
@@ -253,7 +264,7 @@ namespace RType
                             } else if (monster.second->getType() == Entity::Monster::BOSS) {
                                 if (player.second->getCollisionTimer().hasElapsed()) {
                                     player.second->TakeDamage(monster.second->getDamage());
-                                    command_processor->send(-1, "p_damage", std::to_string(player.second->getId()) + " " + std::to_string(monster.second->getDamage()));
+                                    command_processor->send(getPlayersId(), "p_damage", std::to_string(player.second->getId()) + " " + std::to_string(monster.second->getDamage()));
                                     if (player.second->getHealth() <= 0)
                                         Player_death(player);
                                     player.second->getCollisionTimer().reset();
@@ -273,7 +284,7 @@ namespace RType
                 monster.second->getShootTimer().reset();
                 auto shoots = monster.second->getShoots();
                 if (!shoots.empty())
-                    command_processor->send(-1, "shoot", rfcArgParser::CreateObject(shoots.back()->getShootInfo()));
+                    command_processor->send(getPlayersId(), "shoot", rfcArgParser::CreateObject(shoots.back()->getShootInfo()));
             }
             takeShoot(monster);
         }
@@ -306,9 +317,10 @@ namespace RType
                 monster.second->getShootTimer().reset();
                 auto shoots = monster.second->getShoots();
                 if (!shoots.empty())
-                    command_processor->send(-1, "shoot", rfcArgParser::CreateObject(shoots.back()->getShootInfo()));
+                    command_processor->send(getPlayersId(), "shoot", rfcArgParser::CreateObject(shoots.back()->getShootInfo()));
                 takeShoot(monster);
-            } if (monster.second->getPhase() >= 2) {
+            }
+            if (monster.second->getPhase() >= 2) {
                 if (monster.second->getRushTimer().hasElapsed() && monster.second->getRuee() == false) {
                     int newY = (std::rand() % 2 == 0) ? 200 : 400;
                     monster.second->setPosY(newY);
@@ -316,7 +328,8 @@ namespace RType
                     monster.second->getRushTimer().reset();
                     monster.second->setRuee(true);
                 }
-            } if (monster.second->getPhase() == 3) {
+            }
+            if (monster.second->getPhase() == 3) {
                 if (monster.second->getSpawnTimer().hasElapsed()) {
                     spawnMonster();
                     monster.second->getSpawnTimer().reset();
@@ -332,7 +345,7 @@ namespace RType
             auto shoots = monster.second->getShoots();
             for (auto &shoot : shoots) {
                 if (!shoot->getIsActive()) {
-                    command_processor->send(-1, "s_death", rfcArgParser::CreateObject(shoot->getShootInfo()));
+                    command_processor->send(getPlayersId(), "s_death", rfcArgParser::CreateObject(shoot->getShootInfo()));
                     monster.second->removeShoot(shoot->getId());
                     continue;
                 }
@@ -343,9 +356,9 @@ namespace RType
                         continue;
                     if (checkCollision(shoot->getPosition(), 5, player->second->getPosition(), player->second->getSize())) {
                         player->second->TakeDamage(monster.second->getDamage());
-                        command_processor->send(-1, "s_death", rfcArgParser::CreateObject(shoot->getShootInfo()));
+                        command_processor->send(getPlayersId(), "s_death", rfcArgParser::CreateObject(shoot->getShootInfo()));
                         monster.second->removeShoot(shoot->getId());
-                        command_processor->send(-1, "p_damage", std::to_string(player->second->getId()) + " " + std::to_string(monster.second->getDamage()));
+                        command_processor->send(getPlayersId(), "p_damage", std::to_string(player->second->getId()) + " " + std::to_string(monster.second->getDamage()));
                         if (player->second->getHealth() <= 0)
                             Player_death(*player);
                     }
@@ -367,11 +380,11 @@ namespace RType
                 return;
             int MonsterTypes[] =
                 {Entity::Monster::BASIC_MONSTER, Entity::Monster::KAMIKAZE_MONSTER,
-                Entity::Monster::BOSS, Entity::Monster::HEALTH_BONUS,
-                Entity::Monster::DAMAGE_BONUS, Entity::Monster::SHOTGUN_WEAPON, -1};
+                 Entity::Monster::BOSS, Entity::Monster::HEALTH_BONUS,
+                 Entity::Monster::DAMAGE_BONUS, Entity::Monster::SHOTGUN_WEAPON, -1};
             void (Room::*monsterUpdate[])(std::pair<int, std::shared_ptr<Entity::Monster>>) =
                 {&Room::basicMonster, &Room::kamikazeMonster, &Room::bossMonster,
-                &Room::bonusHandler, &Room::bonusHandler, &Room::bonusHandler };
+                 &Room::bonusHandler, &Room::bonusHandler, &Room::bonusHandler};
 
             for (int i = 0; MonsterTypes[i] != -1; i++) {
                 for (auto &monster : _monsters) {
@@ -381,7 +394,7 @@ namespace RType
                     std::unordered_map<std::string, std::string> tmp;
                     tmp["x"] = std::to_string(monster.second->getPosX());
                     tmp["y"] = std::to_string(monster.second->getPosY());
-                    command_processor->send(-1, "e_position", std::to_string(monster.second->getId()) + " " + rfcArgParser::CreateObject(tmp));
+                    command_processor->send(getPlayersId(), "e_position", std::to_string(monster.second->getId()) + " " + rfcArgParser::CreateObject(tmp));
                     if (monster.second->getPosX() < -100) {
                         monster.second->setPosX(800);
                         monster.second->setPosY(std::rand() % 600);
@@ -396,7 +409,7 @@ namespace RType
                 auto shoots = player.second->getShoots();
                 for (auto &shoot : shoots) {
                     if (!shoot->getIsActive()) {
-                        command_processor->send(-1, "s_death", rfcArgParser::CreateObject(shoot->getShootInfo()));
+                        command_processor->send(getPlayersId(), "s_death", rfcArgParser::CreateObject(shoot->getShootInfo()));
                         player.second->removeShoot(shoot->getId());
                         continue;
                     }
@@ -406,14 +419,14 @@ namespace RType
                         {"x", std::to_string(shoot->getPosition().x)},
                         {"y", std::to_string(shoot->getPosition().y)}};
                     std::string data_str = rfcArgParser::CreateObject(tmp) + " " + rfcArgParser::CreateObject(data);
-                    command_processor->send(-1, "s_position", data_str);
+                    command_processor->send(getPlayersId(), "s_position", data_str);
                 }
             }
             for (auto &monster : _monsters) {
                 auto shoots = monster.second->getShoots();
                 for (auto &shoot : shoots) {
                     if (!shoot->getIsActive()) {
-                        command_processor->send(-1, "s_death", rfcArgParser::CreateObject(shoot->getShootInfo()));
+                        command_processor->send(getPlayersId(), "s_death", rfcArgParser::CreateObject(shoot->getShootInfo()));
                         monster.second->removeShoot(shoot->getId());
                         continue;
                     }
@@ -423,7 +436,7 @@ namespace RType
                         {"x", std::to_string(shoot->getPosition().x)},
                         {"y", std::to_string(shoot->getPosition().y)}};
                     std::string data_str = rfcArgParser::CreateObject(tmp) + " " + rfcArgParser::CreateObject(data);
-                    command_processor->send(-1, "s_position", data_str);
+                    command_processor->send(getPlayersId(), "s_position", data_str);
                 }
             }
         }
@@ -437,8 +450,9 @@ namespace RType
 
             if (_monsters.empty()) {
                 if (_wave == MAX_WAVE) {
-                    command_processor->send(-1, "end", "win");
+                    command_processor->send(getPlayersId(), "end", "win");
                     _mode.store(Mode::END);
+                    _stateCondVar.notify_all();
                     return;
                 }
                 std::cout << "Wave " << _wave << " ended" << std::endl;
@@ -490,7 +504,7 @@ namespace RType
                           << "Type of " << monster->getType() << std::endl;
                 std::lock_guard<std::mutex> lock(_monsterMutex);
                 _monsters[monsterId] = monster;
-                command_processor->send(-1, "enemy", rfcArgParser::CreateObject(monster->getEnemyInfo()));
+                command_processor->send(getPlayersId(), "enemy", rfcArgParser::CreateObject(monster->getEnemyInfo()));
             } catch (const std::exception &e) {
                 std::cerr << "Error spawning monster: " << e.what() << std::endl;
                 return;
@@ -517,7 +531,7 @@ namespace RType
                           << "Type of " << monster->getType() << std::endl;
                 std::lock_guard<std::mutex> lock(_monsterMutex);
                 _monsters[monsterId] = monster;
-                command_processor->send(-1, "enemy", rfcArgParser::CreateObject(monster->getEnemyInfo()));
+                command_processor->send(getPlayersId(), "enemy", rfcArgParser::CreateObject(monster->getEnemyInfo()));
             } catch (const std::exception &e) {
                 std::cerr << "Error spawning monster: " << e.what() << std::endl;
                 return;
@@ -551,7 +565,7 @@ namespace RType
 
                 std::lock_guard<std::mutex> lock(_monsterMutex);
                 _monsters[monsterId] = monster;
-                command_processor->send(-1, "enemy", rfcArgParser::CreateObject(monster->getEnemyInfo()));
+                command_processor->send(getPlayersId(), "enemy", rfcArgParser::CreateObject(monster->getEnemyInfo()));
 
             } catch (const std::exception &e) {
                 std::cerr << "Error spawning bonus monster: " << e.what() << std::endl;
@@ -559,11 +573,13 @@ namespace RType
             }
         }
 
-        void Room::addPlayer(std::shared_ptr<Game::Entity::Player> player)
+        bool Room::addPlayer(std::shared_ptr<Game::Entity::Player> player)
         {
             std::lock_guard<std::mutex> lock(_playerMutex);
-            if ((int)_players.size() >= MAX_PLAYER) return;
+            if (_wave > 1) return false;
+            if ((int)_players.size() > MAX_PLAYER) return false;
             _players[player->getId()] = player;
+            return true;
         }
 
         void Room::removePlayer(int playerId)

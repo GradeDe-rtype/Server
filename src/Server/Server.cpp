@@ -56,6 +56,13 @@ namespace Server
         return room_id - 1;
     }
 
+    int GameServer::add_room()
+    {
+        auto room = RType::Game::Room::create(room_id++, "ID=" + std::to_string(room_id), command_processor_.get());
+        rooms_.push_back(std::move(room));
+        return room_id - 1;
+    }
+
     void GameServer::start_room(size_t index) const
     {
         if (index < rooms_.size()) {
@@ -72,15 +79,20 @@ namespace Server
                      rooms_.end());
     }
 
-    void GameServer::add_player_to_room(int room_id, int player_id)
+    bool GameServer::add_player_to_room(int room_id, int player_id)
     {
         auto room_it = std::find_if(rooms_.begin(), rooms_.end(),
                                     [room_id](const auto &room) { return room->getID() == room_id; });
 
         if (room_it != rooms_.end()) {
-            (*room_it)->addPlayer(get_client_ptr(player_id));
+            if ((*room_it)->addPlayer(get_client_ptr(player_id)) == false) {
+                std::cerr << "Room is full." << std::endl;
+                return false;
+            }
+            return true;
         } else {
             std::cerr << "Room not found." << std::endl;
+            return false;
         }
     }
 
@@ -161,12 +173,6 @@ namespace Server
     {
         std::shared_ptr<RType::Game::Entity::Player> player = get_client_ptr(player_id);
         return player->isInRoom();
-    }
-
-    bool GameServer::isInMenu(int player_id)
-    {
-        std::shared_ptr<RType::Game::Entity::Player> player = get_client_ptr(player_id);
-        return player->isInMenu();
     }
 
     std::unordered_map<std::string, std::string> GameServer::get_room_info(int room_id)
