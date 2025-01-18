@@ -126,6 +126,8 @@ namespace RType
         bool Room::arePlayersAlive()
         {
             int DeadPlayer = 0, TotalPlayer = 0;
+            if (_players.empty())
+                return false;
 
             for (auto &player : _players) {
                 if (player.second->getIsAlive() == false)
@@ -445,8 +447,11 @@ namespace RType
         {
             if (!_isReady && _mode != Mode::PLAYING)
                 return;
-            if (!arePlayersAlive())
+            if (!arePlayersAlive()) {
+                _mode.store(Mode::END);
+                _stateCondVar.notify_all();
                 return;
+            }
 
             if (_monsters.empty()) {
                 if (_wave == MAX_WAVE) {

@@ -50,7 +50,7 @@ namespace Server
             void start_room(size_t index) const;
             void remove_room(int room_id);
             bool add_player_to_room(int room_id, int player_id);
-            void remove_player_from_room(int room_id, int player_id);
+            void remove_player_from_room(int player_id);
             void send_message(int from_id, int to_id, const rfcArgParser::DataPacket &data);
             void send_multicast(const rfcArgParser::DataPacket &data, const std::vector<int> &excludes);
             void send_multicast_excluded(const rfcArgParser::DataPacket &data, const std::vector<int> &excludes);

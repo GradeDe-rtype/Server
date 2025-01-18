@@ -96,13 +96,13 @@ namespace Server
         }
     }
 
-    void GameServer::remove_player_from_room(int room_id, int player_id)
+    void GameServer::remove_player_from_room(int player_id)
     {
-        auto room_it = std::find_if(rooms_.begin(), rooms_.end(),
-                                    [room_id](const auto &room) { return room->getID() == room_id; });
-
-        if (room_it != rooms_.end()) {
-            (*room_it)->removePlayer(player_id);
+        for (auto &room : rooms_) {
+            if (room->getPlayers().find(player_id) != room->getPlayers().end()) {
+                room->removePlayer(player_id);
+                return;
+            }
         }
     }
 
@@ -138,7 +138,10 @@ namespace Server
         });
 
         network_.setDisconnectCallback([this](int client_id) {
-            remove_client(client_id);
+            if (client_exist(client_id)) {
+                remove_player_from_room(client_id);
+                remove_client(client_id);
+            }
         });
 
         network_.setMessageCallback([this](int client_id, const std::string &data) {
