@@ -12,7 +12,7 @@ find_package(Boost REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(CRITERION REQUIRED criterion)
 
-# ---- INCLURE LES BIBLIOTHÈQUES ---- #
+# ---- INCLUDE LIBRARIES ---- #
 set(LIBRARY_PATH ${CMAKE_SOURCE_DIR}/../lib)
 set(PAPAYA_LIB ${LIBRARY_PATH}/libpapaya.a)
 set(RFCARGPARSER_LIB ${LIBRARY_PATH}/librfcArgParser.a)
@@ -24,7 +24,7 @@ file(GLOB_RECURSE SRC_SOURCES
     "${CMAKE_SOURCE_DIR}/../src/**/*.cpp"
 )
 
-# ---- VERIFICATION DES FICHIERS ---- #
+# ---- CHECK FILES ---- #
 foreach(FILE ${TEST_SOURCES} ${SRC_SOURCES})
     if (NOT EXISTS "${FILE}")
         message(FATAL_ERROR "Source file not found : ${FILE}")
