@@ -23,7 +23,7 @@ namespace RType
         {
             Colors &colors = Colors::get();
 
-            cr_assert_eq(colors.getColor(0), "#FF0000", "The color at index 0 should be #FF0000");
+            cr_assert_eq(colors.getColor(0), "#FFd0000", "The color at index 0 should be #FF0000");
             cr_assert_eq(colors.getColor(1), "#00FF00", "The color at index 1 should be #00FF00");
             cr_assert_eq(colors.getColor(2), "#0000FF", "The color at index 2 should be #0000FF");
             cr_assert_eq(colors.getColor(3), "#FFFF00", "The color at index 3 should be #FFFF00");
