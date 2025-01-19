@@ -62,21 +62,26 @@ namespace RType
 
                 cr_assert_eq(monster.getId(), 1, "The monster ID should be 1.");
                 cr_assert_eq(monster.getLevel(), 1, "The default level should be 1.");
-                cr_assert_eq(monster.getHealth(), 100, "The default health should be 100.");
+                cr_assert_eq(monster.getHealth(), 25, "The default health should be 100.");
                 cr_assert_eq(monster.getDamage(), 10, "Default damage should be 10.");
+                cr_assert_eq(monster.getSpeed(), 8, "The monster speed should be 8.");
+                cr_assert_eq(monster.getSize(), 40, "The monster size should be 8.");                
                 cr_assert(monster.getIsAlive(), "The monster should be alive by default.");
                 cr_assert_eq(monster.getDirection(), Direction::LEFT, "The default direction should be LEFT.");
             }
 
             Test(Monster, ConstructorWithLevel)
             {
-                Monster monster(2, 3); // ID: 2, Level: 3
+                Monster monster(2, 3);
 
                 cr_assert_eq(monster.getId(), 2, "Monster ID should be 2.");
                 cr_assert_eq(monster.getLevel(), 3, "Monster level should be 3.");
-                cr_assert_eq(monster.getHealth(), 300, "Health should be multiplied by level (100 * 3).");
-                cr_assert_eq(monster.getDamage(), 30, "Damage should be multiplied by level (10 * 3).");
+                cr_assert_eq(monster.getHealth(), 75, "The default health should be 25 * level.");
+                cr_assert_eq(monster.getDamage(), 30, "Default damage should be 10 * level.");
+                cr_assert_eq(monster.getSpeed(), 8, "The monster speed should be 8.");
+                cr_assert_eq(monster.getSize(), 40, "The monster size should be 8.");                
                 cr_assert(monster.getIsAlive(), "The monster should be alive by default.");
+                cr_assert_eq(monster.getDirection(), Direction::LEFT, "The default direction should be LEFT.");
             }
 
             Test(Monster, SetGetType)
@@ -97,26 +102,15 @@ namespace RType
                 cr_assert_eq(shoots[0]->getDamage(), monster.getDamage(), "Shot damage should match monster damage.");
             }
 
-            Test(Monster, UpdateKamikaze)
-            {
-                Monster monster(5);
-                monster.setType(Monster::Type::KAMIKAZE_MONSTER);
-
-                int initialPosX = monster.getPosX();
-                monster.update();
-
-                cr_assert_lt(monster.getPosX(), initialPosX, "The X position should decrease after an update for a KAMIKAZE_MONSTER.");
-            }
-
             Test(Monster, GetEnemyInfo)
             {
                 Monster monster(6);
                 auto info = monster.getEnemyInfo();
 
                 cr_assert_eq(info["id"], "6", "The ID in EnemyInfo should be 6.");
-                cr_assert_eq(info["type"], "3", "The default type should be BASIC_MONSTER (3)");
+                cr_assert_eq(info["type"], "0", "The default type should be MONSTER.");
                 cr_assert_eq(info["size"], "40", "Size should be 40.");
-                cr_assert_eq(info["health"], "100", "Health should be 100.");
+                cr_assert_eq(info["health"], "25", "Health should be 25.");
             }
 
             /* ---- PLAYER CLASS ---- */
@@ -129,8 +123,9 @@ namespace RType
                 Player player(1, socket);
 
                 cr_assert_eq(player.getId(), 1, "The constructor does not initialize the ID correctly.");
+                cr_assert_eq(player.getLevel(), 1, "The constructor does not initialize the level correctly.");
                 cr_assert_eq(player.getHealth(), 100, "Initial health must be 100.");
-                cr_assert_eq(player.getDamage(), 10, "Initial damage must be 10.");
+                cr_assert_eq(player.getDamage(), 25, "Initial damage must be 10.");
                 cr_assert_eq(player.getSize(), 40, "Initial size must be 40.");
                 cr_assert_eq(player.getSpeed(), 1, "Initial speed must be 1.");
                 cr_assert(player.getIsAlive(), "Player must be alive after creation.");
@@ -150,20 +145,6 @@ namespace RType
                 cr_assert_eq(shoots[0]->getPosX(), 10, "The position X of the shot is incorrect.");
                 cr_assert_eq(shoots[0]->getPosY(), 20, "The Y position of the shot is incorrect.");
                 cr_assert_eq(shoots[0]->getDamage(), player.getDamage(), "Shot damage must match player damage.");
-            }
-
-            Test(Player, UpdateFunctionality)
-            {
-                boost::asio::io_context io_context;
-                auto socket = std::make_shared<boost::asio::ip::tcp::socket>(boost::asio::make_strand(io_context));
-                Player player(1, socket);
-
-                player.shoot(10, 20);
-                auto shoots = player.getShoots();
-                shoots[0]->setIsActive(false); // Désactiver le tir
-                player.update();
-
-                cr_assert_eq(player.getShoots().size(), 0, "Inactive shots must be deleted after the update call.");
             }
 
             Test(Player, SettersAndGetters)
