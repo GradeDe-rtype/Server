@@ -22,7 +22,7 @@ else
 fi
 
 if [ $? -ne 0 ]; then
-    echo -e $RED "Formatting failed. Please fix the issues before pushing." $RESET
+    echo -e $BOLD$RED "Formatting failed. Please fix the issues before pushing." $RESET
     exit 1
 fi
 
@@ -30,7 +30,7 @@ echo -e $BOLD$GREEN " >> Running tests..." $RESET
 "$TEST_SCRIPT"
 
 if [ $? -ne 0 ]; then
-    echo -e $RED "Tests failed. Please fix the issues before pushing." $RESET
+    echo -e $BOLD$RED "Tests failed. Please fix the issues before pushing." $RESET
     exit 1
 fi
 
