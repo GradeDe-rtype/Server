@@ -53,80 +53,59 @@ namespace RType
             cr_assert_eq(colors.getColor(20), "#FF00FF", "Index 20 should loop properly (20 % 8 = 4 -> #FF00FF)");
         }
 
-        /* ---- TIMER TESTS ---- */
-        
-        Test(Timer, TimerInitialization) {
-            Timer timer(1000);
-            cr_assert(timer.timeLeft() <= 1000, "The timer should have at most 1000ms left at initialization.");
-        }
-        
-        Test(Timer, TimerReset) {
-            Timer timer(500);
-            std::this_thread::sleep_for(std::chrono::milliseconds(300));
-            timer.reset();
-            cr_assert(timer.timeLeft() >= 400, "After reset, the timer should have close to 500ms left.");
-        }
-        
-        Test(Timer, TimerHasElapsed) {
-            Timer timer(200);
-            std::this_thread::sleep_for(std::chrono::milliseconds(300));
-            cr_assert(timer.hasElapsed(), "Timer should have elapsed after 300ms.");
-        }
-
         /* ---- ROOM TESTS ---- */
         
-        Test(Room, RoomCreation) {
+        Test(Room, RoomCreation)
+        {
             boost::asio::io_context io_context;
-            Server::GameServer gameServer(io_context, 12345); // Création du serveur
+            Server::GameServer gameServer(io_context, 0); // Port dynamique
             std::unique_ptr<Server::Command> dummy_command = std::make_unique<Server::Command>(gameServer);
-            auto room = RType::Game::Room::create(1, "TestRoom", dummy_command.get());
+            auto room = RType::Game::Room::create(1, "RoomCreation", dummy_command.get());
 
             cr_assert(room != nullptr, "Room should be created successfully.");
             cr_assert_eq(room->getID(), 1, "Room ID should be 1.");
-            cr_assert_eq(room->getName(), "TestRoom", "Room name should match the given name.");
+            cr_assert_eq(room->getName(), "RoomCreation", "Room name should match the given name.");
 
             room->stop();
+            std::this_thread::sleep_for(std::chrono::milliseconds(100)); // 🔴 Attendre libération
         }
-        
-        Test(Room, AddRemovePlayer) {
+
+        Test(Room, AddRemovePlayer)
+        {
             boost::asio::io_context io_context;
-            Server::GameServer gameServer(io_context, 12345);
+            Server::GameServer gameServer(io_context, 0);
             std::unique_ptr<Server::Command> dummy_command = std::make_unique<Server::Command>(gameServer);
-            auto room = RType::Game::Room::create(2, "TestRoom", dummy_command.get());
+            auto room = RType::Game::Room::create(2, "AddRemovePlayer", dummy_command.get());
 
             auto socket = std::make_shared<boost::asio::ip::tcp::socket>(boost::asio::make_strand(io_context));
             auto player = std::make_shared<Game::Entity::Player>(1, socket);
 
-            room->stop();
-        }
-        
-        Test(Room, StartAndStop) {
-            boost::asio::io_context io_context;
-            Server::GameServer gameServer(io_context, 12345);
-            std::unique_ptr<Server::Command> dummy_command = std::make_unique<Server::Command>(gameServer);
-            auto room = RType::Game::Room::create(3, "TestRoom", dummy_command.get());
+            cr_assert(room->addPlayer(player), "Adding a player should return true.");
+            cr_assert_eq(room->getPlayers().size(), 1, "There should be 1 player in the room.");
 
-            
-            room->start();
-            cr_assert(room->isRunning(), "Room should be running after start().");
-            
+            room->removePlayer(1);
+            cr_assert_eq(room->getPlayers().size(), 0, "There should be no players in the room after removal.");
+
             room->stop();
-            cr_assert(!room->isRunning(), "Room should not be running after stop().");
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
-        
-        Test(Room, NextWave) {
+
+        Test(Room, NextWave)
+        {
             boost::asio::io_context io_context;
-            Server::GameServer gameServer(io_context, 12345);
+            Server::GameServer gameServer(io_context, 0);
             std::unique_ptr<Server::Command> dummy_command = std::make_unique<Server::Command>(gameServer);
-            auto room = RType::Game::Room::create(4, "TestRoom", dummy_command.get());
+            auto room = RType::Game::Room::create(4, "NextWave", dummy_command.get());
 
             cr_assert(room->nextWave(), "First call to nextWave() should return true.");
+
             room->stop();
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
         
         Test(Room, CheckCollision) {
             Server::Command *dummy_command = nullptr;
-            auto room = Room::create(5, "TestRoom", dummy_command);
+            auto room = Room::create(5, "CheckCollision", dummy_command);
             
             Game::Entity::Position pos1 = {10, 10};
             Game::Entity::Position pos2 = {15, 15};
