@@ -5,12 +5,12 @@
 #include <memory>
 
 #include "Colors.hpp"
+#include "Command.hpp"
 #include "Monster.hpp"
 #include "Player.hpp"
+#include "Room.hpp"
 #include "Shoot.hpp"
 #include "Timer.hpp"
-#include "Room.hpp"
-#include "Command.hpp"
 
 namespace RType
 {
@@ -54,27 +54,30 @@ namespace RType
         }
 
         /* ---- TIMER TESTS ---- */
-        
-        Test(Timer, TimerInitialization) {
+
+        Test(Timer, TimerInitialization)
+        {
             Timer timer(1000);
             cr_assert(timer.timeLeft() <= 1000, "The timer should have at most 1000ms left at initialization.");
         }
-        
-        Test(Timer, TimerReset) {
+
+        Test(Timer, TimerReset)
+        {
             Timer timer(500);
             std::this_thread::sleep_for(std::chrono::milliseconds(300));
             timer.reset();
             cr_assert(timer.timeLeft() >= 400, "After reset, the timer should have close to 500ms left.");
         }
-        
-        Test(Timer, TimerHasElapsed) {
+
+        Test(Timer, TimerHasElapsed)
+        {
             Timer timer(200);
             std::this_thread::sleep_for(std::chrono::milliseconds(300));
             cr_assert(timer.hasElapsed(), "Timer should have elapsed after 300ms.");
         }
 
         /* ---- ROOM TESTS ---- */
-        
+
         Test(Room, RoomCreation)
         {
             boost::asio::io_context io_context;
@@ -87,7 +90,7 @@ namespace RType
             cr_assert_eq(room->getName(), "RoomCreation", "Room name should match the given name.");
 
             room->stop();
-            std::this_thread::sleep_for(std::chrono::milliseconds(100)); // 🔴 Attendre libération
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
 
         Test(Room, AddRemovePlayer)
@@ -122,16 +125,17 @@ namespace RType
             room->stop();
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
-        
-        Test(Room, CheckCollision) {
+
+        Test(Room, CheckCollision)
+        {
             Server::Command *dummy_command = nullptr;
             auto room = Room::create(5, "CheckCollision", dummy_command);
-            
+
             Game::Entity::Position pos1 = {10, 10};
             Game::Entity::Position pos2 = {15, 15};
-            
+
             cr_assert(room->checkCollision(pos1, 10, pos2, 10), "Collision should be detected.");
-            
+
             Game::Entity::Position pos3 = {100, 100};
             cr_assert(!room->checkCollision(pos1, 10, pos3, 10), "No collision should be detected.");
         }
@@ -150,7 +154,7 @@ namespace RType
                 cr_assert_eq(monster.getHealth(), 25, "The default health should be 100.");
                 cr_assert_eq(monster.getDamage(), 10, "Default damage should be 10.");
                 cr_assert_eq(monster.getSpeed(), 8, "The monster speed should be 8.");
-                cr_assert_eq(monster.getSize(), 40, "The monster size should be 8.");                
+                cr_assert_eq(monster.getSize(), 40, "The monster size should be 8.");
                 cr_assert(monster.getIsAlive(), "The monster should be alive by default.");
                 cr_assert_eq(monster.getDirection(), Direction::LEFT, "The default direction should be LEFT.");
             }
@@ -164,7 +168,7 @@ namespace RType
                 cr_assert_eq(monster.getHealth(), 75, "The default health should be 25 * level.");
                 cr_assert_eq(monster.getDamage(), 30, "Default damage should be 10 * level.");
                 cr_assert_eq(monster.getSpeed(), 8, "The monster speed should be 8.");
-                cr_assert_eq(monster.getSize(), 40, "The monster size should be 8.");                
+                cr_assert_eq(monster.getSize(), 40, "The monster size should be 8.");
                 cr_assert(monster.getIsAlive(), "The monster should be alive by default.");
                 cr_assert_eq(monster.getDirection(), Direction::LEFT, "The default direction should be LEFT.");
             }
