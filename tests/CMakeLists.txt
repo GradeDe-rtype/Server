@@ -4,13 +4,8 @@
 file(GLOB TEST_SOURCES "*.cpp")
 
 #  ---- SRC SOURCES ---- #
-set(SRC_SOURCES
-    ${CMAKE_SOURCE_DIR}/src/Game/Entity/Base/AEntity.cpp
-    ${CMAKE_SOURCE_DIR}/src/Game/Colors/Colors.cpp
-    ${CMAKE_SOURCE_DIR}/src/Game/Entity/Monster/Monster.cpp
-    ${CMAKE_SOURCE_DIR}/src/Game/Entity/Player/Player.cpp
-    ${CMAKE_SOURCE_DIR}/src/Game/Entity/Shoot/Shoot.cpp
-    ${CMAKE_SOURCE_DIR}/src/Game/Timer/Timer.cpp
+file(GLOB_RECURSE SRC_SOURCES
+    "${CMAKE_SOURCE_DIR}/src/**/*.cpp"
 )
 
 foreach(FILE ${TEST_SOURCES} ${SRC_SOURCES})
@@ -39,6 +34,8 @@ target_include_directories(r-type_tests PRIVATE
     ${CMAKE_SOURCE_DIR}/src/Network/
     ${CMAKE_SOURCE_DIR}/src/Utils/Utils/
     ${CMAKE_SOURCE_DIR}/src/Utils/Path/
+    ${CMAKE_SOURCE_DIR}/lib/papaya/include/
+    ${CMAKE_SOURCE_DIR}/lib/rfcArgParser/include/
 )
 
 target_include_directories(r-type_tests PRIVATE 
@@ -46,9 +43,11 @@ target_include_directories(r-type_tests PRIVATE
 )
 
 # ---- LINK LIBRARIES ---- #
-target_link_libraries(r-type_tests PRIVATE 
-    ${CRITERION_LIBRARIES}
+target_link_libraries(r-type_tests PRIVATE
     ${Boost_LIBRARIES}
+    ${CRITERION_LIBRARIES}
+    papaya
+    rfcArgParser
 )
 
 # ---- COMPILE OPTIONS ---- #
@@ -69,5 +68,6 @@ add_custom_target(run_tests
     COMMAND $<TARGET_FILE:r-type_tests>
     DEPENDS r-type_tests
     COMMENT "Manual Criterion test execution"
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     VERBATIM
 )
