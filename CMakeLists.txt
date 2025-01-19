@@ -19,13 +19,6 @@ endforeach()
 #  ---- FIND BOOST ---- #
 find_package(Boost REQUIRED)
 
-#  ---- FIND CRITERION ---- #
-# find_package(PkgConfig REQUIRED)
-# pkg_check_modules(CRITERION REQUIRED criterion)
-
-# Add tests
-# add_subdirectory(tests)
-
 # ---- SOURCES ---- #
 file(GLOB_RECURSE SOURCES
     "src/**/**/**/**/*.cpp"
