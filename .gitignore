@@ -12,5 +12,7 @@ cmake-build-default
 cmake-build-debug
 build
 
+tests/build
+
 a.out
 r-type_server
