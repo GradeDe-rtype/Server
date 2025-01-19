@@ -53,6 +53,26 @@ namespace RType
             cr_assert_eq(colors.getColor(20), "#FF00FF", "Index 20 should loop properly (20 % 8 = 4 -> #FF00FF)");
         }
 
+        /* ---- TIMER TESTS ---- */
+        
+        Test(Timer, TimerInitialization) {
+            Timer timer(1000);
+            cr_assert(timer.timeLeft() <= 1000, "The timer should have at most 1000ms left at initialization.");
+        }
+        
+        Test(Timer, TimerReset) {
+            Timer timer(500);
+            std::this_thread::sleep_for(std::chrono::milliseconds(300));
+            timer.reset();
+            cr_assert(timer.timeLeft() >= 400, "After reset, the timer should have close to 500ms left.");
+        }
+        
+        Test(Timer, TimerHasElapsed) {
+            Timer timer(200);
+            std::this_thread::sleep_for(std::chrono::milliseconds(300));
+            cr_assert(timer.hasElapsed(), "Timer should have elapsed after 300ms.");
+        }
+
         /* ---- ROOM TESTS ---- */
         
         Test(Room, RoomCreation)
