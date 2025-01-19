@@ -31,6 +31,14 @@ file(GLOB_RECURSE SOURCES
 # ---- EXECUTABLE ---- #
 add_executable(r-type_server ${SOURCES})
 
+if(MSVC)
+    # Ajout d'options spécifiques à Visual Studio
+    target_compile_options(r-type_server PRIVATE /W4) # Niveau d'avertissements élevé pour MSVC
+else()
+    # Ajout d'options pour GCC ou Clang
+    target_compile_options(r-type_server PRIVATE)
+endif()
+
 # ---- INCLUDES ---- #
 target_include_directories(r-type_server PRIVATE
     "include/"
